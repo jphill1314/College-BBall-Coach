@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">College Basketball Coach</string>
+
+    <string-array name="drawer_items">
+        <item>Roster</item>
+        <item>Schedule</item>
+        <item>Standings</item>
+        <item>Recruiting</item>
+        <item>Strategy</item>
+        <item>Staff</item>
+        <item>Training</item>
+    </string-array>
+
+    <string name="position">Position</string>
+    <string name="name">Name</string>
+    <string name="rating">Rating</string>
+    <string name="pt">Playing Time</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
