@@ -43,7 +43,7 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
-        holder.tvPos.setText(Integer.toString(players[position].getPosition()));
+        holder.tvPos.setText(players[position].getPositionAbr());
         holder.tvName.setText(players[position].getfName() + " " + players[position].getlName());
         holder.tvRating.setText(Integer.toString(players[position].getOverallRating()));
         holder.tvPT.setText("25");

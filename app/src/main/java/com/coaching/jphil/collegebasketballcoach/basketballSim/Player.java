@@ -37,6 +37,22 @@ public class Player {
         return position;
     }
 
+    public String getPositionAbr(){
+        switch(position){
+            case 1:
+                return "PG";
+            case 2:
+                return "SG";
+            case 3:
+                return "SF";
+            case 4:
+                return "PF";
+            case 5:
+                return "C";
+        }
+        return "Error";
+    }
+
     public void setPosition(int position) {
         this.position = position;
     }
@@ -48,4 +64,5 @@ public class Player {
     public void setOverallRating(int overallRating) {
         this.overallRating = overallRating;
     }
+
 }

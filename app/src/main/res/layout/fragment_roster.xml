@@ -15,24 +15,35 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:paddingEnd="5dp"
             android:text="@string/position"
             android:layout_weight="1"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:paddingEnd="5dp"
             android:text="@string/name"
             android:layout_weight="2"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:paddingEnd="5dp"
             android:text="@string/rating"
             android:layout_weight="1"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:paddingEnd="5dp"
             android:text="@string/pt"
             android:layout_weight="1"/>
 
