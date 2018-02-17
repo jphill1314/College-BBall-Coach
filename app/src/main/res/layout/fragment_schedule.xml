@@ -9,6 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/sim_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sim_game"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/schedule_list"
         android:scrollbars="vertical"

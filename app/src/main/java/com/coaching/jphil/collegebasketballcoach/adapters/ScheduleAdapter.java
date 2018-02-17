@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHolder> {
 
     private ArrayList<Game> games;
+    private Team playerTeam;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView tvDate, tvDesc, tvScore;
@@ -30,8 +32,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
         }
     }
 
-    public ScheduleAdapter(ArrayList<Game> games){
+    public ScheduleAdapter(ArrayList<Game> games, Team playerTeam){
         this.games = games;
+        this.playerTeam = playerTeam;
     }
 
     @Override
@@ -43,8 +46,14 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvDate.setText("Game #" + (position + 1));
-        holder.tvDesc.setText("Text");
-        holder.tvScore.setText("Preview");
+        if(games.get(position).getHomeTeam().getFullName().equals(playerTeam.getFullName())){
+            holder.tvDesc.setText("vs. " + games.get(position).getAwayTeamName());
+        }
+        else{
+            holder.tvDesc.setText("@ " + games.get(position).getHomeTeamName());
+        }
+
+        holder.tvScore.setText(games.get(position).getFormattedScore());
     }
 
     @Override

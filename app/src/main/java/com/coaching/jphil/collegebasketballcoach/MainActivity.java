@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         teams = new Team[names.length];
 
         for(int i = 0; i < teams.length; i++){
-            teams[i] = new Team(names[i], mascots[i], getPlayers());
+            teams[i] = new Team(names[i], mascots[i], getPlayers(10));
         }
 
         for(int x = 0; x < teams.length; x++){
@@ -99,14 +99,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Player[] getPlayers(){
-        Player[] players = new Player[15];
+    private Player[] getPlayers(int numPlayers){
+        Player[] players = new Player[numPlayers];
         String[] lastNames = getResources().getStringArray(R.array.last_names);
         String[] firstNames = getResources().getStringArray(R.array.first_names);
         Random r = new Random();
 
-        for(int i = 0; i < 15; i++){
-            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, i*6);
+        for(int i = 0; i < numPlayers; i++){
+            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, 70);
         }
         return players;
     }

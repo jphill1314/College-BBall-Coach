@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
@@ -42,16 +43,28 @@ public class ScheduleFragment extends Fragment {
         TextView tvSeason = (TextView) view.findViewById(R.id.schedule_season);
         tvSeason.setText("2017-18 Season");
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+        final MainActivity mainActivity = (MainActivity) getActivity();
         Log.v("tag", "size: " + mainActivity.teams[2].getGames().size());
 
         recyclerView = (RecyclerView) view.findViewById(R.id.schedule_list);
         recyclerView.setHasFixedSize(true);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(mainActivity.teams[2].getGames());
+        adapter = new ScheduleAdapter(mainActivity.teams[2].getGames(), mainActivity.teams[2]);
         recyclerView.setAdapter(adapter);
 
+        Button simGame = (Button) view.findViewById(R.id.sim_game);
+        simGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Game game = mainActivity.teams[2].getNextGame();
+                game.simulateGame();
+                game.getHomeTeam().playGame();
+                game.getAwayTeam().playGame();
+
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         return view;
     }
