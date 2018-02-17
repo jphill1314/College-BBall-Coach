@@ -46,11 +46,24 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvDate.setText("Game #" + (position + 1));
-        if(games.get(position).getHomeTeam().getFullName().equals(playerTeam.getFullName())){
+        if(games.get(position).getHomeTeam().equals(playerTeam)){
             holder.tvDesc.setText("vs. " + games.get(position).getAwayTeamName());
+            if(games.get(position).isPlayed() && games.get(position).homeTeamWin()){
+                holder.tvScore.setBackgroundResource(R.color.winner);
+            }
+            else if(games.get(position).isPlayed()){
+                holder.tvScore.setBackgroundResource(R.color.loser);
+            }
+
         }
         else{
             holder.tvDesc.setText("@ " + games.get(position).getHomeTeamName());
+            if(games.get(position).isPlayed() && !games.get(position).homeTeamWin()){
+                holder.tvScore.setBackgroundResource(R.color.winner);
+            }
+            else if(games.get(position).isPlayed()){
+                holder.tvScore.setBackgroundResource(R.color.loser);
+            }
         }
 
         holder.tvScore.setText(games.get(position).getFormattedScore());

@@ -14,9 +14,11 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.ScheduleFragment;
+import com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView mDrawerList;
 
     public Team[] teams;
+    public ArrayList<Game> masterSchedule;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 t.replace(R.id.content_frame, new ScheduleFragment());
                 break;
             case 2:
+                t.replace(R.id.content_frame, new StandingsFragment());
                 break;
             case 3:
                 break;
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         String[] names = {"UNC", "Duke", "Wofford", "Furman", "Citadel", "Mercer"};
         String[] mascots = {"Tar Heels", "Blue Devils", "Terriers", "Paladins", "Bulldogs", "Bears"};
         teams = new Team[names.length];
+        masterSchedule = new ArrayList<Game>();
 
         for(int i = 0; i < teams.length; i++){
             teams[i] = new Team(names[i], mascots[i], getPlayers(10));
@@ -93,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
         for(int x = 0; x < teams.length; x++){
             for(int y = 0; y < teams.length; y++){
                 if(x != y) {
-                    Game game = new Game(teams[x], teams[y]);
-                    teams[x].addGame(game);
-                    teams[y].addGame(game);
+                    masterSchedule.add(new Game(teams[x], teams[y]));
                 }
             }
         }
+
+        Collections.shuffle(masterSchedule);
     }
 
     private Player[] getPlayers(int numPlayers){

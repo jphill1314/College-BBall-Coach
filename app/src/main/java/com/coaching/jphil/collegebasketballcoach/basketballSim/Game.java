@@ -15,13 +15,13 @@ public class Game {
 
     private Team homeTeam, awayTeam;
     private int homeScore, awayScore;
+    private boolean isPlayed;
 
     public Game(Team homeTeam, Team awayTeam){
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
 
-        homeScore = -1;
-        awayScore = -1;
+        isPlayed = false;
     }
 
     public String getHomeTeamName(){
@@ -30,6 +30,10 @@ public class Game {
 
     public String getAwayTeamName(){
         return awayTeam.getFullName();
+    }
+
+    public boolean isPlayed(){
+        return isPlayed;
     }
 
     public Team getHomeTeam(){
@@ -48,8 +52,17 @@ public class Game {
         return awayScore;
     }
 
+    public boolean homeTeamWin(){
+        if(isPlayed && (homeScore > awayScore)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     public String getFormattedScore(){
-        if(homeScore != -1 && awayScore != -1) {
+        if(isPlayed) {
             return homeScore + " - " + awayScore;
         }
         else{
@@ -64,7 +77,7 @@ public class Game {
 
         int pace = (int)((homeTeam.getPace() + awayTeam.getPace()) / 2.0);
         Random r = new Random();
-        if(homeScore == -1 && awayScore == -1){
+        if(!isPlayed){
             int homeMargin = (int)((pace / 100.0) * (homeTeam.getTotalEfficiency() - awayTeam.getTotalEfficiency()));
 
             homeMargin += 2 * r.nextInt(scoreVariability) - scoreVariability;
@@ -73,5 +86,7 @@ public class Game {
             homeScore = (int) ((pace / 100.0) * homeTeam.getOffensiveEfficiency());
             awayScore = homeScore - homeMargin;
         }
+
+        isPlayed = true;
     }
 }

@@ -16,6 +16,11 @@
     <string name="rating">Rating</string>
     <string name="pt">Minutes</string>
 
+    <string name="standing">Conference Standings</string>
+    <string name="school_name">School</string>
+    <string name="wins">Wins</string>
+    <string name="loses">Loses</string>
+
     <string name="sim_game">Sim Next Game!</string>
 
     <string name="offense">Offense</string>
@@ -2258,4 +2263,7 @@
         <item>Noel</item>
         <item>Vang</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

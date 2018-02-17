@@ -14,8 +14,9 @@ public class Team {
     private double minDefensiveEfficiency = 70.0;
 
     private Player[] players;
-    private ArrayList<Game> games;
     private int gamesPlayed;
+
+    private int wins, loses;
 
     private String schoolName, mascot;
 
@@ -30,7 +31,8 @@ public class Team {
         this.mascot = mascot;
         this.players = players;
         gamesPlayed = 0;
-        games = new ArrayList<Game>();
+        wins = 0;
+        loses = 0;
     }
 
     public String getFullName(){
@@ -41,24 +43,26 @@ public class Team {
         return players;
     }
 
-    public ArrayList<Game> getGames(){
-        return games;
+    public int getGamesPlayed(){
+        return gamesPlayed;
     }
 
-    public void addGame(Game game){
-        games.add(game);
-    }
-
-    public Game getNextGame(){
-        if(games.get(gamesPlayed) != null){
-            return  games.get(gamesPlayed);
-        }
-        return null;
-
-    }
-
-    public void playGame(){
+    public void playGame(boolean wonGame){
         gamesPlayed++;
+        if(wonGame){
+            wins++;
+        }
+        else{
+            loses++;
+        }
+    }
+
+    public int getWins(){
+        return wins;
+    }
+
+    public int getLoses(){
+        return loses;
     }
 
     public void setOffenseFavorsThrees(int value){

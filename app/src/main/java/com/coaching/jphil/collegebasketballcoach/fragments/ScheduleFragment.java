@@ -17,7 +17,9 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -34,6 +36,7 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager manager;
+    private MainActivity mainActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,24 +46,20 @@ public class ScheduleFragment extends Fragment {
         TextView tvSeason = view.findViewById(R.id.schedule_season);
         tvSeason.setText("2017-18 Season");
 
-        final MainActivity mainActivity = (MainActivity) getActivity();
-        Log.v("tag", "size: " + mainActivity.teams[2].getGames().size());
+        mainActivity = (MainActivity) getActivity();
 
         recyclerView = view.findViewById(R.id.schedule_list);
         recyclerView.setHasFixedSize(true);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(mainActivity.teams[2].getGames(), mainActivity.teams[2]);
+        adapter = new ScheduleAdapter(getTeamSchedule(mainActivity.teams[2]), mainActivity.teams[2]);
         recyclerView.setAdapter(adapter);
 
         Button simGame = (Button) view.findViewById(R.id.sim_game);
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Game game = mainActivity.teams[2].getNextGame();
-                game.simulateGame();
-                game.getHomeTeam().playGame();
-                game.getAwayTeam().playGame();
+                simulateGames(mainActivity.teams[2]);
 
                 adapter.notifyDataSetChanged();
             }
@@ -69,4 +68,35 @@ public class ScheduleFragment extends Fragment {
         return view;
     }
 
+    private void simulateGames(Team team){
+        for(Game game: mainActivity.masterSchedule) {
+            if(!game.isPlayed()) {
+                if(game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
+                    game.simulateGame();
+                    game.getHomeTeam().playGame(game.homeTeamWin());
+                    game.getAwayTeam().playGame(!game.homeTeamWin());
+                    return;
+                }
+                else{
+                    game.simulateGame();
+                    game.getHomeTeam().playGame(game.homeTeamWin());
+                    game.getAwayTeam().playGame(!game.homeTeamWin());
+                }
+            }
+        }
+
+    }
+
+    private ArrayList<Game> getTeamSchedule(Team team){
+        ArrayList<Game> teamSchedule = new ArrayList<Game>();
+
+
+        for(Game game : mainActivity.masterSchedule){
+            if(game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())){
+                teamSchedule.add(game);
+            }
+        }
+
+        return teamSchedule;
+    }
 }
