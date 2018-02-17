@@ -14,6 +14,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.ScheduleFragment;
+import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             case 3:
                 break;
             case 4:
+                t.replace(R.id.content_frame, new StrategyFragment());
                 break;
             case 5:
                 break;

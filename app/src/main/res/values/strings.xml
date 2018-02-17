@@ -18,8 +18,21 @@
 
     <string name="sim_game">Sim Next Game!</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="offense">Offense</string>
+    <string name="defense">Defense</string>
+    <string name="favor_three">Favors threes</string>
+    <string name="pace">Pace</string>
+    <string name="tend_to_help">Tendency for help</string>
+
+
+    <string name="slower">Slower</string>
+    <string name="faster">Faster</string>
+
+    <string name="more_three">More threes</string>
+    <string name="few_three">Fewer threes</string>
+
+    <string name="more_help">More help</string>
+    <string name="less_help">Less help</string>
 
     <string-array name="first_names">
         <item>James</item>

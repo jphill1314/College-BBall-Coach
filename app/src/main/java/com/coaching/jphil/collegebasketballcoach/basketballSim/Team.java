@@ -61,6 +61,34 @@ public class Team {
         gamesPlayed++;
     }
 
+    public void setOffenseFavorsThrees(int value){
+        offenseFavorsThrees = value;
+    }
+
+    public void setDefenseFavorsThrees(int value){
+        defenseFavorsThrees = value;
+    }
+
+    public void setDefenseTendToHelp(int value){
+        defenseTendToHelp = value;
+    }
+
+    public void setPace(int value){
+        pace = value;
+    }
+
+    public int getOffenseFavorsThrees() {
+        return offenseFavorsThrees;
+    }
+
+    public int getDefenseFavorsThrees() {
+        return defenseFavorsThrees;
+    }
+
+    public int getDefenseTendToHelp() {
+        return defenseTendToHelp;
+    }
+
     public int getPace(){
         return pace;
     }

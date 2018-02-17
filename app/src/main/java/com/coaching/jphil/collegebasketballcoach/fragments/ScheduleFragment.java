@@ -40,13 +40,13 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-        TextView tvSeason = (TextView) view.findViewById(R.id.schedule_season);
+        TextView tvSeason = view.findViewById(R.id.schedule_season);
         tvSeason.setText("2017-18 Season");
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         Log.v("tag", "size: " + mainActivity.teams[2].getGames().size());
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.schedule_list);
+        recyclerView = view.findViewById(R.id.schedule_list);
         recyclerView.setHasFixedSize(true);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);

@@ -58,6 +58,10 @@ public class Game {
     }
 
     public void simulateGame(){
+        // The big issue with the current sim is that it doesn't take into account how teams
+        // would play against each other. For example if one team wants to let the other team
+        // shoot a bunch of threes, that should give that team a boost to their 3-point shooting
+
         int pace = (int)((homeTeam.getPace() + awayTeam.getPace()) / 2.0);
         Random r = new Random();
         if(homeScore == -1 && awayScore == -1){
