@@ -54,6 +54,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
             else if(games.get(position).isPlayed()){
                 holder.tvScore.setBackgroundResource(R.color.loser);
             }
+            else{
+                holder.tvScore.setBackgroundResource(R.color.defaultTV);
+            }
 
         }
         else{
@@ -63,6 +66,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
             }
             else if(games.get(position).isPlayed()){
                 holder.tvScore.setBackgroundResource(R.color.loser);
+            }
+            else{
+                holder.tvScore.setBackgroundResource(R.color.defaultTV);
             }
         }
 

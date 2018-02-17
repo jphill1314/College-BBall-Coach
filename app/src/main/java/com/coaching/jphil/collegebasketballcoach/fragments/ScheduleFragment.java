@@ -52,14 +52,15 @@ public class ScheduleFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(getTeamSchedule(mainActivity.teams[2]), mainActivity.teams[2]);
+        adapter = new ScheduleAdapter(getTeamSchedule(mainActivity.teams[mainActivity.playerTeamIndex])
+                , mainActivity.teams[mainActivity.playerTeamIndex]);
         recyclerView.setAdapter(adapter);
 
-        Button simGame = (Button) view.findViewById(R.id.sim_game);
+        Button simGame = view.findViewById(R.id.sim_game);
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                simulateGames(mainActivity.teams[2]);
+                simulateGames(mainActivity.teams[mainActivity.playerTeamIndex]);
 
                 adapter.notifyDataSetChanged();
             }

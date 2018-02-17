@@ -56,6 +56,10 @@ public class Player {
         return fName;
     }
 
+    public String getFullName(){
+        return fName + " " + lName;
+    }
+
     public int getPosition() {
         return position;
     }
@@ -156,5 +160,57 @@ public class Player {
         efficiency = efficiency / 5.0;
 
         return efficiency;
+    }
+
+    public int getCloseRangeShot() {
+        return closeRangeShot;
+    }
+
+    public int getMidRangeShot() {
+        return midRangeShot;
+    }
+
+    public int getLongRangeShot() {
+        return longRangeShot;
+    }
+
+    public int getBallHandling() {
+        return ballHandling;
+    }
+
+    public int getPassing() {
+        return passing;
+    }
+
+    public int getScreening() {
+        return screening;
+    }
+
+    public int getPostDefense() {
+        return postDefense;
+    }
+
+    public int getPerimeterDefense() {
+        return perimeterDefense;
+    }
+
+    public int getOnBallDefense() {
+        return onBallDefense;
+    }
+
+    public int getOffBallDefense() {
+        return offBallDefense;
+    }
+
+    public int getStealing() {
+        return stealing;
+    }
+
+    public int getRebounding() {
+        return rebounding;
+    }
+
+    public int getStamina() {
+        return stamina;
     }
 }

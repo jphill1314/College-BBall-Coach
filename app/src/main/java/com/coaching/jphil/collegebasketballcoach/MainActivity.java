@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView mDrawerList;
 
     public Team[] teams;
+    public int playerTeamIndex = 2;
     public ArrayList<Game> masterSchedule;
 
     @Override
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateFragment(int position){
         android.support.v4.app.FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-        Bundle bundle = new Bundle();
 
         switch(position){
             case 0:
@@ -86,34 +86,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void generateTeams(){
-        String[] names = {"UNC", "Duke", "Wofford", "Furman", "Citadel", "Mercer"};
-        String[] mascots = {"Tar Heels", "Blue Devils", "Terriers", "Paladins", "Bulldogs", "Bears"};
+        String[] names = {"ETSU", "UNCG", "Wofford", "Furman", "Mercer", "Western Carolina", "Samford", "The Citadel", "Chattanooga", "VMI"};
+        String[] mascots = {"Bucs", "Paladins", "Terriers", "Paladins", "Bears", "Catamounts", "Bulldogs", "Bulldogs", "Mocs", "Keydets"};
         teams = new Team[names.length];
         masterSchedule = new ArrayList<Game>();
+        Random r = new Random();
 
         for(int i = 0; i < teams.length; i++){
-            teams[i] = new Team(names[i], mascots[i], getPlayers(10));
+            teams[i] = new Team(names[i], mascots[i], getPlayers(10, r.nextInt(15) + 50));
         }
 
-        for(int x = 0; x < teams.length; x++){
-            for(int y = 0; y < teams.length; y++){
-                if(x != y) {
+        for (int x = 0; x < teams.length; x++) {
+            for (int y = 0; y < teams.length; y++) {
+                if (x != y) {
                     masterSchedule.add(new Game(teams[x], teams[y]));
                 }
             }
         }
 
+
         Collections.shuffle(masterSchedule);
     }
 
-    private Player[] getPlayers(int numPlayers){
+    private Player[] getPlayers(int numPlayers, int teamRating){
         Player[] players = new Player[numPlayers];
         String[] lastNames = getResources().getStringArray(R.array.last_names);
         String[] firstNames = getResources().getStringArray(R.array.first_names);
         Random r = new Random();
 
-        for(int i = 0; i < numPlayers; i++){
-            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, 70);
+        for(int i = 0; i < 5; i++){
+            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, teamRating);
+        }
+        for(int i = 5; i < numPlayers; i++){
+            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, teamRating - r.nextInt(10));
         }
         return players;
     }

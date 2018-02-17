@@ -1,0 +1,157 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.PlayerInfoFragment">
+
+    <TextView
+        android:id="@+id/player_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+   <SeekBar
+        android:id="@+id/minutes_seek"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/minutes_text"
+        android:max="40"/>
+
+    <TextView
+        android:id="@+id/minutes_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pt"
+        android:layout_alignParentBottom="true" />
+
+    <ScrollView
+        android:id="@+id/attributes_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/player_name"
+        android:layout_above="@id/minutes_seek">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:text="@string/off_attributes"/>
+
+            <TextView
+                android:id="@+id/close_shot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/mid_shot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/long_shot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/ball_handle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/passing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:paddingTop="24dp"
+                android:text="@string/def_attributes"/>
+
+            <TextView
+                android:id="@+id/post_def"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/perim_def"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/on_ball"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/off_ball"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/stealing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/rebound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:paddingTop="24dp"
+                android:text="@string/phys_attributes"/>
+
+            <TextView
+                android:id="@+id/stamina"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

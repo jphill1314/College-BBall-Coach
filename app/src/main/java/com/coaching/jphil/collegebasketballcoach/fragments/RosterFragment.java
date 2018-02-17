@@ -38,7 +38,7 @@ public class RosterFragment extends Fragment {
         recyclerView = view.findViewById(R.id.roster_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new RosterAdapter(mainActivity.teams[2].getPlayers());
+        adapter = new RosterAdapter(mainActivity.teams[mainActivity.playerTeamIndex].getPlayers(), mainActivity);
         recyclerView.setAdapter(adapter);
 
         return view;

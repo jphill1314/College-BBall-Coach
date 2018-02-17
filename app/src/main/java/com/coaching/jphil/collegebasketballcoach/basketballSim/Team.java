@@ -16,7 +16,7 @@ public class Team {
     private Player[] players;
     private int gamesPlayed;
 
-    private int wins, loses;
+    private int wins, loses, overallRating;
 
     private String schoolName, mascot;
 
@@ -33,6 +33,8 @@ public class Team {
         gamesPlayed = 0;
         wins = 0;
         loses = 0;
+
+        setOverallRating();
     }
 
     public String getFullName(){
@@ -65,6 +67,10 @@ public class Team {
         return loses;
     }
 
+    public int getOverallRating(){
+        return overallRating;
+    }
+
     public void setOffenseFavorsThrees(int value){
         offenseFavorsThrees = value;
     }
@@ -95,6 +101,15 @@ public class Team {
 
     public int getPace(){
         return pace;
+    }
+
+    private void setOverallRating(){
+        overallRating = 0;
+        for(Player p : players){
+            overallRating += p.getOverallRating();
+        }
+
+        overallRating = overallRating / players.length;
     }
 
     public double getTotalEfficiency(){

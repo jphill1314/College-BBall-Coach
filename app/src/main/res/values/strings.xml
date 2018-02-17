@@ -21,6 +21,27 @@
     <string name="wins">Wins</string>
     <string name="loses">Loses</string>
 
+    <string name="off_attributes">Offensive Attributes</string>
+    <string name="close_shot">Close Range Shot: %d</string>
+    <string name="mid_shot">Mid Range Shot: %d</string>
+    <string name="long_shot">Long Range Shot: %d</string>
+    <string name="ball_handle">Ball Handling: %d</string>
+    <string name="passing">Passing: %d</string>
+    <string name="screening">Screening: %d</string>
+
+    <string name="def_attributes">Defensive Attributes</string>
+    <string name="post_def">Post Defense: %d</string>
+    <string name="perim_def">Perimeter Defense: %d</string>
+    <string name="on_ball">On Ball Defense: %d</string>
+    <string name="off_ball">Off Ball Defense: %d</string>
+    <string name="steal">Stealing: %d</string>
+    <string name="rebound">Rebounding: %d</string>
+
+    <string name="phys_attributes">Physical Attributes</string>
+    <string name="stamina">Stamina: %d</string>
+
+    <string name="player_name_pos">%s   %s</string>
+
     <string name="sim_game">Sim Next Game!</string>
 
     <string name="offense">Offense</string>

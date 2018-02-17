@@ -49,7 +49,7 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvPos.setText(Integer.toString(position + 1));
-        holder.tvName.setText(standing.get(position).getFullName());
+        holder.tvName.setText(standing.get(position).getFullName() + " (" + standing.get(position).getOverallRating() + ")");
         holder.tvWins.setText(Integer.toString(standing.get(position).getWins()));
         holder.tvLoses.setText(Integer.toString(standing.get(position).getLoses()));
     }
