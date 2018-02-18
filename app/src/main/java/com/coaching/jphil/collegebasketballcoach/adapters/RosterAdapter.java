@@ -21,16 +21,16 @@ import com.coaching.jphil.collegebasketballcoach.fragments.PlayerInfoFragment;
 public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder> {
 
     private Player[] players;
-    private static MainActivity activity;
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView tvPos, tvName, tvRating, tvPT;
-        public ViewHolder(View view){
+        public ViewHolder(View view, final MainActivity activity){
             super(view);
-            tvPos = (TextView) view.findViewById(R.id.roster_position);
-            tvName = (TextView) view.findViewById(R.id.roster_name);
-            tvRating = (TextView) view.findViewById(R.id.roster_rating);
-            tvPT = (TextView) view.findViewById(R.id.roster_pt);
+            tvPos = view.findViewById(R.id.roster_position);
+            tvName = view.findViewById(R.id.roster_name);
+            tvRating =  view.findViewById(R.id.roster_rating);
+            tvPT = view.findViewById(R.id.roster_pt);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -49,16 +49,15 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
         }
     }
 
-    public RosterAdapter(Player[] players, MainActivity activity){
+    public RosterAdapter(Player[] players){
         this.players = players;
-        this.activity = activity;
     }
 
     @Override
     public RosterAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.roster_list_item, parent, false);
 
-        ViewHolder vh = new ViewHolder(view);
+        ViewHolder vh = new ViewHolder(view, (MainActivity)parent.getContext());
         return vh;
     }
 

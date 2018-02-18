@@ -14,6 +14,7 @@ public class Team {
     private double minDefensiveEfficiency = 70.0;
 
     private Player[] players;
+    private Coach[] coaches;
     private int gamesPlayed;
 
     private int wins, loses, overallRating;
@@ -26,10 +27,12 @@ public class Team {
     private int defenseTendToHelp = 50;
     private int pace = 70;
 
-    public Team(String schoolName, String mascot, Player[] players){
+    public Team(String schoolName, String mascot, Player[] players, Coach[] coaches){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.players = players;
+        this.coaches = coaches;
+
         gamesPlayed = 0;
         wins = 0;
         loses = 0;
@@ -72,6 +75,20 @@ public class Team {
         setOverallRating();
     }
 
+    public void addCoach(Coach coach){
+        if(coaches != null){
+            Coach[] temp = new Coach[coaches.length + 1];
+            for(int i = 0; i < coaches.length; i++){
+                temp[i] = coaches[i];
+            }
+            temp[coaches.length] = coach;
+            coaches = temp;
+        }
+        else{
+            coaches = new Coach[]{coach};
+        }
+    }
+
     public String getFullName(){
         return schoolName + " " + mascot;
     }
@@ -86,6 +103,10 @@ public class Team {
 
     public Player[] getPlayers(){
         return players;
+    }
+
+    public Coach[] getCoaches(){
+        return coaches;
     }
 
     public int getGamesPlayed(){

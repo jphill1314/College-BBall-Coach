@@ -1,5 +1,6 @@
 package com.coaching.jphil.collegebasketballcoach;
 
+import android.app.FragmentManager;
 import android.arch.persistence.room.Room;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
@@ -13,14 +14,17 @@ import android.widget.ListView;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDAO;
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
+import com.coaching.jphil.collegebasketballcoach.Database.CoachDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
 import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 import com.coaching.jphil.collegebasketballcoach.Database.TeamDB;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.ScheduleFragment;
+import com.coaching.jphil.collegebasketballcoach.fragments.StaffFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 
@@ -76,7 +80,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateFragment(int position){
-        android.support.v4.app.FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+        for(int i = 0; i < fm.getBackStackEntryCount(); i++){
+            fm.popBackStack();
+        }
+
+        android.support.v4.app.FragmentTransaction t = fm.beginTransaction();
 
         switch(position){
             case 0:
@@ -94,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 t.replace(R.id.content_frame, new StrategyFragment());
                 break;
             case 5:
+                t.replace(R.id.content_frame, new StaffFragment());
                 break;
             case 6:
                 break;
@@ -109,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
         Random r = new Random();
 
         for(int i = 0; i < teams.length; i++){
-            teams[i] = new Team(names[i], mascots[i], getPlayers(10, r.nextInt(15) + 50));
+            int rating = r.nextInt(15) + 50;
+            teams[i] = new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating));
         }
 
         for (int x = 0; x < teams.length; x++) {
@@ -143,6 +154,19 @@ public class MainActivity extends AppCompatActivity {
         return players;
     }
 
+    private Coach[] getCoaches(int numCoaches, int teamRating){
+        Coach[] coaches = new Coach[numCoaches];
+        String[] lastNames = getResources().getStringArray(R.array.last_names);
+        String[] firstNames = getResources().getStringArray(R.array.first_names);
+        Random r = new Random();
+
+        coaches[0] = new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 1, teamRating + 5);
+        for(int i = 1; i < numCoaches; i++){
+            coaches[i] = new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 2, teamRating - 5);
+        }
+        return coaches;
+    }
+
     private class SaveDataAsync extends AsyncTask<String, String, String>{
 
         @Override
@@ -155,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
             if(db != null){
                 TeamDB[] teamsDB = new TeamDB[teams.length];
                 int numPlayers = 0;
+                int numCoaches = 0;
 
                 for(int i = 0; i < teams.length; i++){
                     teamsDB[i] = new TeamDB();
@@ -171,13 +196,9 @@ public class MainActivity extends AppCompatActivity {
                     teamsDB[i].pace = teams[i].getPace();
 
                     numPlayers += teams[i].getPlayers().length;
+                    numCoaches += teams[i].getCoaches().length;
                 }
                 db.appDAO().insertTeams(teamsDB);
-
-                Map<String, String> teamIDMap = new HashMap<String, String>();
-                for(int a = 0; a < teams.length; a++){
-                    teamIDMap.put(teams[a].getFullName(), Integer.toString(a));
-                }
 
                 PlayerDB[] players = new PlayerDB[numPlayers];
                 int pIndex = 0;
@@ -185,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                     for(Player player: teams[i].getPlayers()){
                         players[pIndex] = new PlayerDB();
                         players[pIndex].playerId = pIndex;
-                        players[pIndex].teamID = Integer.parseInt(teamIDMap.get(teams[i].getFullName()));
+                        players[pIndex].teamID = i;
                         players[pIndex].lastName = player.getlName();
                         players[pIndex].firstName = player.getfName();
                         players[pIndex].pos = player.getPosition();
@@ -212,6 +233,44 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 db.appDAO().insertPlayers(players);
+
+                CoachDB[] coaches = new CoachDB[numCoaches];
+                int cIndex = 0;
+
+                for(int i = 0; i < teams.length; i++){
+                    for(Coach coach: teams[i].getCoaches()){
+                        coaches[cIndex] = new CoachDB();
+                        coaches[cIndex].coachID = cIndex;
+                        coaches[cIndex].teamID = i;
+
+                        coaches[cIndex].firstName = coach.getFirstName();
+                        coaches[cIndex].lastName = coach.getLastName();
+                        coaches[cIndex].pos = coach.getPosition();
+
+                        coaches[cIndex].shotTeaching = coach.getShotTeaching();
+                        coaches[cIndex].ballControlTeaching = coach.getBallControlTeaching();
+                        coaches[cIndex].screenTeaching = coach.getScreenTeaching();
+
+                        coaches[cIndex].defPositionTeaching = coach.getDefPositionTeaching();
+                        coaches[cIndex].defOnBallTeaching = coach.getDefOnBallTeaching();
+                        coaches[cIndex].defOffBallTeaching = coach.getDefOffBallTeaching();
+                        coaches[cIndex].reboundTeaching = coach.getReboundTeaching();
+                        coaches[cIndex].stealTeaching = coach.getStealTeaching();
+
+                        coaches[cIndex].conditioningTeaching = coach.getConditioningTeaching();
+
+                        coaches[cIndex].workingWithGuards = coach.getWorkingWithGuards();
+                        coaches[cIndex].workingWithBigs = coach.getWorkingWithBigs();
+                        cIndex++;
+                    }
+                }
+
+                db.appDAO().insertCoaches(coaches);
+
+                Map<String, String> teamIDMap = new HashMap<String, String>();
+                for(int i = 0; i < teams.length; i++){
+                    teamIDMap.put(teams[i].getFullName(), Integer.toString(i));
+                }
 
                 GameDB[] games = new GameDB[masterSchedule.size()];
                 for(int z = 0; z < masterSchedule.size(); z++){
@@ -258,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
                 TeamDB[] teamsDB = db.appDAO().loadAllTeams();
                 PlayerDB[] players = db.appDAO().loadAllPlayers();
                 GameDB[] games = db.appDAO().loadAllGames();
+                CoachDB[] coaches = db.appDAO().loadAllCoaches();
 
                 teams = new Team[teamsDB.length];
                 for(int i = 0; i < teamsDB.length; i++){
@@ -272,6 +332,13 @@ public class MainActivity extends AppCompatActivity {
                             player.longRangeShot, player.ballHandling, player.screening, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
                             player.stealing, player.rebounding, player.stamina));
+                }
+
+                for(CoachDB coach: coaches){
+                    teams[coach.teamID].addCoach(new Coach(coach.firstName, coach.lastName, coach.pos,
+                            coach.shotTeaching, coach.ballControlTeaching, coach.screenTeaching, coach.defPositionTeaching,
+                            coach.defOnBallTeaching, coach.defOffBallTeaching, coach.reboundTeaching, coach.stealTeaching,
+                            coach.conditioningTeaching, coach.workingWithGuards, coach.workingWithBigs));
                 }
 
                 masterSchedule = new ArrayList<Game>();
@@ -289,6 +356,7 @@ public class MainActivity extends AppCompatActivity {
             if(db != null){
                 db.appDAO().deleteGameDB();
                 db.appDAO().deletePlayerDB();
+                db.appDAO().deleteCoachDB();
                 db.appDAO().deleteTeamDB();
             }
             return null;

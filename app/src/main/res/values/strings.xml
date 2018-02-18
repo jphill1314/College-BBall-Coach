@@ -70,6 +70,23 @@
     <string name="more_help">More help</string>
     <string name="less_help">Less help</string>
 
+    <!-- Coach Info Fragment-->
+    <string name="coach_attributes">Coaching Attributes</string>
+    <string name="shot_teach">Shooting: %d</string>
+    <string name="control_teach">Ball Control: %d</string>
+    <string name="screen_teach">Screening: %d</string>
+
+    <string name="positioning">Defensive Positioning: %d</string>
+    <string name="on_ball_teach">On Ball Defense: %d</string>
+    <string name="off_ball_teach">Off Ball Defense: %d</string>
+    <string name="rebound_teach">Rebounding: %d</string>
+    <string name="steal_teach">Stealing: %d</string>
+
+    <string name="condition_teaching">Conditioning: %d</string>
+
+    <string name="work_guards">Working with Guards: %d</string>
+    <string name="work_bigs">Workign with Bigs: %d</string>
+
     <string-array name="first_names">
         <item>James</item>
         <item>John</item>
