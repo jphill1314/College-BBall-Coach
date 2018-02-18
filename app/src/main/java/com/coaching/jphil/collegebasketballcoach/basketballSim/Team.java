@@ -37,8 +37,51 @@ public class Team {
         setOverallRating();
     }
 
+    public Team(String schoolName, String mascot, int wins, int loses, int offenseFavorsThrees,
+                int defenseFavorsThrees, int defenseTendToHelp, int pace){
+        this.schoolName = schoolName;
+        this.mascot = mascot;
+
+        this.wins = wins;
+        this.loses = loses;
+        gamesPlayed = this.wins + this.loses;
+
+        this.offenseFavorsThrees = offenseFavorsThrees;
+        this.defenseFavorsThrees = defenseFavorsThrees;
+        this.defenseTendToHelp = defenseTendToHelp;
+        this.pace = pace;
+    }
+
+    public void addPlayers(Player[] players){
+        this.players = players;
+        setOverallRating();
+    }
+
+    public void addPlayer(Player player){
+        if(players != null){
+            Player[] temp = new Player[players.length + 1];
+            for(int i = 0; i < players.length; i++){
+                temp[i] = players[i];
+            }
+            temp[players.length] = player;
+            players = temp;
+        }
+        else{
+            players = new Player[]{player};
+        }
+        setOverallRating();
+    }
+
     public String getFullName(){
         return schoolName + " " + mascot;
+    }
+
+    public String getSchoolName(){
+        return schoolName;
+    }
+
+    public String getMascot(){
+        return mascot;
     }
 
     public Player[] getPlayers(){
@@ -101,6 +144,15 @@ public class Team {
 
     public int getPace(){
         return pace;
+    }
+
+    public int getTotalMinutes(){
+        int minutes = 0;
+        for(Player player: players){
+            minutes += player.getMinutes();
+        }
+
+        return minutes;
     }
 
     private void setOverallRating(){

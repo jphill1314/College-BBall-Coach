@@ -24,6 +24,16 @@ public class Game {
         isPlayed = false;
     }
 
+    public Game(Team homeTeam, Team awayTeam, int homeScore, int awayScore, boolean isPlayed){
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
+
+        this.isPlayed = isPlayed;
+    }
+
     public String getHomeTeamName(){
         return homeTeam.getFullName();
     }
@@ -70,23 +80,28 @@ public class Game {
         }
     }
 
-    public void simulateGame(){
+    public boolean simulateGame(){
         // The big issue with the current sim is that it doesn't take into account how teams
         // would play against each other. For example if one team wants to let the other team
         // shoot a bunch of threes, that should give that team a boost to their 3-point shooting
+        if(homeTeam.getTotalMinutes() == 200 && awayTeam.getTotalMinutes() == 200) {
+            int pace = (int) ((homeTeam.getPace() + awayTeam.getPace()) / 2.0);
+            Random r = new Random();
+            if (!isPlayed) {
+                int homeMargin = (int) ((pace / 100.0) * (homeTeam.getTotalEfficiency() - awayTeam.getTotalEfficiency()));
 
-        int pace = (int)((homeTeam.getPace() + awayTeam.getPace()) / 2.0);
-        Random r = new Random();
-        if(!isPlayed){
-            int homeMargin = (int)((pace / 100.0) * (homeTeam.getTotalEfficiency() - awayTeam.getTotalEfficiency()));
+                homeMargin += 2 * r.nextInt(scoreVariability) - scoreVariability;
+                homeMargin += homeCourtAdvantage;
 
-            homeMargin += 2 * r.nextInt(scoreVariability) - scoreVariability;
-            homeMargin += homeCourtAdvantage;
+                homeScore = (int) ((pace / 100.0) * homeTeam.getOffensiveEfficiency());
+                awayScore = homeScore - homeMargin;
+            }
 
-            homeScore = (int) ((pace / 100.0) * homeTeam.getOffensiveEfficiency());
-            awayScore = homeScore - homeMargin;
+            isPlayed = true;
+            return true;
         }
-
-        isPlayed = true;
+        else{
+            return false;
+        }
     }
 }

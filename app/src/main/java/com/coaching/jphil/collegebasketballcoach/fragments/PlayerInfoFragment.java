@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
@@ -27,7 +28,7 @@ public class PlayerInfoFragment extends Fragment {
     private TextView closeShot, midShot, longShot, ballHandle, pass, screen;
     private TextView postDef, perimDef, onBall, offBall, steal, rebound;
     private TextView stamina;
-    private TextView playerName;
+    private TextView playerName, playerMinutes, teamMinutes;
     private MainActivity mainActivity;
 
     @Override
@@ -59,8 +60,33 @@ public class PlayerInfoFragment extends Fragment {
         stamina = view.findViewById(R.id.stamina);
 
         playerName = view.findViewById(R.id.player_name);
+        playerMinutes = view.findViewById(R.id.minutes_text);
+        teamMinutes = view.findViewById(R.id.team_minutes);
 
         setAttributes();
+
+        SeekBar minutes = view.findViewById(R.id.minutes_seek);
+        minutes.setProgress(mainActivity.teams[mainActivity.playerTeamIndex].getPlayers()[playerIndex].getMinutes());
+        minutes.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mainActivity.teams[mainActivity.playerTeamIndex].getPlayers()[playerIndex].setMinutes(i);
+                playerMinutes.setText(getResources().getString(R.string.player_minutes,
+                        mainActivity.teams[mainActivity.playerTeamIndex].getPlayers()[playerIndex].getMinutes()));
+                teamMinutes.setText(getResources().getString(R.string.team_minutes,
+                        200 -mainActivity.teams[mainActivity.playerTeamIndex].getTotalMinutes()));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         return view;
     }
@@ -85,6 +111,8 @@ public class PlayerInfoFragment extends Fragment {
         stamina.setText(getResources().getString(R.string.stamina, player.getStamina()));
 
         playerName.setText(getResources().getString(R.string.player_name_pos, player.getFullName(), player.getPositionAbr()));
+        playerMinutes.setText(getResources().getString(R.string.player_minutes, player.getMinutes()));
+        teamMinutes.setText(getResources().getString(R.string.team_minutes, 200 - mainActivity.teams[mainActivity.playerTeamIndex].getTotalMinutes()));
     }
 
 }

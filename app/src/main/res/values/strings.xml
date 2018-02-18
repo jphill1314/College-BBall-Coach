@@ -11,16 +11,21 @@
         <item>Training</item>
     </string-array>
 
+    <string name="toast_minutes">Your team must have exactly 200 minutes of playing time set!</string>
+
+    <!-- Roster Fragment-->
     <string name="position">Pos.</string>
     <string name="name">Name</string>
     <string name="rating">Rating</string>
     <string name="pt">Minutes</string>
 
+    <!-- Standings Fragment -->
     <string name="standing">Conference Standings</string>
     <string name="school_name">School</string>
     <string name="wins">Wins</string>
     <string name="loses">Loses</string>
 
+    <!-- Player Info Fragment -->
     <string name="off_attributes">Offensive Attributes</string>
     <string name="close_shot">Close Range Shot: %d</string>
     <string name="mid_shot">Mid Range Shot: %d</string>
@@ -41,15 +46,20 @@
     <string name="stamina">Stamina: %d</string>
 
     <string name="player_name_pos">%s   %s</string>
+    <string name="team_minutes">Unassigned Minutes: %d</string>
+    <string name="player_minutes">Playing Time: %d</string>
 
+    <!-- Schedule Fragment -->
+    <string name="season_name">%d-%d Season</string>
     <string name="sim_game">Sim Next Game!</string>
+    <string name="new_season">Start New Season!</string>
 
+    <!--Strategy Fragment -->
     <string name="offense">Offense</string>
     <string name="defense">Defense</string>
     <string name="favor_three">Favors threes</string>
     <string name="pace">Pace</string>
     <string name="tend_to_help">Tendency for help</string>
-
 
     <string name="slower">Slower</string>
     <string name="faster">Faster</string>

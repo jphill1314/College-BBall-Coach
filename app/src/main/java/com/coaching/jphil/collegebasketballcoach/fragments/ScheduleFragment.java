@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
@@ -38,13 +39,15 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
     private MainActivity mainActivity;
 
+    private Button simGame, newSeason;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
         TextView tvSeason = view.findViewById(R.id.schedule_season);
-        tvSeason.setText("2017-18 Season");
+        tvSeason.setText(getResources().getString(R.string.season_name, 2017, 18));
 
         mainActivity = (MainActivity) getActivity();
 
@@ -56,13 +59,23 @@ public class ScheduleFragment extends Fragment {
                 , mainActivity.teams[mainActivity.playerTeamIndex]);
         recyclerView.setAdapter(adapter);
 
-        Button simGame = view.findViewById(R.id.sim_game);
+        simGame = view.findViewById(R.id.sim_game);
+        newSeason = view.findViewById(R.id.start_new_season);
+
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 simulateGames(mainActivity.teams[mainActivity.playerTeamIndex]);
-
                 adapter.notifyDataSetChanged();
+            }
+        });
+
+        newSeason.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.startNewSeason();
+                newSeason.setVisibility(View.GONE);
+                simGame.setVisibility(View.VISIBLE);
             }
         });
 
@@ -73,10 +86,16 @@ public class ScheduleFragment extends Fragment {
         for(Game game: mainActivity.masterSchedule) {
             if(!game.isPlayed()) {
                 if(game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
-                    game.simulateGame();
-                    game.getHomeTeam().playGame(game.homeTeamWin());
-                    game.getAwayTeam().playGame(!game.homeTeamWin());
-                    return;
+                    if(game.simulateGame()) {
+                        game.getHomeTeam().playGame(game.homeTeamWin());
+                        game.getAwayTeam().playGame(!game.homeTeamWin());
+                        return;
+                    }
+                    else{
+                        Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    }
                 }
                 else{
                     game.simulateGame();
@@ -85,6 +104,9 @@ public class ScheduleFragment extends Fragment {
                 }
             }
         }
+
+        newSeason.setVisibility(View.VISIBLE);
+        simGame.setVisibility(View.INVISIBLE);
 
     }
 

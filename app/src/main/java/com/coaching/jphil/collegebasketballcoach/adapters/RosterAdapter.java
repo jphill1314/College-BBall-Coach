@@ -35,7 +35,6 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.v("tag", "" + getLayoutPosition());
                     Bundle args = new Bundle();
                     args.putInt("player", getLayoutPosition());
                     PlayerInfoFragment frag = new PlayerInfoFragment();
@@ -68,7 +67,7 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
         holder.tvPos.setText(players[position].getPositionAbr());
         holder.tvName.setText(players[position].getfName() + " " + players[position].getlName());
         holder.tvRating.setText(Integer.toString(players[position].getOverallRating()));
-        holder.tvPT.setText("25");
+        holder.tvPT.setText(Integer.toString(players[position].getMinutes()));
     }
 
     @Override

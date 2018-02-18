@@ -48,6 +48,32 @@ public class Player {
         minutes = 20;
     }
 
+    public Player(String lName, String fName, int position, int minutes, int closeShot, int midShot,
+                  int longShot, int ballHandle, int screen, int postDef, int perDef, int onBall,
+                  int offBall, int steal, int rebound, int stamina){
+        this.lName = lName;
+        this.fName = fName;
+        this.position = position;
+        this.minutes = minutes;
+
+        closeRangeShot = closeShot;
+        midRangeShot = midShot;
+        longRangeShot = longShot;
+        ballHandling = ballHandle;
+        screening = screen;
+
+        postDefense = postDef;
+        perimeterDefense = perDef;
+        onBallDefense = onBall;
+        offBallDefense = offBall;
+        stealing = steal;
+        rebounding = rebound;
+
+        this.stamina = stamina;
+
+        calculateRating();
+    }
+
     public String getlName() {
         return lName;
     }
