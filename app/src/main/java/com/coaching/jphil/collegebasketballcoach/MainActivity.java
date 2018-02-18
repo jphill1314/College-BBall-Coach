@@ -31,6 +31,7 @@ import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(db == null){
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
-            new LoadDataAsync().execute();
+            new DataAsync().execute("load");
         }
     }
 
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
 
-        new SaveDataAsync().execute();
+        new DataAsync().execute("save");
     }
 
     public void updateFragment(int position){
@@ -120,7 +121,19 @@ public class MainActivity extends AppCompatActivity {
 
         for(int i = 0; i < teams.length; i++){
             int rating = r.nextInt(15) + 50;
-            teams[i] = new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating));
+            teams[i] = new Team(names[i], mascots[i], getPlayers(10, rating, false), getCoaches(4, rating));
+        }
+        generateSchedule();
+    }
+
+    public void generateSchedule(){
+        if(masterSchedule != null){
+            if(masterSchedule.size() > 0){
+                masterSchedule.clear();
+            }
+        }
+        else{
+            masterSchedule = new ArrayList<Game>();
         }
 
         for (int x = 0; x < teams.length; x++) {
@@ -136,43 +149,116 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startNewSeason(){
-        new ClearDataAsync().execute();
+        for(Team team: teams){
+            team.newSeason();
+            int maxImprovement = 0;
+            for(Coach coach: team.getCoaches()){
+                maxImprovement += coach.getOverallRating();
+            }
+            maxImprovement = (int)((maxImprovement / team.getCoaches().size()) / 7.0) ;
+
+            Iterator<Player> iterator = team.getPlayers().iterator();
+            while(iterator.hasNext()){
+                Player player = iterator.next();
+                player.newSeason(maxImprovement);
+
+                if(player.getYear() > 3){
+                    iterator.remove();
+                }
+            }
+            if(team.getNumberOfPlayers() < 10){
+                team.addPlayers(getPlayers(10 - team.getNumberOfPlayers(), team.getOverallRating(), true));
+            }
+        }
+
+        generateSchedule();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new RosterFragment())
+                .commit();
     }
 
-    private Player[] getPlayers(int numPlayers, int teamRating){
-        Player[] players = new Player[numPlayers];
+    private ArrayList<Player> getPlayers(int numPlayers, int teamRating, boolean onlyFreshman){
+        ArrayList<Player> players = new ArrayList<Player>();
         String[] lastNames = getResources().getStringArray(R.array.last_names);
         String[] firstNames = getResources().getStringArray(R.array.first_names);
         Random r = new Random();
 
-        for(int i = 0; i < 5; i++){
-            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, teamRating);
+        if(!onlyFreshman) {
+            for (int i = 0; i < 5; i++) {
+                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                        (i % 5) + 1, r.nextInt(4), teamRating));
+            }
+            for (int i = 5; i < numPlayers; i++) {
+                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                        (i % 5) + 1, r.nextInt(4), teamRating - r.nextInt(10)));
+            }
         }
-        for(int i = 5; i < numPlayers; i++){
-            players[i] = new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],(i%5) + 1, teamRating - r.nextInt(10));
+        else{
+            for(int i = 0; i < numPlayers; i++){
+                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                        (i % 5) + 1, 0, teamRating - r.nextInt(10)));
+            }
         }
         return players;
     }
 
-    private Coach[] getCoaches(int numCoaches, int teamRating){
-        Coach[] coaches = new Coach[numCoaches];
+    private ArrayList<Coach> getCoaches(int numCoaches, int teamRating){
+        ArrayList<Coach> coaches = new ArrayList<Coach>();
         String[] lastNames = getResources().getStringArray(R.array.last_names);
         String[] firstNames = getResources().getStringArray(R.array.first_names);
         Random r = new Random();
 
-        coaches[0] = new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 1, teamRating + 5);
+        coaches.add(new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 1, teamRating + 5));
         for(int i = 1; i < numCoaches; i++){
-            coaches[i] = new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 2, teamRating - 5);
+            coaches.add(new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 2, teamRating - 5));
         }
         return coaches;
     }
 
-    private class SaveDataAsync extends AsyncTask<String, String, String>{
+    private class DataAsync extends AsyncTask<String, String, String>{
+        @Override
+        protected String doInBackground(String... strings){
+            if(strings[0].equals("load")){
+                loadData();
+                return "loaded";
+            }
+            else if(strings[0].equals("save")){
+                saveData();
+            }
+            else if(strings[0].equals("new season")){
+                //saveData();
+                return "new season";
+            }
+            else if(strings[0].equals("delete all")){
+                clearData();
+                return "data cleared";
+            }
+
+            return null;
+        }
 
         @Override
-        protected String doInBackground(String... strings) {
-            saveData();
-            return null;
+        protected void onPostExecute(String result){
+            if(result != null) {
+                if (result.equals("loaded") || result.equals("new season")) {
+                    if (teams == null) {
+                        generateTeams();
+                    } else if (teams.length == 0) {
+                        generateTeams();
+                    }
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_frame, new RosterFragment())
+                            .commit();
+                } else if (result.equals("data cleared")) {
+                    generateTeams();
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_frame, new RosterFragment())
+                            .commit();
+                }
+            }
         }
 
         private void saveData(){
@@ -195,8 +281,8 @@ public class MainActivity extends AppCompatActivity {
                     teamsDB[i].defTendToHelp = teams[i].getDefenseTendToHelp();
                     teamsDB[i].pace = teams[i].getPace();
 
-                    numPlayers += teams[i].getPlayers().length;
-                    numCoaches += teams[i].getCoaches().length;
+                    numPlayers += teams[i].getPlayers().size();
+                    numCoaches += teams[i].getCoaches().size();
                 }
                 db.appDAO().insertTeams(teamsDB);
 
@@ -209,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
                         players[pIndex].teamID = i;
                         players[pIndex].lastName = player.getlName();
                         players[pIndex].firstName = player.getfName();
+                        players[pIndex].year = player.getYear();
                         players[pIndex].pos = player.getPosition();
                         players[pIndex].minutes = player.getMinutes();
 
@@ -289,28 +376,6 @@ public class MainActivity extends AppCompatActivity {
                 db.close();
             }
         }
-    }
-
-    private class LoadDataAsync extends AsyncTask<String, String, String>{
-        @Override
-        protected String doInBackground(String... strings){
-            loadData();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result){
-            if(teams == null){
-                generateTeams();
-            }
-            else if(teams.length == 0){
-                generateTeams();
-            }
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_frame, new RosterFragment())
-                    .commit();
-        }
 
         private void loadData(){
             if(db != null){
@@ -327,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for(PlayerDB player: players){
-                    teams[player.teamID].addPlayer(new Player(player.lastName, player.firstName,
+                    teams[player.teamID].addPlayer(new Player(player.lastName, player.firstName, player.year,
                             player.pos, player.minutes, player.closeRangeShot, player.midRangeShot,
                             player.longRangeShot, player.ballHandling, player.screening, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
@@ -348,30 +413,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-    }
 
-    private class ClearDataAsync extends AsyncTask<String, String, String>{
-        @Override
-        protected String doInBackground(String... strings){
+        private void clearData(){
             if(db != null){
                 db.appDAO().deleteGameDB();
                 db.appDAO().deletePlayerDB();
                 db.appDAO().deleteCoachDB();
                 db.appDAO().deleteTeamDB();
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result){
-            generateTeams();
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_frame, new RosterFragment())
-                    .commit();
         }
     }
-
 }
 
 

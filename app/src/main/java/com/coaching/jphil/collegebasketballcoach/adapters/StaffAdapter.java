@@ -12,13 +12,15 @@ import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.fragments.CoachInfoFragment;
 
+import java.util.ArrayList;
+
 /**
  * Created by jphil on 2/18/2018.
  */
 
 public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> {
 
-    private Coach[] coaches;
+    private ArrayList<Coach> coaches;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView tvPos, tvName, tvRating;
@@ -47,7 +49,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> 
         }
     }
 
-    public StaffAdapter(Coach[] coaches){
+    public StaffAdapter(ArrayList<Coach> coaches){
         this.coaches = coaches;
     }
 
@@ -59,13 +61,13 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
-        holder.tvPos.setText(coaches[position].getPositionAsString());
-        holder.tvName.setText(coaches[position].getFullName());
-        holder.tvRating.setText(Integer.toString(coaches[position].getOverallRating()));
+        holder.tvPos.setText(coaches.get(position).getPositionAsString());
+        holder.tvName.setText(coaches.get(position).getFullName());
+        holder.tvRating.setText(Integer.toString(coaches.get(position).getOverallRating()));
     }
 
     @Override
     public int getItemCount(){
-        return coaches.length;
+        return coaches.size();
     }
 }

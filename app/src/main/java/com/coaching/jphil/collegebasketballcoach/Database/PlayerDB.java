@@ -19,6 +19,7 @@ public class PlayerDB {
     public String lastName;
     public String firstName;
     public int pos;
+    public int year;
 
     public int minutes;
 

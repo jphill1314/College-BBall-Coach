@@ -24,6 +24,15 @@
         android:layout_weight="2"/>
 
     <TextView
+        android:id="@+id/roster_year"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:paddingEnd="5dp"
+        android:layout_weight="1"/>
+
+    <TextView
         android:id="@+id/roster_rating"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

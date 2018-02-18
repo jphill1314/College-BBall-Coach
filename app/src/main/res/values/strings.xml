@@ -16,8 +16,9 @@
     <!-- Roster Fragment-->
     <string name="position">Pos.</string>
     <string name="name">Name</string>
+    <string name="year">Class</string>
     <string name="rating">Rating</string>
-    <string name="pt">Minutes</string>
+    <string name="pt">PT</string>
 
     <!-- Standings Fragment -->
     <string name="standing">Conference Standings</string>
@@ -45,7 +46,7 @@
     <string name="phys_attributes">Physical Attributes</string>
     <string name="stamina">Stamina: %d</string>
 
-    <string name="player_name_pos">%s   %s</string>
+    <string name="player_name_pos">%s - %s - %s</string>
     <string name="team_minutes">Unassigned Minutes: %d</string>
     <string name="player_minutes">Playing Time: %d</string>
 

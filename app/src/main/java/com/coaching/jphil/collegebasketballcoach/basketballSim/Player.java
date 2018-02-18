@@ -12,6 +12,7 @@ public class Player {
 
     private String lName, fName;
     private int position;
+    private int year;
     private int overallRating;
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
 
@@ -39,20 +40,22 @@ public class Player {
     // Physical attributes
     private int stamina;
 
-    public Player(String lName, String fName, int position, int overallRating){
+    public Player(String lName, String fName, int position, int year, int overallRating){
         this.lName = lName;
         this.fName = fName;
+        this.year = year;
         this.position = position;
         generateAttributes(overallRating);
 
         minutes = 20;
     }
 
-    public Player(String lName, String fName, int position, int minutes, int closeShot, int midShot,
+    public Player(String lName, String fName, int position, int year, int minutes, int closeShot, int midShot,
                   int longShot, int ballHandle, int screen, int postDef, int perDef, int onBall,
                   int offBall, int steal, int rebound, int stamina){
         this.lName = lName;
         this.fName = fName;
+        this.year = year;
         this.position = position;
         this.minutes = minutes;
 
@@ -84,6 +87,50 @@ public class Player {
 
     public String getFullName(){
         return fName + " " + lName;
+    }
+
+    public int getYear(){
+        return year;
+    }
+
+    public String getYearAsString(){
+        switch (year){
+            case 0:
+                return "FR";
+            case 1:
+                return "SO";
+            case 2:
+                return "JR";
+            case 3:
+                return "SR";
+        }
+        return "Error";
+    }
+
+    public void newSeason(int maxImprovement){
+        year++;
+        improveAttributes(maxImprovement);
+    }
+
+    private void improveAttributes(int maxImprovement){
+        Random r = new Random();
+
+        closeRangeShot += r.nextInt(maxImprovement);
+        midRangeShot += r.nextInt(maxImprovement);
+        longRangeShot += r.nextInt(maxImprovement);
+        ballHandling += r.nextInt(maxImprovement);
+        passing += r.nextInt(maxImprovement);
+        screening += r.nextInt(maxImprovement);
+
+        postDefense += r.nextInt(maxImprovement);
+        perimeterDefense += r.nextInt(maxImprovement);
+        onBallDefense += r.nextInt(maxImprovement);
+        offBallDefense += r.nextInt(maxImprovement);
+        stealing += r.nextInt(maxImprovement);
+        rebounding += r.nextInt(maxImprovement);
+        stamina += r.nextInt(maxImprovement);
+
+        calculateRating();
     }
 
     public int getPosition() {

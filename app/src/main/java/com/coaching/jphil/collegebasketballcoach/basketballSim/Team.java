@@ -13,8 +13,8 @@ public class Team {
     private double maxOffensiveEfficiency = 120.0;
     private double minDefensiveEfficiency = 70.0;
 
-    private Player[] players;
-    private Coach[] coaches;
+    private ArrayList<Player> players;
+    private ArrayList<Coach> coaches;
     private int gamesPlayed;
 
     private int wins, loses, overallRating;
@@ -27,7 +27,7 @@ public class Team {
     private int defenseTendToHelp = 50;
     private int pace = 70;
 
-    public Team(String schoolName, String mascot, Player[] players, Coach[] coaches){
+    public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.players = players;
@@ -55,37 +55,38 @@ public class Team {
         this.pace = pace;
     }
 
-    public void addPlayers(Player[] players){
-        this.players = players;
+    public void addPlayers(ArrayList<Player> players){
+        if(this.players == null) {
+            this.players = players;
+        }
+        else{
+            this.players.addAll(players);
+        }
         setOverallRating();
     }
 
     public void addPlayer(Player player){
-        if(players != null){
-            Player[] temp = new Player[players.length + 1];
-            for(int i = 0; i < players.length; i++){
-                temp[i] = players[i];
-            }
-            temp[players.length] = player;
-            players = temp;
+        if(players == null){
+            players = new ArrayList<Player>();
+            players.add(player);
         }
         else{
-            players = new Player[]{player};
+            players.add(player);
         }
         setOverallRating();
     }
 
+    public void removePlayer(Player player){
+        players.remove(player);
+    }
+
     public void addCoach(Coach coach){
-        if(coaches != null){
-            Coach[] temp = new Coach[coaches.length + 1];
-            for(int i = 0; i < coaches.length; i++){
-                temp[i] = coaches[i];
-            }
-            temp[coaches.length] = coach;
-            coaches = temp;
+        if(coaches == null){
+            coaches = new ArrayList<Coach>();
+            coaches.add(coach);
         }
         else{
-            coaches = new Coach[]{coach};
+            coaches.add(coach);
         }
     }
 
@@ -101,16 +102,26 @@ public class Team {
         return mascot;
     }
 
-    public Player[] getPlayers(){
+    public ArrayList<Player> getPlayers(){
         return players;
     }
 
-    public Coach[] getCoaches(){
+    public int getNumberOfPlayers(){
+        return players.size();
+    }
+
+    public ArrayList<Coach> getCoaches(){
         return coaches;
     }
 
     public int getGamesPlayed(){
         return gamesPlayed;
+    }
+
+    public void newSeason(){
+        wins = 0;
+        loses = 0;
+        gamesPlayed = 0;
     }
 
     public void playGame(boolean wonGame){
@@ -182,16 +193,16 @@ public class Team {
             overallRating += p.getOverallRating();
         }
 
-        overallRating = overallRating / players.length;
+        overallRating = overallRating / players.size();
     }
 
     public double getTotalEfficiency(){
         double offense = 0;
         double defense = 0;
 
-        for(int x = 0; x < players.length; x++){
-            offense += (players[x].getMinutes()/40.0) * players[x].getOffensiveEfficiency(offenseFavorsThrees, pace);
-            defense += (players[x].getMinutes()/40.0) * players[x].getDefensiveEfficiency(defenseTendToHelp, defenseFavorsThrees, pace);
+        for(Player player:players){
+            offense += player.getMinutes()/40.0 * player.getOffensiveEfficiency(offenseFavorsThrees, pace);
+            defense += player.getMinutes()/40.0 * player.getDefensiveEfficiency(defenseTendToHelp, defenseFavorsThrees, pace);
         }
 
         offense = offense / 3.2;
@@ -207,8 +218,8 @@ public class Team {
     public double getOffensiveEfficiency(){
         double offense = 0;
 
-        for(int x = 0; x < players.length; x++){
-            offense += (players[x].getMinutes()/40.0) * players[x].getOffensiveEfficiency(offenseFavorsThrees, pace);
+        for(Player player:players){
+            offense += player.getMinutes()/40.0 * player.getOffensiveEfficiency(offenseFavorsThrees, pace);
         }
 
         offense = offense / 2.5;

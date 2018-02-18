@@ -58,7 +58,7 @@ public class CoachInfoFragment extends Fragment {
     }
 
     private void setAttributes(){
-        Coach coach = activity.teams[activity.playerTeamIndex].getCoaches()[coachIndex];
+        Coach coach = activity.teams[activity.playerTeamIndex].getCoaches().get(coachIndex);
 
         tvShot.setText(getResources().getString(R.string.shot_teach, coach.getShotTeaching()));
         tvBallControl.setText(getResources().getString(R.string.ball_handle, coach.getBallControlTeaching()));
