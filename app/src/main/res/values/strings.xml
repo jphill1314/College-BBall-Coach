@@ -71,6 +71,10 @@
     <string name="more_help">More help</string>
     <string name="less_help">Less help</string>
 
+    <!-- Training Fragment -->
+    <string name="practice">Practice Plan</string>
+    <string name="time_available">Practice Time Available: %d</string>
+
     <!-- Coach Info Fragment-->
     <string name="coach_attributes">Coaching Attributes</string>
     <string name="shot_teach">Shooting: %d</string>

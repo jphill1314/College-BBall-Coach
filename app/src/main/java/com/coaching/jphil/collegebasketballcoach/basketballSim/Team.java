@@ -21,6 +21,10 @@ public class Team {
 
     private String schoolName, mascot;
 
+    private int tClose, tMid, tLong, tHandle, tPass, tScreen;
+    private int tPost, tPerim, tOnBall, tOffBall, tSteal, tRebound;
+    private int tStamina;
+
     // Strategy
     private int offenseFavorsThrees = 50;
     private int defenseFavorsThrees = 50;
@@ -37,6 +41,7 @@ public class Team {
         wins = 0;
         loses = 0;
 
+        setEqualTrainingFocus();
         setOverallRating();
     }
 
@@ -226,5 +231,125 @@ public class Team {
         offense = offense / 100 * maxOffensiveEfficiency;
 
         return  offense;
+    }
+
+    private void setEqualTrainingFocus(){
+        tClose = 100 / 13 + 1;
+        tMid = 100 / 13 + 1;
+        tLong = 100 / 13 + 1;
+        tHandle = 100 / 13 + 1;
+        tPass = 100 / 13 + 1;
+        tScreen = 100 / 13 + 1;
+        tPost = 100 / 13 + 1;
+        tPerim = 100 / 13 + 1;
+        tOnBall = 100 / 13 + 1;
+        tOffBall = 100 / 13;
+        tSteal = 100 / 13;
+        tRebound = 100 / 13;
+        tStamina = 100 / 13;
+    }
+
+    public int gettClose() {
+        return tClose;
+    }
+
+    public void settClose(int tClose) {
+        this.tClose = tClose;
+    }
+
+    public int gettMid() {
+        return tMid;
+    }
+
+    public void settMid(int tMid) {
+        this.tMid = tMid;
+    }
+
+    public int gettLong() {
+        return tLong;
+    }
+
+    public void settLong(int tLong) {
+        this.tLong = tLong;
+    }
+
+    public int gettHandle() {
+        return tHandle;
+    }
+
+    public void settHandle(int tHandle) {
+        this.tHandle = tHandle;
+    }
+
+    public int gettPass() {
+        return tPass;
+    }
+
+    public void settPass(int tPass) {
+        this.tPass = tPass;
+    }
+
+    public int gettScreen() {
+        return tScreen;
+    }
+
+    public void settScreen(int tScreen) {
+        this.tScreen = tScreen;
+    }
+
+    public int gettPost() {
+        return tPost;
+    }
+
+    public void settPost(int tPost) {
+        this.tPost = tPost;
+    }
+
+    public int gettPerim() {
+        return tPerim;
+    }
+
+    public void settPerim(int tPerim) {
+        this.tPerim = tPerim;
+    }
+
+    public int gettOnBall() {
+        return tOnBall;
+    }
+
+    public void settOnBall(int tOnBall) {
+        this.tOnBall = tOnBall;
+    }
+
+    public int gettOffBall() {
+        return tOffBall;
+    }
+
+    public void settOffBall(int tOffBall) {
+        this.tOffBall = tOffBall;
+    }
+
+    public int gettSteal() {
+        return tSteal;
+    }
+
+    public void settSteal(int tSteal) {
+        this.tSteal = tSteal;
+    }
+
+    public int gettRebound() {
+        return tRebound;
+    }
+
+    public void settRebound(int tRebound) {
+        this.tRebound = tRebound;
+    }
+
+    public int gettStamina() {
+        return tStamina;
+    }
+
+    public void settStamina(int tStamina) {
+        this.tStamina = tStamina;
     }
 }
