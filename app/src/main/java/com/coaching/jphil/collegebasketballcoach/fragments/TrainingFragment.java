@@ -22,13 +22,7 @@ public class TrainingFragment extends Fragment {
         // Required empty public constructor
     }
 
-    TextView tvClose, tvMid, tvLong, tvHandle, tvPass, tvScreen;
-    TextView tvPost, tvPerim, tvOnBall, tvOffball, tvSteal, tvRebound;
-    TextView tvStamina;
-
-    SeekBar sClose, sMid, sLong, sHandle, sPass, sScreen;
-    SeekBar sPost, sPerim, sOnBall, sOffBall, sSteal, sRebound;
-    SeekBar sStamina;
+    SeekBar seekOffense, seekPerimeter, seekSkills;
 
     MainActivity activity;
 
@@ -38,7 +32,78 @@ public class TrainingFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_training, container, false);
 
+        activity = (MainActivity) getActivity();
+
+        seekOffense = view.findViewById(R.id.s_offense);
+        seekPerimeter = view.findViewById(R.id.s_perimeter);
+        seekSkills = view.findViewById(R.id.s_skills);
+
+        setupSeekBars();
+
         return view;
+    }
+
+    private void setupSeekBars(){
+        seekOffense.setProgress(activity.teams[activity.playerTeamIndex].getOffenseFocus());
+        seekPerimeter.setProgress(activity.teams[activity.playerTeamIndex].getPerimeterFocus());
+        seekSkills.setProgress(activity.teams[activity.playerTeamIndex].getSkillFocus());
+
+        seekOffense.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progress = 0;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                progress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                activity.teams[activity.playerTeamIndex].setOffenseFocus(progress);
+            }
+        });
+
+        seekPerimeter.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progress = 0;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                progress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                activity.teams[activity.playerTeamIndex].setPerimeterFocus(progress);
+            }
+        });
+
+        seekSkills.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progress = 0;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                progress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                activity.teams[activity.playerTeamIndex].setSkillFocus(progress);
+            }
+        });
     }
 
 }

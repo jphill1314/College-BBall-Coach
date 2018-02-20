@@ -73,7 +73,12 @@
 
     <!-- Training Fragment -->
     <string name="practice">Practice Plan</string>
-    <string name="time_available">Practice Time Available: %d</string>
+    <string name="offense_focus">More Offense</string>
+    <string name="defense_focus">More Defense</string>
+    <string name="perimeter_focus">More Perimeter</string>
+    <string name="post_focus">More Post</string>
+    <string name="skill_focus">More Skills</string>
+    <string name="physical_focus">More Conditioning</string>
 
     <!-- Coach Info Fragment-->
     <string name="coach_attributes">Coaching Attributes</string>

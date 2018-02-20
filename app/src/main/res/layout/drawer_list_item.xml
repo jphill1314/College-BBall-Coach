@@ -3,11 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_text"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:drawableStart="@drawable/ic_assignment_black_24dp"
     android:textSize="35sp"
     android:orientation="horizontal"
-    android:paddingTop="10dp">
-
-
+    android:paddingTop="10dp"
+    android:paddingStart="16dp">
 </TextView>

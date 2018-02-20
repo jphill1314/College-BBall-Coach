@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment">
+    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/tv_practice"
@@ -15,222 +16,92 @@
         android:text="@string/practice" />
 
     <TextView
-        android:id="@+id/practice_time"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <ScrollView
+        android:id="@+id/p_offense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/tv_practice"
-        android:layout_above="@id/practice_time"
+        android:paddingTop="16dp"
+        android:textSize="20sp"/>
+
+    <SeekBar
+        android:id="@+id/s_offense"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/p_offense"
+        android:max="100"/>
 
+    <TextView
+        android:id="@+id/defense_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/s_offense"
+        android:text="@string/defense_focus"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:orientation="vertical">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/s_offense"
+        android:layout_alignParentEnd="true"
+        android:text="@string/offense_focus"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:text="@string/off_attributes"/>
+    <TextView
+        android:id="@+id/p_perimeter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/defense_label"
+        android:paddingTop="16dp"
+        android:textSize="20sp"/>
 
-            <TextView
-                android:id="@+id/p_close_shot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
+    <SeekBar
+        android:id="@+id/s_perimeter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/p_perimeter"
+        android:max="100"/>
 
-            <SeekBar
-                android:id="@+id/s_close_shot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
+    <TextView
+        android:id="@+id/post_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/s_perimeter"
+        android:text="@string/post_focus"/>
 
-            <TextView
-                android:id="@+id/p_mid_shot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-            <SeekBar
-                android:id="@+id/s_mid_shot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/s_perimeter"
+        android:layout_alignParentEnd="true"
+        android:text="@string/perimeter_focus"/>
 
-            <TextView
-                android:id="@+id/p_long_shot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/p_skills"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_label"
+        android:paddingTop="16dp"
+        android:textSize="20sp"/>
 
-            <SeekBar
-                android:id="@+id/s_long_shot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
+    <SeekBar
+        android:id="@+id/s_skills"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/p_skills"
+        android:max="100"/>
 
-            <TextView
-                android:id="@+id/p_ball_handle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/s_skills"
+        android:text="@string/physical_focus"/>
 
-            <SeekBar
-                android:id="@+id/s_ball_handle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_passing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_passing"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_screen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_screen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:paddingTop="24dp"
-                android:text="@string/def_attributes"/>
-
-            <TextView
-                android:id="@+id/p_post_def"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_post_def"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_perim_def"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_perim_def"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_on_ball"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_on_ball"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_off_ball"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_off_ball"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_stealing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_steal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:id="@+id/p_rebound"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_rebound"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:paddingTop="24dp"
-                android:text="@string/phys_attributes"/>
-
-            <TextView
-                android:id="@+id/p_stamina"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <SeekBar
-                android:id="@+id/s_stamina"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="100"/>
-
-        </LinearLayout>
-
-
-    </ScrollView>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/s_skills"
+        android:layout_alignParentEnd="true"
+        android:text="@string/skill_focus"/>
 
 </RelativeLayout>

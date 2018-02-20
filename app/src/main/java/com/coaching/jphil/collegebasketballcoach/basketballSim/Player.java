@@ -107,28 +107,29 @@ public class Player {
         return "Error";
     }
 
-    public void newSeason(int maxImprovement){
+    public void newSeason(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
         year++;
-        improveAttributes(maxImprovement);
+        improveAttributes(maxImprovement, offenseFocus, perimeterFocus, skillFocus);
     }
 
-    private void improveAttributes(int maxImprovement){
+    private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
         Random r = new Random();
 
-        closeRangeShot += r.nextInt(maxImprovement);
-        midRangeShot += r.nextInt(maxImprovement);
-        longRangeShot += r.nextInt(maxImprovement);
-        ballHandling += r.nextInt(maxImprovement);
-        passing += r.nextInt(maxImprovement);
-        screening += r.nextInt(maxImprovement);
+        closeRangeShot += r.nextInt((int)(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
+        midRangeShot += r.nextInt((int)(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
+        longRangeShot += r.nextInt((int)(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
+        ballHandling += r.nextInt((int)(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
+        passing += r.nextInt((int)(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
+        screening += r.nextInt((int)(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
 
-        postDefense += r.nextInt(maxImprovement);
-        perimeterDefense += r.nextInt(maxImprovement);
-        onBallDefense += r.nextInt(maxImprovement);
-        offBallDefense += r.nextInt(maxImprovement);
-        stealing += r.nextInt(maxImprovement);
-        rebounding += r.nextInt(maxImprovement);
-        stamina += r.nextInt(maxImprovement);
+        postDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
+        perimeterDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
+        onBallDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
+        offBallDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
+        stealing += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
+        rebounding += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
+
+        stamina += r.nextInt((int)(maxImprovement * (1 - skillFocus/100.0)));
 
         calculateRating();
     }

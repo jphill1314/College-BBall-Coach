@@ -2,10 +2,13 @@ package com.coaching.jphil.collegebasketballcoach;
 
 import android.app.FragmentManager;
 import android.arch.persistence.room.Room;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +21,7 @@ import com.coaching.jphil.collegebasketballcoach.Database.CoachDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
 import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 import com.coaching.jphil.collegebasketballcoach.Database.TeamDB;
+import com.coaching.jphil.collegebasketballcoach.adapters.NavDrawerAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
@@ -27,6 +31,7 @@ import com.coaching.jphil.collegebasketballcoach.fragments.ScheduleFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StaffFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
+import com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +42,10 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String[] mDrawerItems;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private DrawerLayout drawerLayout;
+    private RecyclerView drawerList;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager manager;
 
     private AppDatabase db;
 
@@ -52,20 +58,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDrawerItems = getResources().getStringArray(R.array.drawer_items);
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        mDrawerList = findViewById(R.id.drawer_list);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerList = findViewById(R.id.drawer_list);
 
-        ArrayAdapter adapter = new ArrayAdapter(this, R.layout.drawer_list_item, mDrawerItems);
+        manager = new LinearLayoutManager(this);
+        drawerList.setLayoutManager(manager);
 
-        mDrawerList.setAdapter(adapter);
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                updateFragment(i);
-                mDrawerLayout.closeDrawer(mDrawerList);
-            }
-        });
+        Drawable[] drawables = new Drawable[7];
+        for(int x = 0; x < drawables.length; x++){
+            drawables[x] = getResources().getDrawable(R.drawable.ic_assignment_black_24dp);
+        }
+
+        adapter = new NavDrawerAdapter(getResources().getStringArray(R.array.drawer_items), drawables);
+        drawerList.setAdapter(adapter);
 
         if(db == null){
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -107,9 +112,11 @@ public class MainActivity extends AppCompatActivity {
                 t.replace(R.id.content_frame, new StaffFragment());
                 break;
             case 6:
+                t.replace(R.id.content_frame, new TrainingFragment());
                 break;
         }
         t.commit();
+        drawerLayout.closeDrawer(drawerList);
     }
 
     private void generateTeams(){
@@ -160,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             Iterator<Player> iterator = team.getPlayers().iterator();
             while(iterator.hasNext()){
                 Player player = iterator.next();
-                player.newSeason(maxImprovement);
+                player.newSeason(maxImprovement, team.getOffenseFocus(), team.getPerimeterFocus(), team.getSkillFocus());
 
                 if(player.getYear() > 3){
                     iterator.remove();
@@ -197,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             for(int i = 0; i < numPlayers; i++){
                 players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                        (i % 5) + 1, 0, teamRating - r.nextInt(10)));
+                        r.nextInt(4) + 1, 0, teamRating - r.nextInt(10)));
             }
         }
         return players;
@@ -280,6 +287,10 @@ public class MainActivity extends AppCompatActivity {
                     teamsDB[i].defFavorsThrees = teams[i].getDefenseFavorsThrees();
                     teamsDB[i].defTendToHelp = teams[i].getDefenseTendToHelp();
                     teamsDB[i].pace = teams[i].getPace();
+
+                    teamsDB[i].offenseFocus = teams[i].getOffenseFocus();
+                    teamsDB[i].perimeterFocus = teams[i].getPerimeterFocus();
+                    teamsDB[i].skillsFocus = teams[i].getSkillFocus();
 
                     numPlayers += teams[i].getPlayers().size();
                     numCoaches += teams[i].getCoaches().size();
@@ -388,7 +399,8 @@ public class MainActivity extends AppCompatActivity {
                 for(int i = 0; i < teamsDB.length; i++){
                     teams[i] = new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot,
                             teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
-                            teamsDB[i].defFavorsThrees, teamsDB[i].defTendToHelp, teamsDB[i].pace);
+                            teamsDB[i].defFavorsThrees, teamsDB[i].defTendToHelp, teamsDB[i].pace,
+                            teamsDB[i].offenseFocus, teamsDB[i].perimeterFocus, teamsDB[i].skillsFocus);
                 }
 
                 for(PlayerDB player: players){

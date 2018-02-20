@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/College-BBall-Coach.iml" filepath="$PROJECT_DIR$/College-BBall-Coach.iml" />
       <module fileurl="file://D:\jphil\Documents\Android_Projects\CollegeBasketballCoach\College-BBall-Coach.iml" filepath="D:\jphil\Documents\Android_Projects\CollegeBasketballCoach\College-BBall-Coach.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CollegeBasketballCoach.iml" filepath="$PROJECT_DIR$/CollegeBasketballCoach.iml" />
       <module fileurl="file://C:\Users\Jake\Documents\Android Stuff\College_Basketball_Coach\College-BBall-Coach\CollegeBasketballCoach.iml" filepath="C:\Users\Jake\Documents\Android Stuff\College_Basketball_Coach\College-BBall-Coach\CollegeBasketballCoach.iml" />
+      <module fileurl="file://C:\AndroidDev\College-BBall-Coach\CollegeBasketballCoach.iml" filepath="C:\AndroidDev\College-BBall-Coach\CollegeBasketballCoach.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

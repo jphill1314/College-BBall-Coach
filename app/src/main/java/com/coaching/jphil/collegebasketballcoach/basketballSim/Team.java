@@ -21,9 +21,7 @@ public class Team {
 
     private String schoolName, mascot;
 
-    private int tClose, tMid, tLong, tHandle, tPass, tScreen;
-    private int tPost, tPerim, tOnBall, tOffBall, tSteal, tRebound;
-    private int tStamina;
+    private int offenseFocus, perimeterFocus, skillFocus;
 
     // Strategy
     private int offenseFavorsThrees = 50;
@@ -46,7 +44,8 @@ public class Team {
     }
 
     public Team(String schoolName, String mascot, int wins, int loses, int offenseFavorsThrees,
-                int defenseFavorsThrees, int defenseTendToHelp, int pace){
+                int defenseFavorsThrees, int defenseTendToHelp, int pace, int offenseFocus,
+                int perimeterFocus, int skillFocus){
         this.schoolName = schoolName;
         this.mascot = mascot;
 
@@ -58,6 +57,10 @@ public class Team {
         this.defenseFavorsThrees = defenseFavorsThrees;
         this.defenseTendToHelp = defenseTendToHelp;
         this.pace = pace;
+
+        this.offenseFocus = offenseFocus;
+        this.perimeterFocus = perimeterFocus;
+        this.skillFocus = skillFocus;
     }
 
     public void addPlayers(ArrayList<Player> players){
@@ -234,122 +237,32 @@ public class Team {
     }
 
     private void setEqualTrainingFocus(){
-        tClose = 100 / 13 + 1;
-        tMid = 100 / 13 + 1;
-        tLong = 100 / 13 + 1;
-        tHandle = 100 / 13 + 1;
-        tPass = 100 / 13 + 1;
-        tScreen = 100 / 13 + 1;
-        tPost = 100 / 13 + 1;
-        tPerim = 100 / 13 + 1;
-        tOnBall = 100 / 13 + 1;
-        tOffBall = 100 / 13;
-        tSteal = 100 / 13;
-        tRebound = 100 / 13;
-        tStamina = 100 / 13;
+        offenseFocus = 50;
+        perimeterFocus = 50;
+        skillFocus = 50;
     }
 
-    public int gettClose() {
-        return tClose;
+    public int getOffenseFocus() {
+        return offenseFocus;
     }
 
-    public void settClose(int tClose) {
-        this.tClose = tClose;
+    public void setOffenseFocus(int offenseFocus) {
+        this.offenseFocus = offenseFocus;
     }
 
-    public int gettMid() {
-        return tMid;
+    public int getPerimeterFocus() {
+        return perimeterFocus;
     }
 
-    public void settMid(int tMid) {
-        this.tMid = tMid;
+    public void setPerimeterFocus(int perimeterFocus) {
+        this.perimeterFocus = perimeterFocus;
     }
 
-    public int gettLong() {
-        return tLong;
+    public int getSkillFocus() {
+        return skillFocus;
     }
 
-    public void settLong(int tLong) {
-        this.tLong = tLong;
-    }
-
-    public int gettHandle() {
-        return tHandle;
-    }
-
-    public void settHandle(int tHandle) {
-        this.tHandle = tHandle;
-    }
-
-    public int gettPass() {
-        return tPass;
-    }
-
-    public void settPass(int tPass) {
-        this.tPass = tPass;
-    }
-
-    public int gettScreen() {
-        return tScreen;
-    }
-
-    public void settScreen(int tScreen) {
-        this.tScreen = tScreen;
-    }
-
-    public int gettPost() {
-        return tPost;
-    }
-
-    public void settPost(int tPost) {
-        this.tPost = tPost;
-    }
-
-    public int gettPerim() {
-        return tPerim;
-    }
-
-    public void settPerim(int tPerim) {
-        this.tPerim = tPerim;
-    }
-
-    public int gettOnBall() {
-        return tOnBall;
-    }
-
-    public void settOnBall(int tOnBall) {
-        this.tOnBall = tOnBall;
-    }
-
-    public int gettOffBall() {
-        return tOffBall;
-    }
-
-    public void settOffBall(int tOffBall) {
-        this.tOffBall = tOffBall;
-    }
-
-    public int gettSteal() {
-        return tSteal;
-    }
-
-    public void settSteal(int tSteal) {
-        this.tSteal = tSteal;
-    }
-
-    public int gettRebound() {
-        return tRebound;
-    }
-
-    public void settRebound(int tRebound) {
-        this.tRebound = tRebound;
-    }
-
-    public int gettStamina() {
-        return tStamina;
-    }
-
-    public void settStamina(int tStamina) {
-        this.tStamina = tStamina;
+    public void setSkillFocus(int tSkillFocus) {
+        this.skillFocus = skillFocus;
     }
 }
