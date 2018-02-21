@@ -18,6 +18,7 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
 import java.lang.reflect.Array;
@@ -89,6 +90,9 @@ public class ScheduleFragment extends Fragment {
                     if(game.simulateGame()) {
                         game.getHomeTeam().playGame(game.homeTeamWin());
                         game.getAwayTeam().playGame(!game.homeTeamWin());
+                        for(Recruit recruit: mainActivity.teams[mainActivity.playerTeamIndex].getRecruits()){
+                            recruit.setIsRecentlyRecruited(false);
+                        }
                         return;
                     }
                     else{

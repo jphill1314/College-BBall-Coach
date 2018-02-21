@@ -3,6 +3,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by jphil on 2/14/2018.
@@ -15,6 +16,7 @@ public class Team {
 
     private ArrayList<Player> players;
     private ArrayList<Coach> coaches;
+    private ArrayList<Recruit> recruits;
     private int gamesPlayed;
 
     private int wins, loses, overallRating;
@@ -124,6 +126,21 @@ public class Team {
 
     public int getGamesPlayed(){
         return gamesPlayed;
+    }
+
+    public void setRecruits(ArrayList<Recruit> recruits){
+        this.recruits = recruits;
+    }
+
+    public ArrayList<Recruit> getRecruits(){
+        return recruits;
+    }
+
+    public void addRecruit(Recruit recruit){
+        if(recruits == null){
+            recruits = new ArrayList<Recruit>();
+        }
+        recruits.add(recruit);
     }
 
     public void newSeason(){
@@ -262,7 +279,19 @@ public class Team {
         return skillFocus;
     }
 
-    public void setSkillFocus(int tSkillFocus) {
+    public void setSkillFocus(int skillFocus) {
         this.skillFocus = skillFocus;
+    }
+
+    public int getNumberOfPlayersAtPosition(int position, boolean countSeniors){
+        int num = 0;
+        for(Player player:players){
+            if(player.getPosition() == position){
+                if(!countSeniors && player.getYear() != 3){
+                    num++;
+                }
+            }
+        }
+        return num;
     }
 }

@@ -6,6 +6,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.coaching.jphil.collegebasketballcoach.adapters.RecruitAdapter;
+
 /**
  * Created by jphil on 2/17/2018.
  */
@@ -24,17 +26,8 @@ public interface AppDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertCoaches(CoachDB... coaches);
 
-    @Update
-    public void updateTeams(TeamDB... teams);
-
-    @Update
-    public void updatePlayers(PlayerDB... players);
-
-    @Update
-    public void updateGames(GameDB... games);
-
-    @Update
-    public void updateCoaches(CoachDB... coaches);
+    @Insert(onConflict =  OnConflictStrategy.REPLACE)
+    public void insertRecruits(RecruitDB... recruits);
 
     @Query("SELECT * FROM TeamDB")
     public TeamDB[] loadAllTeams();
@@ -48,6 +41,9 @@ public interface AppDAO {
     @Query("SELECT * FROM CoachDB")
     public CoachDB[] loadAllCoaches();
 
+    @Query("SELECT * FROM RecruitDB")
+    public RecruitDB[] loadAllRecruits();
+
     @Query("DELETE FROM TeamDB")
     public void deleteTeamDB();
 
@@ -59,6 +55,9 @@ public interface AppDAO {
 
     @Query("DELETE FROM CoachDB")
     public void deleteCoachDB();
+
+    @Query("DELETE FROM RecruitDB")
+    public void deleteRecruitDB();
 
 
 }

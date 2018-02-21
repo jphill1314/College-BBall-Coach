@@ -97,6 +97,11 @@
     <string name="work_guards">Working with Guards: %d</string>
     <string name="work_bigs">Workign with Bigs: %d</string>
 
+    <!-- Recruiting Fragment -->
+    <string name="recruit_interest">Interest</string>
+    <string name="button_recruit">Recruit this player</string>
+    <string name="button_commit">Get commitment</string>
+
     <string-array name="first_names">
         <item>James</item>
         <item>John</item>
