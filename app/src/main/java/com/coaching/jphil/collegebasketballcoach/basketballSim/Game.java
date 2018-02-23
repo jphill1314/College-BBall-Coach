@@ -15,6 +15,7 @@ public class Game {
 
     private Team homeTeam, awayTeam;
     private int homeScore, awayScore;
+    private boolean isNeutralCourt;
     private boolean isPlayed;
 
     public Game(Team homeTeam, Team awayTeam){
@@ -22,9 +23,18 @@ public class Game {
         this.awayTeam = awayTeam;
 
         isPlayed = false;
+        isNeutralCourt = false;
     }
 
-    public Game(Team homeTeam, Team awayTeam, int homeScore, int awayScore, boolean isPlayed){
+    public Game(Team homeTeam, Team awayTeam, boolean isNeutralCourt){
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+
+        this.isNeutralCourt = false;
+        isPlayed = false;
+    }
+
+    public Game(Team homeTeam, Team awayTeam, int homeScore, int awayScore, boolean isPlayed, boolean isNeutralCourt){
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
 
@@ -32,6 +42,7 @@ public class Game {
         this.awayScore = awayScore;
 
         this.isPlayed = isPlayed;
+        this.isNeutralCourt = isNeutralCourt;
     }
 
     public String getHomeTeamName(){
@@ -60,6 +71,14 @@ public class Game {
 
     public int getAwayScore(){
         return awayScore;
+    }
+
+    public boolean getIsNeutralCourt(){
+        return isNeutralCourt;
+    }
+
+    public void setIsNeutralCourt(boolean isNeutralCourt){
+        this.isNeutralCourt = isNeutralCourt;
     }
 
     public boolean homeTeamWin(){

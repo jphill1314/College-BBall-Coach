@@ -67,6 +67,10 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 simulateGames(mainActivity.teams[mainActivity.playerTeamIndex]);
+                if(mainActivity.tourny != null){
+                    ScheduleAdapter ad = (ScheduleAdapter) adapter;
+                    ad.changeGames(getTeamTournySchedule(mainActivity.teams[mainActivity.playerTeamIndex]));
+                }
                 adapter.notifyDataSetChanged();
             }
         });
@@ -75,6 +79,10 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 mainActivity.startNewSeason();
+                if(mainActivity.tourny != null){
+                    ScheduleAdapter ad = (ScheduleAdapter) adapter;
+                    ad.changeGames(getTeamTournySchedule(mainActivity.teams[mainActivity.playerTeamIndex]));
+                }
                 newSeason.setVisibility(View.GONE);
                 simGame.setVisibility(View.VISIBLE);
             }
@@ -108,6 +116,14 @@ public class ScheduleFragment extends Fragment {
                 }
             }
         }
+        if(mainActivity.tourny != null){
+            mainActivity.tourny.playNextRound();
+            if(mainActivity.tourny.isHasChampion()){
+                newSeason.setVisibility(View.VISIBLE);
+                simGame.setVisibility(View.INVISIBLE);
+            }
+            return;
+        }
 
         newSeason.setVisibility(View.VISIBLE);
         simGame.setVisibility(View.INVISIBLE);
@@ -119,6 +135,19 @@ public class ScheduleFragment extends Fragment {
 
 
         for(Game game : mainActivity.masterSchedule){
+            if(game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())){
+                teamSchedule.add(game);
+            }
+        }
+
+        return teamSchedule;
+    }
+
+    private ArrayList<Game> getTeamTournySchedule(Team team){
+        ArrayList<Game> teamSchedule = new ArrayList<Game>();
+
+
+        for(Game game : mainActivity.tourny.getGames()){
             if(game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())){
                 teamSchedule.add(game);
             }

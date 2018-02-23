@@ -26,15 +26,20 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
         public TextView tvDate, tvDesc, tvScore;
         public ViewHolder(View view){
             super(view);
-            tvDate = (TextView) view.findViewById(R.id.schedule_date);
-            tvDesc = (TextView) view.findViewById(R.id.schedule_desc);
-            tvScore = (TextView) view.findViewById(R.id.schedule_score);
+            tvDate = view.findViewById(R.id.schedule_date);
+            tvDesc = view.findViewById(R.id.schedule_desc);
+            tvScore = view.findViewById(R.id.schedule_score);
         }
     }
 
     public ScheduleAdapter(ArrayList<Game> games, Team playerTeam){
         this.games = games;
         this.playerTeam = playerTeam;
+    }
+
+    public void changeGames(ArrayList<Game> games){
+        this.games = games;
+        notifyDataSetChanged();
     }
 
     @Override

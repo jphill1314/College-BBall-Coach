@@ -21,5 +21,6 @@ public class GameDB {
     public int homeScore;
     public int awayScore;
 
+    public boolean isNeutralCourt;
     public boolean isPlayed;
 }
