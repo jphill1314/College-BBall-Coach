@@ -54,6 +54,7 @@
     <string name="season_name">%d-%d Season</string>
     <string name="sim_game">Sim Next Game!</string>
     <string name="new_season">Start New Season!</string>
+    <string name="start_tournament">Start Tournament!</string>
 
     <!--Strategy Fragment -->
     <string name="offense">Offense</string>
@@ -81,6 +82,7 @@
     <string name="physical_focus">More Conditioning</string>
 
     <!-- Coach Info Fragment-->
+    <string name ="coach_name_pos">%s - %s</string>
     <string name="coach_attributes">Coaching Attributes</string>
     <string name="shot_teach">Shooting: %d</string>
     <string name="control_teach">Ball Control: %d</string>

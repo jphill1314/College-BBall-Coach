@@ -38,15 +38,17 @@ public class TrainingFragment extends Fragment {
         seekPerimeter = view.findViewById(R.id.s_perimeter);
         seekSkills = view.findViewById(R.id.s_skills);
 
-        setupSeekBars();
+        if(activity.currentTeam.isPlayerControlled()) {
+            setupSeekBars();
+        }
 
         return view;
     }
 
     private void setupSeekBars(){
-        seekOffense.setProgress(activity.teams[activity.playerTeamIndex].getOffenseFocus());
-        seekPerimeter.setProgress(activity.teams[activity.playerTeamIndex].getPerimeterFocus());
-        seekSkills.setProgress(activity.teams[activity.playerTeamIndex].getSkillFocus());
+        seekOffense.setProgress(activity.currentTeam.getOffenseFocus());
+        seekPerimeter.setProgress(activity.currentTeam.getPerimeterFocus());
+        seekSkills.setProgress(activity.currentTeam.getSkillFocus());
 
         seekOffense.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int progress = 0;
@@ -63,7 +65,7 @@ public class TrainingFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                activity.teams[activity.playerTeamIndex].setOffenseFocus(progress);
+                activity.currentTeam.setOffenseFocus(progress);
             }
         });
 
@@ -82,7 +84,7 @@ public class TrainingFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                activity.teams[activity.playerTeamIndex].setPerimeterFocus(progress);
+                activity.currentTeam.setPerimeterFocus(progress);
             }
         });
 
@@ -101,7 +103,7 @@ public class TrainingFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                activity.teams[activity.playerTeamIndex].setSkillFocus(progress);
+                activity.currentTeam.setSkillFocus(progress);
             }
         });
     }

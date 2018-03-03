@@ -70,4 +70,5 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> 
     public int getItemCount(){
         return coaches.size();
     }
+
 }

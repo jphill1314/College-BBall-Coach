@@ -20,6 +20,7 @@ import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
     private MainActivity mainActivity;
 
-    private Button simGame, newSeason;
+    private Button simGame, newSeason, startTournament;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,24 +54,28 @@ public class ScheduleFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
 
         recyclerView = view.findViewById(R.id.schedule_list);
-        recyclerView.setHasFixedSize(true);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(getTeamSchedule(mainActivity.teams[mainActivity.playerTeamIndex])
-                , mainActivity.teams[mainActivity.playerTeamIndex]);
+        adapter = new ScheduleAdapter(getTeamSchedule(mainActivity.currentTeam)
+                , mainActivity.currentTeam);
         recyclerView.setAdapter(adapter);
 
         simGame = view.findViewById(R.id.sim_game);
         newSeason = view.findViewById(R.id.start_new_season);
+        startTournament = view.findViewById(R.id.start_tournament);
+
+        if(!mainActivity.currentTeam.isPlayerControlled()){
+            simGame.setVisibility(View.INVISIBLE);
+            newSeason.setVisibility(View.INVISIBLE);
+        }
 
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                simulateGames(mainActivity.teams[mainActivity.playerTeamIndex]);
-                if(mainActivity.tourny != null){
-                    ScheduleAdapter ad = (ScheduleAdapter) adapter;
-                    ad.changeGames(getTeamTournySchedule(mainActivity.teams[mainActivity.playerTeamIndex]));
-                }
+                simulateGames(mainActivity.currentTeam);
+
+                ScheduleAdapter adapt = (ScheduleAdapter)adapter;
+                adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
                 adapter.notifyDataSetChanged();
             }
         });
@@ -79,12 +84,21 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 mainActivity.startNewSeason();
-                if(mainActivity.tourny != null){
-                    ScheduleAdapter ad = (ScheduleAdapter) adapter;
-                    ad.changeGames(getTeamTournySchedule(mainActivity.teams[mainActivity.playerTeamIndex]));
-                }
                 newSeason.setVisibility(View.GONE);
                 simGame.setVisibility(View.VISIBLE);
+            }
+        });
+
+        startTournament.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.currentConference.generateTournament();
+                startTournament.setVisibility(View.GONE);
+                simGame.setVisibility(View.VISIBLE);
+
+                ScheduleAdapter adapt = (ScheduleAdapter)adapter;
+                adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
+                adapter.notifyDataSetChanged();
             }
         });
 
@@ -92,64 +106,55 @@ public class ScheduleFragment extends Fragment {
     }
 
     private void simulateGames(Team team){
-        for(Game game: mainActivity.masterSchedule) {
-            if(!game.isPlayed()) {
-                if(game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
-                    if(game.simulateGame()) {
-                        game.getHomeTeam().playGame(game.homeTeamWin());
-                        game.getAwayTeam().playGame(!game.homeTeamWin());
-                        for(Recruit recruit: mainActivity.teams[mainActivity.playerTeamIndex].getRecruits()){
-                            recruit.setIsRecentlyRecruited(false);
+        for(Conference c: mainActivity.conferences) {
+            if(c.isInPostSeason()) {
+                if(c.isSeasonFinished()){
+                    newSeason.setVisibility(View.VISIBLE);
+                    simGame.setVisibility(View.INVISIBLE);
+                }
+                c.generateTournament();
+                return;
+                // TODO: add a check to see if the player controlled team is still playing
+                // TODO: if no, then simulate the rest of the season on one click
+            }
+            else {
+                for (Game game : c.getMasterSchedule()) {
+                    if (!game.isPlayed()) {
+                        if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
+                            if (game.simulateGame()) {
+                                game.getHomeTeam().playGame(game.homeTeamWin());
+                                game.getAwayTeam().playGame(!game.homeTeamWin());
+                                for (Recruit recruit : mainActivity.currentTeam.getRecruits()) {
+                                    recruit.setIsRecentlyRecruited(false);
+                                }
+                                return;
+                            } else {
+                                Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
+                                toast.show();
+                                return;
+                            }
+                        } else {
+                            game.simulateGame();
+                            game.getHomeTeam().playGame(game.homeTeamWin());
+                            game.getAwayTeam().playGame(!game.homeTeamWin());
                         }
-                        return;
                     }
-                    else{
-                        Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
-                        toast.show();
-                        return;
-                    }
-                }
-                else{
-                    game.simulateGame();
-                    game.getHomeTeam().playGame(game.homeTeamWin());
-                    game.getAwayTeam().playGame(!game.homeTeamWin());
                 }
             }
         }
-        if(mainActivity.tourny != null){
-            mainActivity.tourny.playNextRound();
-            if(mainActivity.tourny.isHasChampion()){
-                newSeason.setVisibility(View.VISIBLE);
-                simGame.setVisibility(View.INVISIBLE);
-            }
-            return;
-        }
-
-        newSeason.setVisibility(View.VISIBLE);
         simGame.setVisibility(View.INVISIBLE);
+        startTournament.setVisibility(View.VISIBLE);
 
     }
 
     private ArrayList<Game> getTeamSchedule(Team team){
-        ArrayList<Game> teamSchedule = new ArrayList<Game>();
+        ArrayList<Game> teamSchedule = new ArrayList<>();
 
-
-        for(Game game : mainActivity.masterSchedule){
-            if(game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())){
-                teamSchedule.add(game);
-            }
-        }
-
-        return teamSchedule;
-    }
-
-    private ArrayList<Game> getTeamTournySchedule(Team team){
-        ArrayList<Game> teamSchedule = new ArrayList<Game>();
-
-
-        for(Game game : mainActivity.tourny.getGames()){
-            if(game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())){
-                teamSchedule.add(game);
+        for(Conference c: mainActivity.conferences) {
+            for (Game game : c.getMasterSchedule()) {
+                if (game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())) {
+                    teamSchedule.add(game);
+                }
             }
         }
 

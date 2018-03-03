@@ -34,7 +34,7 @@ public class StrategyFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_strategy, container, false);
 
         mainActivity = (MainActivity) getActivity();
-        team = mainActivity.teams[mainActivity.playerTeamIndex];
+        team = mainActivity.currentTeam;
         offThree = view.findViewById(R.id.seek_offense_three);
         defThree = view.findViewById(R.id.seek_defense_three);
         defHelp = view.findViewById(R.id.seek_help);

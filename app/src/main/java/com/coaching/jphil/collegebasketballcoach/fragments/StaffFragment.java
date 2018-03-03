@@ -39,7 +39,7 @@ public class StaffFragment extends Fragment {
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
 
-        adapter = new StaffAdapter(mainActivity.teams[mainActivity.playerTeamIndex].getCoaches());
+        adapter = new StaffAdapter(mainActivity.currentTeam.getCoaches());
         recyclerView.setAdapter(adapter);
 
         return view;

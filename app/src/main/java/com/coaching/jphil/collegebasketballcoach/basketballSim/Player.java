@@ -104,6 +104,7 @@ public class Player {
             case 3:
                 return "SR";
         }
+        Log.v("year", year +"");
         return "Error";
     }
 

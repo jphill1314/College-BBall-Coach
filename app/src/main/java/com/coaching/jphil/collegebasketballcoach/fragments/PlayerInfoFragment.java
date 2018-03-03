@@ -66,15 +66,15 @@ public class PlayerInfoFragment extends Fragment {
         setAttributes();
 
         SeekBar minutes = view.findViewById(R.id.minutes_seek);
-        minutes.setProgress(mainActivity.teams[mainActivity.playerTeamIndex].getPlayers().get(playerIndex).getMinutes());
+        minutes.setProgress(mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes());
         minutes.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mainActivity.teams[mainActivity.playerTeamIndex].getPlayers().get(playerIndex).setMinutes(i);
+                mainActivity.currentTeam.getPlayers().get(playerIndex).setMinutes(i);
                 playerMinutes.setText(getResources().getString(R.string.player_minutes,
-                        mainActivity.teams[mainActivity.playerTeamIndex].getPlayers().get(playerIndex).getMinutes()));
+                        mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes()));
                 teamMinutes.setText(getResources().getString(R.string.team_minutes,
-                        200 -mainActivity.teams[mainActivity.playerTeamIndex].getTotalMinutes()));
+                        200 -mainActivity.currentTeam.getTotalMinutes()));
             }
 
             @Override
@@ -92,7 +92,7 @@ public class PlayerInfoFragment extends Fragment {
     }
 
     private void setAttributes(){
-        Player player = mainActivity.teams[mainActivity.playerTeamIndex].getPlayers().get(playerIndex);
+        Player player = mainActivity.currentTeam.getPlayers().get(playerIndex);
 
         closeShot.setText(getResources().getString(R.string.close_shot, player.getCloseRangeShot()));
         midShot.setText(getResources().getString(R.string.mid_shot, player.getMidRangeShot()));
@@ -112,7 +112,7 @@ public class PlayerInfoFragment extends Fragment {
 
         playerName.setText(getResources().getString(R.string.player_name_pos, player.getFullName(), player.getYearAsString(), player.getPositionAbr()));
         playerMinutes.setText(getResources().getString(R.string.player_minutes, player.getMinutes()));
-        teamMinutes.setText(getResources().getString(R.string.team_minutes, 200 - mainActivity.teams[mainActivity.playerTeamIndex].getTotalMinutes()));
+        teamMinutes.setText(getResources().getString(R.string.team_minutes, 200 - mainActivity.currentTeam.getTotalMinutes()));
     }
 
 }

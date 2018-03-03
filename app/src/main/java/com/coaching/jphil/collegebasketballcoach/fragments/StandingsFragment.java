@@ -41,7 +41,7 @@ public class StandingsFragment extends Fragment {
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
 
-        adapter = new StandingAdapter(mainActivity.teams);
+        adapter = new StandingAdapter(mainActivity.currentConference.getTeams());
         recyclerView.setAdapter(adapter);
 
         return view;

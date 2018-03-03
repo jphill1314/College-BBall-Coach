@@ -12,6 +12,8 @@ import android.widget.TextView;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 
 
 public class CoachInfoFragment extends Fragment {
@@ -58,7 +60,7 @@ public class CoachInfoFragment extends Fragment {
     }
 
     private void setAttributes(){
-        Coach coach = activity.teams[activity.playerTeamIndex].getCoaches().get(coachIndex);
+        Coach coach = activity.currentTeam.getCoaches().get(coachIndex);
 
         tvShot.setText(getResources().getString(R.string.shot_teach, coach.getShotTeaching()));
         tvBallControl.setText(getResources().getString(R.string.ball_handle, coach.getBallControlTeaching()));
@@ -71,7 +73,7 @@ public class CoachInfoFragment extends Fragment {
         tvCondition.setText(getResources().getString(R.string.condition_teaching, coach.getConditioningTeaching()));
         tvGuard.setText(getResources().getString(R.string.work_guards, coach.getWorkingWithGuards()));
         tvBig.setText(getResources().getString(R.string.work_bigs, coach.getWorkingWithBigs()));
-        tvName.setText(getResources().getString(R.string.player_name_pos, coach.getFullName(), coach.getPositionAsString()));
+        tvName.setText(getResources().getString(R.string.coach_name_pos, coach.getFullName(), coach.getPositionAsString()));
     }
 
 

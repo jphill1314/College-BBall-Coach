@@ -35,8 +35,8 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
         }
     }
 
-    public StandingAdapter(Team[] teams){
-        standing = new ArrayList<Team>(Arrays.asList(teams));
+    public StandingAdapter(ArrayList<Team> teams){
+        standing = teams;
         generateStandings();
     }
 

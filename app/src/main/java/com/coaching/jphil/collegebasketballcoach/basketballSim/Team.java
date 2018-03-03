@@ -1,8 +1,12 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.coaching.jphil.collegebasketballcoach.R;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -10,6 +14,9 @@ import java.util.Random;
  */
 
 public class Team {
+
+    private boolean isPlayerControlled;
+    private Context context;
 
     private double maxOffensiveEfficiency = 120.0;
     private double minDefensiveEfficiency = 70.0;
@@ -31,11 +38,15 @@ public class Team {
     private int defenseTendToHelp = 50;
     private int pace = 70;
 
-    public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches){
+    public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches,
+                boolean isPlayerControlled, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.players = players;
         this.coaches = coaches;
+        this.context = context;
+
+        this.isPlayerControlled = isPlayerControlled;
 
         gamesPlayed = 0;
         wins = 0;
@@ -45,11 +56,13 @@ public class Team {
         setOverallRating();
     }
 
-    public Team(String schoolName, String mascot, int wins, int loses, int offenseFavorsThrees,
+    public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
                 int defenseFavorsThrees, int defenseTendToHelp, int pace, int offenseFocus,
-                int perimeterFocus, int skillFocus){
+                int perimeterFocus, int skillFocus, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
+        this.isPlayerControlled = isPlayerControlled;
+        this.context = context;
 
         this.wins = wins;
         this.loses = loses;
@@ -147,6 +160,25 @@ public class Team {
         wins = 0;
         loses = 0;
         gamesPlayed = 0;
+
+        int improve = 0;
+        for(Coach c: coaches){
+            improve+= c.getOverallRating();
+        }
+        improve = (improve / coaches.size()) / 10;
+
+        Iterator<Player> itr = players.iterator();
+        while(itr.hasNext()){
+            Player p = itr.next();
+            p.newSeason(improve, offenseFocus, perimeterFocus, skillFocus);
+            if(p.getYear() > 3){
+                itr.remove();
+            }
+        }
+
+        if(players.size() < 10){
+            generateFreshman(10 - players.size());
+        }
     }
 
     public void playGame(boolean wonGame){
@@ -169,6 +201,10 @@ public class Team {
 
     public int getOverallRating(){
         return overallRating;
+    }
+
+    public boolean isPlayerControlled(){
+        return isPlayerControlled;
     }
 
     public void setOffenseFavorsThrees(int value){
@@ -293,5 +329,16 @@ public class Team {
             }
         }
         return num;
+    }
+
+    private void generateFreshman(int numPlayers){
+        Random r = new Random();
+        String[] lastNames = context.getResources().getStringArray(R.array.last_names);
+        String[] firstNames = context.getResources().getStringArray(R.array.first_names);
+
+        for(int i = 0; i < numPlayers; i++){
+            players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                    r.nextInt(4) + 1, 0, overallRating - r.nextInt(10)));
+        }
     }
 }
