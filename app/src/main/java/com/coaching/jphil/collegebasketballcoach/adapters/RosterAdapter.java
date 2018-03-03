@@ -68,7 +68,7 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvPos.setText(players.get(position).getPositionAbr());
         holder.tvName.setText(players.get(position).getFullName());
-        holder.tvRating.setText(Integer.toString(players.get(position).getOverallRating()));
+        holder.tvRating.setText(getStarRating(players.get(position).getOverallRating()));
         holder.tvPT.setText(Integer.toString(players.get(position).getMinutes()));
         holder.tvYear.setText(players.get(position).getYearAsString());
     }
@@ -76,5 +76,16 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
     @Override
     public int getItemCount(){
         return players.size();
+    }
+
+    private String getStarRating(int rating){
+        String stars;
+
+        stars = Integer.toString(rating / 20);
+        if(rating % 20 > 9){
+            stars += ".5";
+        }
+        Log.v("test", ""+rating);
+        return stars;
     }
 }

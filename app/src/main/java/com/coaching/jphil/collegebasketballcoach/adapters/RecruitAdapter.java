@@ -51,7 +51,7 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.tvPosition.setText(recruits.get(position).getPositionAsString());
         holder.tvName.setText(recruits.get(position).getFullName());
-        holder.tvRating.setText(recruits.get(position).getRating() + "");
+        holder.tvRating.setText(getStarRating(recruits.get(position).getRating()));
         holder.tvInterest.setText(recruits.get(position).getInterest() + "");
 
         if(!recruits.get(position).getIsCommitted() && recruits.get(position).getInterest() >= 75){
@@ -85,5 +85,15 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
     @Override
     public int getItemCount() {
         return recruits.size();
+    }
+
+    private String getStarRating(int rating){
+        String stars;
+
+        stars = Integer.toString(rating / 20);
+        if(rating % 20 > 9){
+            stars += ".5";
+        }
+        return stars;
     }
 }

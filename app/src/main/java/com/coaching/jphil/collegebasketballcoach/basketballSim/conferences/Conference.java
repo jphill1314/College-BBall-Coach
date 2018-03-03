@@ -32,7 +32,13 @@ public abstract class Conference {
         this.teams = teams;
         this.context = context;
 
-        startNewSeason();
+        generateMasterSchedule();
+        for(Team t: teams){
+            if(t.isPlayerControlled()){
+                t.setRecruits(getRecruits(t.getOverallRating(), t));
+            }
+        }
+        tournaments = null;
     }
 
     public Conference(String name, Context context){

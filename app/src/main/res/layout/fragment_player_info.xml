@@ -14,6 +14,41 @@
         android:gravity="center"
         android:layout_alignParentTop="true" />
 
+    <ImageView
+        android:id="@+id/player_star_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/player_name"/>
+
+    <ImageView
+        android:id="@+id/player_star_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/player_star_3"
+        android:layout_below="@id/player_name"/>
+
+    <ImageView
+        android:id="@+id/player_star_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/player_star_2"
+        android:layout_below="@id/player_name"/>
+
+    <ImageView
+        android:id="@+id/player_star_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/player_star_3"
+        android:layout_below="@id/player_name"/>
+
+    <ImageView
+        android:id="@+id/player_star_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/player_star_4"
+        android:layout_below="@id/player_name"/>
+
     <LinearLayout
         android:id="@+id/seek_layout"
         android:layout_alignParentBottom="true"
@@ -66,7 +101,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="16dp"
         android:paddingTop="16dp"
-        android:layout_below="@id/player_name"
+        android:layout_below="@id/player_star_3"
         android:layout_above="@id/seek_layout">
 
         <LinearLayout

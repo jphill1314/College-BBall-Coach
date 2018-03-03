@@ -457,8 +457,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for (PlayerDB player : players) {
-                    teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.year,
-                            player.pos, player.minutes, player.closeRangeShot, player.midRangeShot,
+                    teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.pos,
+                            player.year, player.minutes, player.closeRangeShot, player.midRangeShot,
                             player.longRangeShot, player.ballHandling, player.screening, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
                             player.stealing, player.rebounding, player.stamina));

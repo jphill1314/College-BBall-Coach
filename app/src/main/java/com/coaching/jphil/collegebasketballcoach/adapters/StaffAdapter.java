@@ -2,6 +2,7 @@ package com.coaching.jphil.collegebasketballcoach.adapters;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,12 +64,22 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvPos.setText(coaches.get(position).getPositionAsString());
         holder.tvName.setText(coaches.get(position).getFullName());
-        holder.tvRating.setText(Integer.toString(coaches.get(position).getOverallRating()));
+        holder.tvRating.setText(getStarRating(coaches.get(position).getOverallRating()));
     }
 
     @Override
     public int getItemCount(){
         return coaches.size();
+    }
+
+    private String getStarRating(int rating){
+        String stars;
+
+        stars = Integer.toString(rating / 20);
+        if(rating % 20 > 9){
+            stars += ".5";
+        }
+        return stars;
     }
 
 }

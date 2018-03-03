@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:gravity="center"
+        android:drawableEnd="@drawable/ic_star_black_24dp"
         android:layout_weight="1"/>
 
 </LinearLayout>

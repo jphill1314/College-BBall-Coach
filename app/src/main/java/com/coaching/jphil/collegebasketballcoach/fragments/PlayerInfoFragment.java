@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -29,6 +30,9 @@ public class PlayerInfoFragment extends Fragment {
     private TextView postDef, perimDef, onBall, offBall, steal, rebound;
     private TextView stamina;
     private TextView playerName, playerMinutes, teamMinutes;
+
+    private ImageView star1, star2, star3, star4, star5;
+
     private MainActivity mainActivity;
 
     @Override
@@ -62,6 +66,12 @@ public class PlayerInfoFragment extends Fragment {
         playerName = view.findViewById(R.id.player_name);
         playerMinutes = view.findViewById(R.id.minutes_text);
         teamMinutes = view.findViewById(R.id.team_minutes);
+
+        star1 = view.findViewById(R.id.player_star_1);
+        star2 = view.findViewById(R.id.player_star_2);
+        star3 = view.findViewById(R.id.player_star_3);
+        star4 = view.findViewById(R.id.player_star_4);
+        star5 = view.findViewById(R.id.player_star_5);
 
         setAttributes();
 
@@ -113,6 +123,73 @@ public class PlayerInfoFragment extends Fragment {
         playerName.setText(getResources().getString(R.string.player_name_pos, player.getFullName(), player.getYearAsString(), player.getPositionAbr()));
         playerMinutes.setText(getResources().getString(R.string.player_minutes, player.getMinutes()));
         teamMinutes.setText(getResources().getString(R.string.team_minutes, 200 - mainActivity.currentTeam.getTotalMinutes()));
+
+        setStarRating(player.getOverallRating());
     }
 
+    private void setStarRating(int rating){
+        switch (getStarRating(rating)){
+            case "0.5":
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
+                break;
+            case "1":
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                break;
+            case "1.5":
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
+                break;
+            case "2":
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                break;
+            case "2.5":
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
+                break;
+            case "3":
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                break;
+            case "3.5":
+                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
+                break;
+            case "4":
+                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                break;
+            case "4.5":
+                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star5.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
+                break;
+            case "5":
+                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                star5.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
+                break;
+        }
+    }
+
+    private String getStarRating(int rating){
+        String stars;
+
+        stars = Integer.toString(rating / 20);
+        if(rating % 20 > 9){
+            stars += ".5";
+        }
+
+        return stars;
+    }
 }
