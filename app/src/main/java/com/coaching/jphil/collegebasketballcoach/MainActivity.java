@@ -27,6 +27,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StaggeredTenTeam;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardTenTeam;
 import com.coaching.jphil.collegebasketballcoach.fragments.RecruitFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             conferences.clear();
         }
-        conferences.add(new StandardTenTeam("Southern Conference", teams, this));
+        conferences.add(new StaggeredTenTeam("Southern Conference", teams, this));
     }
 
     public void startNewSeason(){
@@ -438,7 +439,12 @@ public class MainActivity extends AppCompatActivity {
 
                 conferences = new ArrayList<>();
                 for (int c = 0; c < conference.length; c++) {
-                    conferences.add(new StandardTenTeam(conference[c].name, getApplicationContext()));
+                    if(conference[c].type == 0) {
+                        conferences.add(new StandardTenTeam(conference[c].name, getApplicationContext()));
+                    }
+                    else{
+                        conferences.add(new StaggeredTenTeam(conference[c].name, getApplicationContext()));
+                    }
 
                 }
 
