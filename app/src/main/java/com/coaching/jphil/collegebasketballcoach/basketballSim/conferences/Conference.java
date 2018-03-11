@@ -26,6 +26,8 @@ public abstract class Conference {
     private ArrayList<Game> masterSchedule;
     private ArrayList<Tournament> tournaments;
 
+    private int id;
+
     private Context context;
 
     public Conference(String name, ArrayList<Team> teams, Context context){
@@ -45,6 +47,14 @@ public abstract class Conference {
     public Conference(String name, Context context){
         this.name = name;
         this.context = context;
+    }
+
+    public void setId(int id){
+        this.id = id;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public void addTeam(Team team){

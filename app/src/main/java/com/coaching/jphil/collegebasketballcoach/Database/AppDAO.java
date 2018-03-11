@@ -32,6 +32,9 @@ public interface AppDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertConferences(ConferenceDB... conferences);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public void insertTournaments(TournamentDB... tournaments);
+
 
     @Query("SELECT * FROM TeamDB")
     public TeamDB[] loadAllTeams();
@@ -51,6 +54,9 @@ public interface AppDAO {
     @Query("SELECT * FROM ConferenceDB")
     public ConferenceDB[] loadAllConferences();
 
+    @Query("SELECT * FROM TournamentDB")
+    public TournamentDB[] loadAllTournaments();
+
 
     @Query("DELETE FROM TeamDB")
     public void deleteTeamDB();
@@ -69,5 +75,8 @@ public interface AppDAO {
 
     @Query("DELETE FROM ConferenceDB")
     public void deleteConferences();
+
+    @Query("DELETE FROM TournamentDB")
+    public void deleteTournaments();
 
 }

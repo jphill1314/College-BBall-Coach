@@ -1,6 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach;
 
 
+import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Room;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -18,12 +19,14 @@ import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
 import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 import com.coaching.jphil.collegebasketballcoach.Database.RecruitDB;
 import com.coaching.jphil.collegebasketballcoach.Database.TeamDB;
+import com.coaching.jphil.collegebasketballcoach.Database.TournamentDB;
 import com.coaching.jphil.collegebasketballcoach.adapters.NavDrawerAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.NationalChampionship;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StaggeredTenTeam;
@@ -37,6 +40,7 @@ import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -175,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.content_frame, new RosterFragment())
                     .commit();
         }
+
+        new DataAsync().execute("new season");
     }
 
     private ArrayList<Player> getPlayers(int numPlayers, int teamRating){
@@ -208,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class DataAsync extends AsyncTask<String, String, String>{
+        int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
+
         @Override
         protected String doInBackground(String... strings){
             if(strings[0].equals("load")){
@@ -218,7 +226,9 @@ public class MainActivity extends AppCompatActivity {
                 saveData();
             }
             else if(strings[0].equals("new season")){
-                //saveData();
+                if(db != null){
+                    db.appDAO().deleteTournaments();
+                }
                 return "new season";
             }
             else if(strings[0].equals("delete all")){
@@ -260,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
             int teamIndex = 0;
             int coachIndex = 0;
             int playerIndex = 0;
+            int tournamentIndex = 0;
 
             if(db != null){
                 if(!db.isOpen()) {
@@ -299,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
                         teamsDB[i].offenseFocus = teams.get(i).getOffenseFocus();
                         teamsDB[i].perimeterFocus = teams.get(i).getPerimeterFocus();
                         teamsDB[i].skillsFocus = teams.get(i).getSkillFocus();
+
+                        teams.get(i).setId(i);
 
                         if(teams.get(i).isPlayerControlled()){
                             recruits = new RecruitDB[teams.get(i).getRecruits().size()];
@@ -404,42 +417,94 @@ public class MainActivity extends AppCompatActivity {
                     db.appDAO().insertCoaches(coaches);
 
 
-                    Map<String, String> teamIDMap = new HashMap<>();
-                    for (int i = 0; i < teams.size(); i++) {
-                        teamIDMap.put(teams.get(i).getFullName(), Integer.toString(i+teamIndex));
-                    }
-
                     ArrayList<Game> masterSchedule = conferences.get(q).getMasterSchedule();
                     GameDB[] games = new GameDB[masterSchedule.size()];
                     for (int z = 0; z < masterSchedule.size(); z++) {
                         games[z] = new GameDB();
                         games[z].gameID = z + gameIndex;
-                        games[z].homeTeamID = Integer.parseInt(teamIDMap.get(masterSchedule.get(z).getHomeTeamName()));
-                        games[z].awayTeamID = Integer.parseInt(teamIDMap.get(masterSchedule.get(z).getAwayTeamName()));
+                        games[z].homeTeamID = masterSchedule.get(z).getHomeTeam().getId() + teamIndex;
+                        games[z].awayTeamID = masterSchedule.get(z).getAwayTeam().getId() + teamIndex;
 
                         games[z].homeScore = masterSchedule.get(z).getHomeScore();
                         games[z].awayScore = masterSchedule.get(z).getAwayScore();
 
                         games[z].isNeutralCourt = masterSchedule.get(z).getIsNeutralCourt();
                         games[z].isPlayed = masterSchedule.get(z).isPlayed();
+
+                        masterSchedule.get(z).setId(z);
                     }
                     gameIndex += masterSchedule.size();
                     teamIndex += teams.size();
                     db.appDAO().insertGames(games);
 
-//                    if(conferences.get(q).getTournaments() != null) {
-//                        TournamentDB[] tournaments = new TournamentDB[conferences.get(q).getTournaments().size()];
-//                        for(int x = 0; x < tournaments.length; x++){
-//                            tournaments[x] = new TournamentDB();
-//                            tournaments[x].tournamentID = x;
-//                            tournaments[x].name = conferences.get(q).getTournaments().get(x).getName();
-//                            tournaments[x].hasChampion = conferences.get(q).getTournaments().get(x).isHasChampion();
-//                            tournaments[x].playAtNeutralCourt = conferences.get(q).getTournaments().get(x).isPlayAtNeutralCourt();
-//
-//
-//                        }
-//                    } TODO: save and load tournaments
+                    if(conferences.get(q).getTournaments() != null) {
+                        TournamentDB[] tournaments = new TournamentDB[conferences.get(q).getTournaments().size()];
+                        for(int x = 0; x < tournaments.length; x++){
+                            tournaments[x] = new TournamentDB();
+                            tournaments[x].tournamentID = x + tournamentIndex;
+                            tournaments[x].name = conferences.get(q).getTournaments().get(x).getName();
+                            tournaments[x].hasChampion = conferences.get(q).getTournaments().get(x).isHasChampion();
+                            tournaments[x].playAtNeutralCourt = conferences.get(q).getTournaments().get(x).isPlayAtNeutralCourt();
+
+
+                            tournaments[x].teamIDs = "";
+                            tournaments[x].gameIDs = "";
+                            for(int z = 0; z < conferences.get(q).getTournaments().get(x).getGames().size(); z++){
+                                tournaments[x].gameIDs += conferences.get(q).getTournaments().get(x).getGames().get(z).getId() + ",";
+                            }
+
+                            for(int z = 0; z < conferences.get(q).getTournaments().get(x).getTeams().size(); z++){
+                                tournaments[x].teamIDs += conferences.get(q).getTournaments().get(x).getTeams().get(z).getId() + ",";
+                            }
+
+                            tournaments[x].conferenceId = q;
+                        }
+                        tournamentIndex += tournaments.length;
+                        db.appDAO().insertTournaments(tournaments);
+
+                    }
                 }
+                if(championship != null){
+                    TournamentDB champ = new TournamentDB();
+                    champ.tournamentID = -1;
+                    champ.name = championship.getTournament().getName();
+                    champ.hasChampion = championship.getTournament().isHasChampion();
+                    champ.playAtNeutralCourt = championship.getTournament().isPlayAtNeutralCourt();
+                    champ.conferenceId = -1;
+
+                    champ.teamIDs = "";
+                    champ.gameIDs = "";
+
+                    for(int z = 0; z < championship.getTournament().getTeams().size(); z++){
+                        champ.teamIDs += championship.getTournament().getTeams().get(z).getFullName() + ",";
+                    }
+
+                    GameDB[] games = new GameDB[championship.getGames().size()];
+                    for(int z = 0; z < championship.getGames().size(); z++){
+                        games[z] = new GameDB();
+                        games[z].gameID = z + nationalChampGameIndex;
+                        for(int t = 0; t < championship.getTournament().getTeams().size(); t++) {
+                            if(championship.getTournament().getTeams().get(t).getId() == championship.getGames().get(z).getHomeTeam().getId()) {
+                                games[z].homeTeamID = t;
+                            }
+                            else if(championship.getTournament().getTeams().get(t).getId() == championship.getGames().get(z).getAwayTeam().getId())
+                            games[z].awayTeamID = t;
+                        }
+
+                        games[z].homeScore = championship.getGames().get(z).getHomeScore();
+                        games[z].awayScore = championship.getGames().get(z).getAwayScore();
+
+                        games[z].isNeutralCourt = championship.getGames().get(z).getIsNeutralCourt();
+                        games[z].isPlayed = championship.getGames().get(z).isPlayed();
+
+                        championship.getGames().get(z).setId(z + nationalChampGameIndex);
+
+                        champ.gameIDs += championship.getGames().get(z).getId() + ",";
+                    }
+                    db.appDAO().insertGames(games);
+                    db.appDAO().insertTournaments(champ);
+                }
+
                 db.close();
             }
         }
@@ -452,6 +517,7 @@ public class MainActivity extends AppCompatActivity {
                 CoachDB[] coaches = db.appDAO().loadAllCoaches();
                 RecruitDB[] recruits = db.appDAO().loadAllRecruits();
                 ConferenceDB[] conference = db.appDAO().loadAllConferences();
+                TournamentDB[] tournaments = db.appDAO().loadAllTournaments();
 
                 conferences = new ArrayList<>();
                 for (int c = 0; c < conference.length; c++) {
@@ -495,18 +561,70 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for (GameDB game : games) {
-                    conferences.get(teamsDB[game.homeTeamID].conferenceID).addGame(new Game(teams.get(game.homeTeamID), teams.get(game.awayTeamID),
-                            game.homeScore, game.awayScore, game.isPlayed, game.isNeutralCourt));
+                    if(game.gameID < nationalChampGameIndex) {
+                        conferences.get(teamsDB[game.homeTeamID].conferenceID).addGame(new Game(teams.get(game.homeTeamID), teams.get(game.awayTeamID),
+                                game.homeScore, game.awayScore, game.isPlayed, game.isNeutralCourt));
+                    }
                 }
 
                 for(int x = 0; x < teams.size(); x++){
                     conferences.get(teamsDB[x].conferenceID).addTeam(teams.get(x));
+                }
+
+                if(tournaments.length > 0){
+                    championship = null;
+                    for(TournamentDB t: tournaments){
+                        Tournament tourn = new Tournament(t.name, t.playAtNeutralCourt, t.hasChampion);
+                        if(t.conferenceId != -1) {
+                            for (String s : Arrays.asList(t.gameIDs.split(","))) {
+                                int i = Integer.parseInt(s);
+                                Log.d("game", s);
+                                tourn.addGame(conferences.get(t.conferenceId).getMasterSchedule().get(i));
+                            }
+                            for (String s : Arrays.asList(t.teamIDs.split(","))) {
+                                int i = Integer.parseInt(s);
+                                Log.d("team", s);
+                                tourn.addTeam(conferences.get(t.conferenceId).getTeams().get(i));
+                            }
+                            conferences.get(t.conferenceId).addTournament(tourn);
+                            Log.d("test", "id " + t.tournamentID + " conf id" + t.conferenceId + " " + t.name);
+                        }
+                        else{
+                            for (String s : Arrays.asList(t.teamIDs.split(","))) {
+                                Team team = null;
+                                for(Conference c: conferences){
+                                    for(Team team1: c.getTeams()){
+                                        if(team1.getFullName().equals(s)){
+                                            team = team1;
+                                        }
+                                    }
+                                }
+                                if(team != null){
+                                    tourn.addTeam(team);
+                                }
+                                else{
+                                    Log.e("Error", "Error adding team to national championship " + s);
+                                }
+                            }
+                            for(GameDB game : games){
+                                if(game.gameID >= nationalChampGameIndex){
+                                    tourn.addGame(new Game(tourn.getTeams().get(game.homeTeamID),
+                                            tourn.getTeams().get(game.awayTeamID), game.homeScore,
+                                            game.awayScore, game.isPlayed, game.isNeutralCourt));
+                                }
+                            }
+
+                            championship = new NationalChampionship(tourn);
+                        }
+                    }
                 }
             }
         }
 
         private void clearData(){
             if(db != null){
+                db.appDAO().deleteRecruitDB();
+                db.appDAO().deleteTournaments();
                 db.appDAO().deleteGameDB();
                 db.appDAO().deletePlayerDB();
                 db.appDAO().deleteCoachDB();

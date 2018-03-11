@@ -32,20 +32,32 @@ public class Tournament {
         }
     }
 
+    public Tournament(String name, boolean playAtNeutralCourt, boolean hasChampion){
+        this.name = name;
+        this.playAtNeutralCourt = playAtNeutralCourt;
+        this.hasChampion = hasChampion;
+    }
+
     public ArrayList<Team> getTeams() {
         return teams;
     }
 
-    public void setTeams(ArrayList<Team> teams) {
-        this.teams = teams;
+    public void addTeam(Team team){
+        if(teams == null){
+            teams = new ArrayList<>();
+        }
+        teams.add(team);
     }
 
     public ArrayList<Game> getGames() {
         return games;
     }
 
-    public void setGames(ArrayList<Game> games) {
-        this.games = games;
+    public void addGame(Game game){
+        if(games == null){
+            games = new ArrayList<>();
+        }
+        games.add(game);
     }
 
     public String getName() {
@@ -60,19 +72,11 @@ public class Tournament {
         return hasChampion;
     }
 
-    public void setHasChampion(boolean hasChampion) {
-        this.hasChampion = hasChampion;
-    }
-
     public boolean isPlayAtNeutralCourt() {
         return playAtNeutralCourt;
     }
 
-    public void setPlayAtNeutralCourt(boolean playAtNeutralCourt) {
-        this.playAtNeutralCourt = playAtNeutralCourt;
-    }
-
-    public void generateNextRound(){
+    private void generateNextRound(){
         if(games.size() == 0){
             if(teams.size() == 2){
                 games.add(new Game(teams.get(0), teams.get(1), playAtNeutralCourt));

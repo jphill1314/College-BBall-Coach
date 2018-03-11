@@ -38,6 +38,8 @@ public class Team {
     private int defenseTendToHelp = 50;
     private int pace = 70;
 
+    private int id;
+
     public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches,
                 boolean isPlayerControlled, Context context){
         this.schoolName = schoolName;
@@ -111,6 +113,14 @@ public class Team {
         else{
             coaches.add(coach);
         }
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public String getFullName(){

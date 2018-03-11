@@ -23,6 +23,11 @@ public class NationalChampionship {
         generateChampionship();
     }
 
+    public NationalChampionship(Tournament tournament){
+        this.tournament = tournament;
+        teams = this.tournament.getTeams();
+    }
+
     private void generateChampionship(){
         tournament = new Tournament(teams, "National Championship", true);
     }
@@ -43,4 +48,9 @@ public class NationalChampionship {
     public boolean hasChampion(){
         return hasChampion;
     }
+
+    public Tournament getTournament(){
+        return tournament;
+    }
+
 }

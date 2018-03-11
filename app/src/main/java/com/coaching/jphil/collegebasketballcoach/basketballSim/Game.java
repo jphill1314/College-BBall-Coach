@@ -18,6 +18,8 @@ public class Game {
     private boolean isNeutralCourt;
     private boolean isPlayed;
 
+    private int id;
+
     public Game(Team homeTeam, Team awayTeam){
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
@@ -71,6 +73,14 @@ public class Game {
 
     public int getAwayScore(){
         return awayScore;
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
     }
 
     public boolean getIsNeutralCourt(){
