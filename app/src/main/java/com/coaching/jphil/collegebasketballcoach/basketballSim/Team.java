@@ -157,10 +157,6 @@ public class Team {
     }
 
     public void newSeason(){
-        wins = 0;
-        loses = 0;
-        gamesPlayed = 0;
-
         int improve = 0;
         for(Coach c: coaches){
             improve+= c.getOverallRating();
@@ -170,11 +166,15 @@ public class Team {
         Iterator<Player> itr = players.iterator();
         while(itr.hasNext()){
             Player p = itr.next();
-            p.newSeason(improve, offenseFocus, perimeterFocus, skillFocus);
+            p.newSeason(improve, gamesPlayed, offenseFocus, perimeterFocus, skillFocus);
             if(p.getYear() > 3){
                 itr.remove();
             }
         }
+
+        wins = 0;
+        loses = 0;
+        gamesPlayed = 0;
 
         if(players.size() < 10){
             generateFreshman(10 - players.size());
@@ -188,6 +188,9 @@ public class Team {
         }
         else{
             loses++;
+        }
+        for(Player p: players){
+            p.playGame();
         }
     }
 

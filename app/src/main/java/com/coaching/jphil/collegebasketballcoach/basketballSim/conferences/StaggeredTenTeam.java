@@ -90,6 +90,14 @@ public class StaggeredTenTeam extends Conference {
     }
 
     @Override
+    public Team getChampion(){
+        if(isSeasonFinished()){
+            return getTournaments().get(4).getChampion();
+        }
+        return null;
+    }
+
+    @Override
     public int getType(){
         return 1;
     }

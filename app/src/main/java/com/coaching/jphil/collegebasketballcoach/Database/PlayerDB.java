@@ -45,4 +45,8 @@ public class PlayerDB {
 
     // Physical attributes
     public int stamina;
+
+    // Tracked Stats
+    public int gamesPlayed;
+    public int totalMinutes;
 }

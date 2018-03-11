@@ -85,7 +85,6 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
         if(rating % 20 > 9){
             stars += ".5";
         }
-        Log.v("test", ""+rating);
         return stars;
     }
 }

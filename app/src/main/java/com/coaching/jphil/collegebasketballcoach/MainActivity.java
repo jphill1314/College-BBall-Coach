@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
 import com.coaching.jphil.collegebasketballcoach.Database.CoachDB;
@@ -18,15 +17,14 @@ import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
 import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 import com.coaching.jphil.collegebasketballcoach.Database.RecruitDB;
 import com.coaching.jphil.collegebasketballcoach.Database.TeamDB;
-import com.coaching.jphil.collegebasketballcoach.Database.TournamentDB;
 import com.coaching.jphil.collegebasketballcoach.adapters.NavDrawerAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.NationalChampionship;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StaggeredTenTeam;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardTenTeam;
 import com.coaching.jphil.collegebasketballcoach.fragments.RecruitFragment;
@@ -37,12 +35,8 @@ import com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -59,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     public Team currentTeam;
     public Conference currentConference;
+    public NationalChampionship championship;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,33 +122,41 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.closeDrawer(drawerList);
     }
 
-    private void generateTeams(){
-        String[] names = {"Wofford", "UNCG", "ETSU", "Furman", "Mercer", "Western Carolina", "Samford", "The Citadel", "Chattanooga", "VMI"};
-        String[] mascots = {"Terriers", "Spartans", "Bucs", "Paladins", "Bears", "Catamounts", "Bulldogs", "Bulldogs", "Mocs", "Keydets"};
+    private void generateConference(String[] names, String[] mascots, String confName, int minRating, int type, boolean player){
         ArrayList<Team> teams = new ArrayList<>();
         Random r = new Random();
 
         for(int i = 0; i < names.length; i++){
-            int rating = r.nextInt(15) + 50;
+            int rating = r.nextInt(15) + minRating;
             if(i != 0) {
                 teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), false, this));
             }
             else{
-                teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), true, this));
+                if(player) {
+                    rating = 90;
+                    teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), true, this));
+                }
+                else{
+                    teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), false, this));
+                }
             }
         }
 
         if(conferences == null){
             conferences = new ArrayList<>();
         }
-        else{
-            conferences.clear();
+
+        if(type == 0){
+            conferences.add(new StandardTenTeam(confName, teams, this));
         }
-        conferences.add(new StaggeredTenTeam("Southern Conference", teams, this));
+        else if(type == 1) {
+            conferences.add(new StaggeredTenTeam(confName, teams, this));
+        }
     }
 
     public void startNewSeason(){
         int numFinished = 0;
+        championship = null;
         for(Conference c: conferences){
             if(c.isSeasonFinished()) {
                 numFinished++;
@@ -230,9 +233,9 @@ public class MainActivity extends AppCompatActivity {
             if(result != null) {
                 if (result.equals("loaded") || result.equals("new season")) {
                     if (conferences == null) {
-                        generateTeams();
+                        newGameSetup();
                     } else if (conferences.size() == 0) {
-                        generateTeams();
+                        newGameSetup();
                     }
 
                     currentTeam = getPlayerTeam();
@@ -242,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                             .replace(R.id.content_frame, new RosterFragment())
                             .commit();
                 } else if (result.equals("data cleared")) {
-                    generateTeams();
+                    newGameSetup();
 
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_frame, new RosterFragment())
@@ -259,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 for(int q = 0; q < conferences.size(); q++) {
                     ConferenceDB conferenceDB = new ConferenceDB();
+                    conferenceDB.conferenceID = q;
                     conferenceDB.name = conferences.get(q).getName();
                     conferenceDB.type = conferences.get(q).getType();
 
@@ -348,6 +352,9 @@ public class MainActivity extends AppCompatActivity {
                             players[pIndex].rebounding = player.getRebounding();
 
                             players[pIndex].stamina = player.getStamina();
+
+                            players[pIndex].gamesPlayed = player.getGamesPlayed();
+                            players[pIndex].totalMinutes = player.getTotalMinutes();
 
                             pIndex++;
                         }
@@ -461,7 +468,8 @@ public class MainActivity extends AppCompatActivity {
                             player.year, player.minutes, player.closeRangeShot, player.midRangeShot,
                             player.longRangeShot, player.ballHandling, player.screening, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
-                            player.stealing, player.rebounding, player.stamina));
+                            player.stealing, player.rebounding, player.stamina, player.gamesPlayed,
+                            player.totalMinutes));
                 }
 
                 for (CoachDB coach : coaches) {
@@ -519,6 +527,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return null;
+    }
+
+    private void newGameSetup(){
+        String[] names = {"Wofford", "UNCG", "ETSU", "Furman", "Mercer", "Western Carolina", "Samford", "The Citadel", "Chattanooga", "VMI"};
+        String[] mascots = {"Terriers", "Spartans", "Bucs", "Paladins", "Bears", "Catamounts", "Bulldogs", "Bulldogs", "Mocs", "Keydets"};
+
+        generateConference(names, mascots, "Southern Conference", 50, 0, true);
+
+        names = new String[]{"Boston", "New York", "Rhode Island", "Philadelphia", "Michigan", "Ohio", "Chicago", "Indianapolis", "Vermont", "NY State"};
+        generateConference(names, mascots, "Northern Conference", 60, 0, false);
+
+        names = new String[]{"San Francisco", "Los Angles", "San Diego", "Seattle", "Portland", "Arizona", "Utah", "Los Vegas", "New Mexico", "Texas"};
+        generateConference(names, mascots, "Western Conference", 40, 1, false);
+
+        names = new String[]{"North Dakota", "South Dakota", "Montana", "Oklahoma", "Iowa", "Denver", "Kansas City", "St. Louis", "Colorado", "St. Paul"};
+        generateConference(names, mascots, "Central Conference", 55, 0, false);
+
+        championship = null;
+
+    }
+
+    public void generateNationalChampionship(){
+        ArrayList<Team> champs = new ArrayList<>();
+        for(Conference c: conferences){
+            champs.add(c.getChampion());
+        }
+
+        championship = new NationalChampionship(champs);
     }
 }
 

@@ -72,7 +72,14 @@ public class ScheduleFragment extends Fragment {
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                simulateGames(mainActivity.currentTeam);
+                for(Conference c: mainActivity.conferences){
+                    if(c.equals(mainActivity.currentConference)){
+                        simulateGames(c, mainActivity.currentTeam);
+                    }
+                    else{
+                        simulateGames(c, c.getTeams().get(0));
+                    }
+                }
 
                 ScheduleAdapter adapt = (ScheduleAdapter)adapter;
                 adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
@@ -92,7 +99,20 @@ public class ScheduleFragment extends Fragment {
         startTournament.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.currentConference.generateTournament();
+                if(!mainActivity.currentConference.isInPostSeason()) {
+                    mainActivity.currentConference.generateTournament();
+                }
+                else{
+                    int count = 0;
+                    for(Conference c: mainActivity.conferences){
+                        if(c.isSeasonFinished()){
+                            count++;
+                        }
+                    }
+                    if(count == mainActivity.conferences.size()){
+                        mainActivity.generateNationalChampionship();
+                    }
+                }
                 startTournament.setVisibility(View.GONE);
                 simGame.setVisibility(View.VISIBLE);
 
@@ -105,42 +125,46 @@ public class ScheduleFragment extends Fragment {
         return view;
     }
 
-    private void simulateGames(Team team){
-        for(Conference c: mainActivity.conferences) {
-            if(c.isInPostSeason()) {
-                if(c.isSeasonFinished()){
+    private void simulateGames(Conference conference, Team team){
+        if(conference.isInPostSeason()) {
+            if(conference.isSeasonFinished() && mainActivity.championship != null){
+                if(mainActivity.championship.hasChampion()) {
                     newSeason.setVisibility(View.VISIBLE);
                     simGame.setVisibility(View.INVISIBLE);
                 }
-                c.generateTournament();
-                return;
-                // TODO: add a check to see if the player controlled team is still playing
-                // TODO: if no, then simulate the rest of the season on one click
             }
-            else {
-                for (Game game : c.getMasterSchedule()) {
-                    if (!game.isPlayed()) {
-                        if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
-                            if (game.simulateGame()) {
-                                game.getHomeTeam().playGame(game.homeTeamWin());
-                                game.getAwayTeam().playGame(!game.homeTeamWin());
+            else if(!conference.isSeasonFinished()) {
+                conference.generateTournament();
+            }
+            return;
+            // TODO: add a check to see if the player controlled team is still playing
+            // TODO: if no, then simulate the rest of the season on one click
+        }
+        else {
+            for (Game game : conference.getMasterSchedule()) {
+                if (!game.isPlayed()) {
+                    if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
+                        if (game.simulateGame()) {
+                            if(team.equals(mainActivity.currentTeam)) {
                                 for (Recruit recruit : mainActivity.currentTeam.getRecruits()) {
                                     recruit.setIsRecentlyRecruited(false);
                                 }
-                                return;
-                            } else {
-                                Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
-                                toast.show();
-                                return;
                             }
+                            return;
                         } else {
-                            game.simulateGame();
-                            game.getHomeTeam().playGame(game.homeTeamWin());
-                            game.getAwayTeam().playGame(!game.homeTeamWin());
+                            Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
+                            toast.show();
                         }
+                    } else {
+                        game.simulateGame();
                     }
                 }
             }
+        }
+
+        if(mainActivity.championship != null){
+            mainActivity.championship.playNextRound();
+            return;
         }
         simGame.setVisibility(View.INVISIBLE);
         startTournament.setVisibility(View.VISIBLE);

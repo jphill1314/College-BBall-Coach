@@ -40,6 +40,11 @@ public class Player {
     // Physical attributes
     private int stamina;
 
+    // Tracked Stats
+    private int gamesPlayed;
+    private int totalMinutes;
+
+
     public Player(String lName, String fName, int position, int year, int overallRating){
         this.lName = lName;
         this.fName = fName;
@@ -47,12 +52,15 @@ public class Player {
         this.position = position;
         generateAttributes(overallRating);
 
+        gamesPlayed = 0;
+        totalMinutes = 0;
+
         minutes = 20;
     }
 
     public Player(String lName, String fName, int position, int year, int minutes, int closeShot, int midShot,
                   int longShot, int ballHandle, int screen, int postDef, int perDef, int onBall,
-                  int offBall, int steal, int rebound, int stamina){
+                  int offBall, int steal, int rebound, int stamina, int gamesPlayed, int totalMinutes){
         this.lName = lName;
         this.fName = fName;
         this.year = year;
@@ -73,6 +81,9 @@ public class Player {
         rebounding = rebound;
 
         this.stamina = stamina;
+
+        this.gamesPlayed = gamesPlayed;
+        this.totalMinutes = totalMinutes;
 
         calculateRating();
     }
@@ -108,9 +119,24 @@ public class Player {
         return "Error";
     }
 
-    public void newSeason(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
+    public void newSeason(int maxImprovement, int games, int offenseFocus, int perimeterFocus, int skillFocus){
         year++;
-        improveAttributes(maxImprovement, offenseFocus, perimeterFocus, skillFocus);
+        int improve = maxImprovement * totalMinutes / (games * 30);
+        if(improve > maxImprovement){
+            improve = maxImprovement;
+        }
+
+        improveAttributes(improve, offenseFocus, perimeterFocus, skillFocus);
+
+        gamesPlayed = 0;
+        totalMinutes = 0;
+    }
+
+    public void playGame(){
+        if(minutes > 0){
+            gamesPlayed++;
+            totalMinutes += minutes;
+        }
     }
 
     private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
@@ -288,5 +314,13 @@ public class Player {
 
     public int getStamina() {
         return stamina;
+    }
+
+    public int getGamesPlayed() {
+        return gamesPlayed;
+    }
+
+    public int getTotalMinutes() {
+        return totalMinutes;
     }
 }

@@ -110,13 +110,17 @@ public class Game {
                 int homeMargin = (int) ((pace / 100.0) * (homeTeam.getTotalEfficiency() - awayTeam.getTotalEfficiency()));
 
                 homeMargin += 2 * r.nextInt(scoreVariability) - scoreVariability;
-                homeMargin += homeCourtAdvantage;
+                if(!isNeutralCourt) {
+                    homeMargin += homeCourtAdvantage;
+                }
 
                 homeScore = (int) ((pace / 100.0) * homeTeam.getOffensiveEfficiency());
                 awayScore = homeScore - homeMargin;
             }
 
             isPlayed = true;
+            homeTeam.playGame(homeTeamWin());
+            awayTeam.playGame(!homeTeamWin());
             return true;
         }
         else{

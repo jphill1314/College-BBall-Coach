@@ -46,6 +46,10 @@
     <string name="phys_attributes">Physical Attributes</string>
     <string name="stamina">Stamina: %d</string>
 
+    <string name="stats">Statistics</string>
+    <string name="games_played">Games played: %d</string>
+    <string name="total_minutes">Minutes played: %d</string>
+
     <string name="player_name_pos">%s - %s - %s</string>
     <string name="team_minutes">Unassigned Minutes: %d</string>
     <string name="player_minutes">Playing Time: %d</string>
@@ -82,7 +86,7 @@
     <string name="physical_focus">More Conditioning</string>
 
     <!-- Coach Info Fragment-->
-    <string name ="coach_name_pos">%s - %s</string>
+    <string name="coach_name_pos">%s - %s</string>
     <string name="coach_attributes">Coaching Attributes</string>
     <string name="shot_teach">Shooting: %d</string>
     <string name="control_teach">Ball Control: %d</string>

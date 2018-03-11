@@ -1,6 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
@@ -100,13 +101,15 @@ public abstract class Conference {
             }
         }
         else{
-            masterSchedule = new ArrayList<Game>();
+            masterSchedule = new ArrayList<>();
         }
 
         for (int x = 0; x < teams.size(); x++) {
             for (int y = 0; y < teams.size(); y++) {
                 if (x != y) {
                     masterSchedule.add(new Game(teams.get(x), teams.get(y)));
+                    Log.v("Schedule", masterSchedule.get(masterSchedule.size()-1).getHomeTeamName() + " vs. " +
+                            masterSchedule.get(masterSchedule.size()-1).getAwayTeamName());
                 }
             }
         }
@@ -174,6 +177,8 @@ public abstract class Conference {
     public abstract void generateTournament();
 
     public abstract boolean isSeasonFinished();
+
+    public abstract Team getChampion();
 
     public abstract int getType();
 }
