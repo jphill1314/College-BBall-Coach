@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
 import com.coaching.jphil.collegebasketballcoach.Database.CoachDB;
@@ -256,6 +257,10 @@ public class MainActivity extends AppCompatActivity {
 
         private void saveData(){
             int gameIndex = 0;
+            int teamIndex = 0;
+            int coachIndex = 0;
+            int playerIndex = 0;
+
             if(db != null){
                 if(!db.isOpen()) {
                     db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -277,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
                     for (int i = 0; i < teams.size(); i++) {
                         teamsDB[i] = new TeamDB();
-                        teamsDB[i].id = i;
+                        teamsDB[i].id = i + teamIndex;
                         teamsDB[i].conferenceID = q;
                         teamsDB[i].isPlayerControlled = teams.get(i).isPlayerControlled();
                         teamsDB[i].schoolName = teams.get(i).getSchoolName();
@@ -302,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                                 recruits[rIndex] = new RecruitDB();
 
                                 recruits[rIndex].recruitID = rIndex;
-                                recruits[rIndex].teamID = i;
+                                recruits[rIndex].teamID = teamIndex;
 
                                 recruits[rIndex].firstName = recruit.getFirstName();
                                 recruits[rIndex].lastName = recruit.getLastName();
@@ -324,13 +329,15 @@ public class MainActivity extends AppCompatActivity {
                         db.appDAO().insertRecruits(recruits);
                     }
 
+
+
                     PlayerDB[] players = new PlayerDB[numPlayers];
                     int pIndex = 0;
                     for (int i = 0; i < teams.size(); i++) {
                         for (Player player : teams.get(i).getPlayers()) {
                             players[pIndex] = new PlayerDB();
-                            players[pIndex].playerId = pIndex;
-                            players[pIndex].teamID = i;
+                            players[pIndex].playerId = pIndex + playerIndex;
+                            players[pIndex].teamID = i + teamIndex;
                             players[pIndex].lastName = player.getlName();
                             players[pIndex].firstName = player.getfName();
                             players[pIndex].year = player.getYear();
@@ -359,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
                             pIndex++;
                         }
                     }
+                    playerIndex += numPlayers;
 
                     db.appDAO().insertPlayers(players);
 
@@ -368,8 +376,8 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < teams.size(); i++) {
                         for (Coach coach : teams.get(i).getCoaches()) {
                             coaches[cIndex] = new CoachDB();
-                            coaches[cIndex].coachID = cIndex;
-                            coaches[cIndex].teamID = i;
+                            coaches[cIndex].coachID = cIndex + coachIndex;
+                            coaches[cIndex].teamID = i + teamIndex;
 
                             coaches[cIndex].firstName = coach.getFirstName();
                             coaches[cIndex].lastName = coach.getLastName();
@@ -392,30 +400,31 @@ public class MainActivity extends AppCompatActivity {
                             cIndex++;
                         }
                     }
-
+                    coachIndex += numCoaches;
                     db.appDAO().insertCoaches(coaches);
 
 
                     Map<String, String> teamIDMap = new HashMap<>();
                     for (int i = 0; i < teams.size(); i++) {
-                        teamIDMap.put(teams.get(i).getFullName(), Integer.toString(i));
+                        teamIDMap.put(teams.get(i).getFullName(), Integer.toString(i+teamIndex));
                     }
 
                     ArrayList<Game> masterSchedule = conferences.get(q).getMasterSchedule();
                     GameDB[] games = new GameDB[masterSchedule.size()];
-                    for (int z = gameIndex; z < masterSchedule.size(); z++) {
+                    for (int z = 0; z < masterSchedule.size(); z++) {
                         games[z] = new GameDB();
-                        games[z].gameID = z;
-                        games[z].homeTeamID = Integer.parseInt(teamIDMap.get(masterSchedule.get(z-gameIndex).getHomeTeamName()));
-                        games[z].awayTeamID = Integer.parseInt(teamIDMap.get(masterSchedule.get(z-gameIndex).getAwayTeamName()));
+                        games[z].gameID = z + gameIndex;
+                        games[z].homeTeamID = Integer.parseInt(teamIDMap.get(masterSchedule.get(z).getHomeTeamName()));
+                        games[z].awayTeamID = Integer.parseInt(teamIDMap.get(masterSchedule.get(z).getAwayTeamName()));
 
-                        games[z].homeScore = masterSchedule.get(z-gameIndex).getHomeScore();
-                        games[z].awayScore = masterSchedule.get(z-gameIndex).getAwayScore();
+                        games[z].homeScore = masterSchedule.get(z).getHomeScore();
+                        games[z].awayScore = masterSchedule.get(z).getAwayScore();
 
-                        games[z].isNeutralCourt = masterSchedule.get(z-gameIndex).getIsNeutralCourt();
-                        games[z].isPlayed = masterSchedule.get(z-gameIndex).isPlayed();
+                        games[z].isNeutralCourt = masterSchedule.get(z).getIsNeutralCourt();
+                        games[z].isPlayed = masterSchedule.get(z).isPlayed();
                     }
                     gameIndex += masterSchedule.size();
+                    teamIndex += teams.size();
                     db.appDAO().insertGames(games);
 
 //                    if(conferences.get(q).getTournaments() != null) {

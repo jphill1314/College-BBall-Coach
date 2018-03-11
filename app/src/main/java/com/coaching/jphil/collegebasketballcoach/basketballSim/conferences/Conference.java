@@ -108,8 +108,6 @@ public abstract class Conference {
             for (int y = 0; y < teams.size(); y++) {
                 if (x != y) {
                     masterSchedule.add(new Game(teams.get(x), teams.get(y)));
-                    Log.v("Schedule", masterSchedule.get(masterSchedule.size()-1).getHomeTeamName() + " vs. " +
-                            masterSchedule.get(masterSchedule.size()-1).getAwayTeamName());
                 }
             }
         }
