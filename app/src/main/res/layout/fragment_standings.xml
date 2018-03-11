@@ -5,10 +5,10 @@
     android:orientation="vertical"
     tools:context="com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment">
 
-    <TextView
+    <Spinner
+        android:id="@+id/conference_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/standing"
         android:textSize="25sp"
         android:textStyle="bold"
         android:gravity="center"

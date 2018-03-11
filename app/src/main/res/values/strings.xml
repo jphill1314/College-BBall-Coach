@@ -21,7 +21,7 @@
     <string name="pt">PT</string>
 
     <!-- Standings Fragment -->
-    <string name="standing">Conference Standings</string>
+    <string name="standing">%s Standings</string>
     <string name="school_name">School</string>
     <string name="wins">Wins</string>
     <string name="loses">Loses</string>

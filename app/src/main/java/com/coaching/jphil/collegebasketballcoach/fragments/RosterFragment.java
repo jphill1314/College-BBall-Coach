@@ -14,7 +14,10 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.RosterAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class RosterFragment extends Fragment {
@@ -35,6 +38,11 @@ public class RosterFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity)getActivity();
 
+        Bundle args = getArguments();
+        if(args != null){
+            mainActivity.currentTeam = generateStandings(mainActivity.currentConference.getTeams()).get(args.getInt("team"));
+        }
+
         recyclerView = view.findViewById(R.id.roster_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
@@ -42,6 +50,30 @@ public class RosterFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         return view;
+    }
+
+    private ArrayList<Team> generateStandings(ArrayList<Team> standing){
+        int changes = 0;
+
+        do{
+            changes = 0;
+            for(int x = 0; x < standing.size() - 1; x++){
+                for(int y = x + 1; y < standing.size(); y++) {
+                    if (standing.get(x).getWins() < standing.get(y).getWins()) {
+                        Collections.swap(standing, x, y);
+                        changes++;
+                    }
+                    else if(standing.get(x).getWins() == standing.get(y).getWins()){
+                        if(standing.get(x).getLoses() > standing.get(y).getLoses()){
+                            Collections.swap(standing, x, y);
+                            changes++;
+                        }
+                    }
+                }
+            }
+        }while(changes != 0);
+
+        return  standing;
     }
 
 }

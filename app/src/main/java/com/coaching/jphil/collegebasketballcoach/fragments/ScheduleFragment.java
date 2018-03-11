@@ -65,8 +65,9 @@ public class ScheduleFragment extends Fragment {
         startTournament = view.findViewById(R.id.start_tournament);
 
         if(!mainActivity.currentTeam.isPlayerControlled()){
-            simGame.setVisibility(View.INVISIBLE);
-            newSeason.setVisibility(View.INVISIBLE);
+            simGame.setVisibility(View.GONE);
+            newSeason.setVisibility(View.GONE);
+            startTournament.setVisibility(View.GONE);
         }
 
         simGame.setOnClickListener(new View.OnClickListener() {

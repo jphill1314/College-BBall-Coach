@@ -1,14 +1,17 @@
 package com.coaching.jphil.collegebasketballcoach.adapters;
 
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,13 +28,27 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView tvPos, tvName, tvWins, tvLoses;
 
-        public ViewHolder(View view){
+        public ViewHolder(View view, final MainActivity activity){
             super(view);
 
             tvPos = view.findViewById(R.id.standing_position);
             tvName = view.findViewById(R.id.standing_team);
             tvWins = view.findViewById(R.id.standing_wins);
             tvLoses = view.findViewById(R.id.standing_loses);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle args = new Bundle();
+                    args.putInt("team", getLayoutPosition());
+                    RosterFragment frag = new RosterFragment();
+                    frag.setArguments(args);
+
+                    activity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_frame, frag)
+                            .commit();
+                }
+            });
         }
     }
 
@@ -43,7 +60,7 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
     @Override
     public StandingAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.standings_list_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, (MainActivity)parent.getContext());
     }
 
     @Override

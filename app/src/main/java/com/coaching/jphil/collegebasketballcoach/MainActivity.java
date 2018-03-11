@@ -634,7 +634,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Team getPlayerTeam(){
+    public Team getPlayerTeam(){
         for(Conference c: conferences){
             for(Team t: c.getTeams()){
                 if(t.isPlayerControlled()){
@@ -645,7 +645,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private Conference getPlayerConference(){
+    public Conference getPlayerConference(){
         for(Conference c: conferences){
             for(Team t: c.getTeams()){
                 if(t.isPlayerControlled()){

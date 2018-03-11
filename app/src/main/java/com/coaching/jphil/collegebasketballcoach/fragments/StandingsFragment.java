@@ -8,10 +8,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.StandingAdapter;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +35,8 @@ public class StandingsFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
     private MainActivity mainActivity;
 
+    private Spinner confNames;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,6 +52,35 @@ public class StandingsFragment extends Fragment {
 
         adapter = new StandingAdapter(mainActivity.currentConference.getTeams());
         recyclerView.setAdapter(adapter);
+
+        confNames = view.findViewById(R.id.conference_name);
+        ArrayList<String> names = new ArrayList<>();
+        int selection = 0;
+        for(int x = 0; x < mainActivity.conferences.size(); x++){
+            names.add(mainActivity.conferences.get(x).getName());
+            if(mainActivity.conferences.get(x).equals(mainActivity.currentConference)){
+                selection = x;
+            }
+        }
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
+        confNames.setAdapter(spinnerAdapter);
+        confNames.setSelection(selection, false);
+        confNames.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mainActivity.currentConference = mainActivity.conferences.get(i);
+                adapter = new StandingAdapter(mainActivity.currentConference.getTeams());
+                recyclerView.setAdapter(adapter);
+
+                mainActivity.currentTeam = mainActivity.currentConference.getTeams().get(0);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         return view;
     }

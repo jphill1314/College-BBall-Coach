@@ -80,27 +80,32 @@ public class PlayerInfoFragment extends Fragment {
         setAttributes();
 
         SeekBar minutes = view.findViewById(R.id.minutes_seek);
-        minutes.setProgress(mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes());
-        minutes.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mainActivity.currentTeam.getPlayers().get(playerIndex).setMinutes(i);
-                playerMinutes.setText(getResources().getString(R.string.player_minutes,
-                        mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes()));
-                teamMinutes.setText(getResources().getString(R.string.team_minutes,
-                        200 -mainActivity.currentTeam.getTotalMinutes()));
-            }
+        if(mainActivity.currentTeam.isPlayerControlled()) {
+            minutes.setProgress(mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes());
+            minutes.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    mainActivity.currentTeam.getPlayers().get(playerIndex).setMinutes(i);
+                    playerMinutes.setText(getResources().getString(R.string.player_minutes,
+                            mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes()));
+                    teamMinutes.setText(getResources().getString(R.string.team_minutes,
+                            200 - mainActivity.currentTeam.getTotalMinutes()));
+                }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
+                }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
 
-            }
-        });
+                }
+            });
+        }
+        else{
+            view.findViewById(R.id.seek_layout).setVisibility(View.GONE);
+        }
 
         return view;
     }
