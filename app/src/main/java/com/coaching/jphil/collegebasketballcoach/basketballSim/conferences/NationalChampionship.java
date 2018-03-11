@@ -1,5 +1,6 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
@@ -33,6 +34,10 @@ public class NationalChampionship {
         else{
             hasChampion = true;
         }
+    }
+
+    public ArrayList<Game> getGames(){
+        return tournament.getGames();
     }
 
     public boolean hasChampion(){

@@ -72,13 +72,17 @@ public class ScheduleFragment extends Fragment {
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for(Conference c: mainActivity.conferences){
-                    if(c.equals(mainActivity.currentConference)){
-                        simulateGames(c, mainActivity.currentTeam);
+                if(mainActivity.championship == null) {
+                    for (Conference c : mainActivity.conferences) {
+                        if (c.equals(mainActivity.currentConference)) {
+                            simulateGames(c, mainActivity.currentTeam, false);
+                        } else {
+                            simulateGames(c, c.getTeams().get(0), false);
+                        }
                     }
-                    else{
-                        simulateGames(c, c.getTeams().get(0));
-                    }
+                }
+                else{
+                    simulateGames(mainActivity.conferences.get(0), mainActivity.currentTeam, true);
                 }
 
                 ScheduleAdapter adapt = (ScheduleAdapter)adapter;
@@ -100,7 +104,10 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(!mainActivity.currentConference.isInPostSeason()) {
-                    mainActivity.currentConference.generateTournament();
+                    for(Conference c: mainActivity.conferences){
+                        simulateGames(c, c.getTeams().get(0), true);
+                        c.generateTournament();
+                    }
                 }
                 else{
                     int count = 0;
@@ -119,38 +126,28 @@ public class ScheduleFragment extends Fragment {
                 ScheduleAdapter adapt = (ScheduleAdapter)adapter;
                 adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
                 adapter.notifyDataSetChanged();
+
+
             }
         });
 
         return view;
     }
 
-    private void simulateGames(Conference conference, Team team){
-        if(conference.isInPostSeason()) {
-            if(conference.isSeasonFinished() && mainActivity.championship != null){
-                if(mainActivity.championship.hasChampion()) {
-                    newSeason.setVisibility(View.VISIBLE);
-                    simGame.setVisibility(View.INVISIBLE);
-                }
-            }
-            else if(!conference.isSeasonFinished()) {
-                conference.generateTournament();
-            }
-            return;
-            // TODO: add a check to see if the player controlled team is still playing
-            // TODO: if no, then simulate the rest of the season on one click
-        }
-        else {
+    private void simulateGames(Conference conference, Team team, boolean simAll){
+        if(!conference.isInPostSeason()) {
             for (Game game : conference.getMasterSchedule()) {
                 if (!game.isPlayed()) {
                     if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                         if (game.simulateGame()) {
-                            if(team.equals(mainActivity.currentTeam)) {
+                            if (team.equals(mainActivity.currentTeam)) {
                                 for (Recruit recruit : mainActivity.currentTeam.getRecruits()) {
                                     recruit.setIsRecentlyRecruited(false);
                                 }
                             }
-                            return;
+                            if (!simAll) {
+                                return;
+                            }
                         } else {
                             Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
                             toast.show();
@@ -161,14 +158,22 @@ public class ScheduleFragment extends Fragment {
                 }
             }
         }
+        else if(!conference.isSeasonFinished()){
+            conference.generateTournament();
+            return;
+        }
 
         if(mainActivity.championship != null){
             mainActivity.championship.playNextRound();
+            if(mainActivity.championship.hasChampion()) {
+                newSeason.setVisibility(View.VISIBLE);
+                simGame.setVisibility(View.INVISIBLE);
+            }
             return;
         }
+
         simGame.setVisibility(View.INVISIBLE);
         startTournament.setVisibility(View.VISIBLE);
-
     }
 
     private ArrayList<Game> getTeamSchedule(Team team){
@@ -176,6 +181,14 @@ public class ScheduleFragment extends Fragment {
 
         for(Conference c: mainActivity.conferences) {
             for (Game game : c.getMasterSchedule()) {
+                if (game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())) {
+                    teamSchedule.add(game);
+                }
+            }
+        }
+
+        if(mainActivity.championship != null){
+            for(Game game : mainActivity.championship.getGames()){
                 if (game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())) {
                     teamSchedule.add(game);
                 }
