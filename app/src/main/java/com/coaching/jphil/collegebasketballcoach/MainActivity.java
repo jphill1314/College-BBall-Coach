@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else{
                 if(player) {
-                    rating = 90;
+                    //rating = 90;
                     teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), true, this));
                 }
                 else{
@@ -684,6 +684,7 @@ public class MainActivity extends AppCompatActivity {
 
         championship = new NationalChampionship(champs);
     }
+
 }
 
 

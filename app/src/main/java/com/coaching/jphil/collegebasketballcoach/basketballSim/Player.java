@@ -141,6 +141,7 @@ public class Player {
             gamesPlayed++;
             totalMinutes += minutes;
         }
+        gameModifier = 0;
     }
 
     private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
@@ -341,7 +342,7 @@ public class Player {
         }
         if(advantage > 0){
             if(advantage > 30){
-                gameModifier -= (int) (30 * 70.0);
+                gameModifier -= (int) (30 * 0.7);
             }
             else{
                 gameModifier -= (int) (advantage * (1 - advantage/100.0));

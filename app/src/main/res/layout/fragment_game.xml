@@ -1,13 +1,89 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.coaching.jphil.collegebasketballcoach.fragments.GameFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/home_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/away_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
+
+    <TextView
+        android:id="@+id/current_half"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_below="@id/home_score"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:id="@+id/current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_below="@id/away_score"
+        android:layout_alignParentEnd="true"/>
+
+    <Spinner
+        android:id="@+id/game_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:layout_below="@id/current_half"/>
+
+    <Button
+        android:id="@+id/call_timeout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:text="@string/timeout"/>
+
+    <Button
+        android:id="@+id/start_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/start_game"/>
+
+    <SeekBar
+        android:id="@+id/game_speed_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:layout_above="@id/call_timeout"
+        android:max="25"/>
+
+    <TextView
+        android:id="@+id/speed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="16dp"
+        android:layout_above="@id/game_speed_bar"
+        android:text="@string/game_speed"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/game_list"
+        android:layout_above="@id/speed_text"
+        android:layout_below="@id/game_spinner"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+</RelativeLayout>

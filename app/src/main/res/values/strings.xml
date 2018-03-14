@@ -108,6 +108,16 @@
     <string name="button_recruit">Recruit this player</string>
     <string name="button_commit">Get commitment</string>
 
+    <!-- Game Fragment -->
+    <string name="timeout">Call timeout</string>
+    <string name="start_game">Start game</string>
+    <string name="start_2nd">Start 2nd half</string>
+    <string name="scores">%s: %d</string>
+    <string name="half">Half: %d</string>
+    <string name="game_speed">Simulation speed</string>
+
+    <string name="list_score">%s: %d - %s: %d</string>
+
     <string-array name="first_names">
         <item>James</item>
         <item>John</item>

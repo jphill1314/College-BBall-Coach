@@ -140,18 +140,28 @@ public class ScheduleFragment extends Fragment {
             for (Game game : conference.getMasterSchedule()) {
                 if (!game.isPlayed()) {
                     if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
-                        if (game.simulateGame()) {
-                            if (team.equals(mainActivity.currentTeam)) {
-                                for (Recruit recruit : mainActivity.currentTeam.getRecruits()) {
-                                    recruit.setIsRecentlyRecruited(false);
+                       if(team.isPlayerControlled()){
+                            GameFragment frag = new GameFragment();
+                            Bundle args = new Bundle();
+                            for(int x = 0; x < conference.getMasterSchedule().size(); x++){
+                                if(game.equals(conference.getMasterSchedule().get(x))){
+                                    args.putInt("game", x);
+                                    break;
                                 }
                             }
-                            if (!simAll) {
-                                return;
-                            }
-                        } else {
-                            Toast toast = Toast.makeText(getContext(), getString(R.string.toast_minutes), Toast.LENGTH_LONG);
-                            toast.show();
+
+                            frag.setArguments(args);
+
+                            mainActivity.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.content_frame, frag)
+                                    .addToBackStack("games")
+                                    .commit();
+                       }
+                       else{
+                           game.simulateGame();
+                       }
+                        if(!simAll){
+                            return;
                         }
                     } else {
                         game.simulateGame();
