@@ -15,6 +15,8 @@ public class Player {
     private int year;
     private int overallRating;
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
+    private int gameVariability = 5;
+    private int gameModifier = 0;
 
     private int minutes;
 
@@ -25,6 +27,7 @@ public class Player {
     private int ballHandling;
     private int passing;
     private int screening;
+    private int offBallMovement;
 
     // Defensive attributes
     private int postDefense;
@@ -59,7 +62,7 @@ public class Player {
     }
 
     public Player(String lName, String fName, int position, int year, int minutes, int closeShot, int midShot,
-                  int longShot, int ballHandle, int screen, int postDef, int perDef, int onBall,
+                  int longShot, int ballHandle, int screen, int offBallMove, int postDef, int perDef, int onBall,
                   int offBall, int steal, int rebound, int stamina, int gamesPlayed, int totalMinutes){
         this.lName = lName;
         this.fName = fName;
@@ -72,6 +75,7 @@ public class Player {
         longRangeShot = longShot;
         ballHandling = ballHandle;
         screening = screen;
+        offBallMovement = offBallMove;
 
         postDefense = postDef;
         perimeterDefense = perDef;
@@ -208,6 +212,7 @@ public class Player {
         ballHandling = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
         passing = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
         screening = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
+        offBallMovement = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
 
         // Defensive
         postDefense = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
@@ -227,8 +232,8 @@ public class Player {
         // Update this to take player's position into account
 
         overallRating = (int)((closeRangeShot + midRangeShot + longRangeShot + ballHandling + passing
-        + screening + postDefense + perimeterDefense + onBallDefense + offBallDefense + stealing + rebounding
-        + stamina) / 13.0);
+        + screening + offBallMovement + postDefense + perimeterDefense + onBallDefense + offBallDefense + stealing + rebounding
+        + stamina) / 14.0);
     }
 
     public double getOffensiveEfficiency(int favorsThrees, int pace){
@@ -265,51 +270,55 @@ public class Player {
     }
 
     public int getCloseRangeShot() {
-        return closeRangeShot;
+        return closeRangeShot + gameModifier;
     }
 
     public int getMidRangeShot() {
-        return midRangeShot;
+        return midRangeShot + gameModifier;
     }
 
     public int getLongRangeShot() {
-        return longRangeShot;
+        return longRangeShot + gameModifier;
     }
 
     public int getBallHandling() {
-        return ballHandling;
+        return ballHandling + gameModifier;
     }
 
     public int getPassing() {
-        return passing;
+        return passing + gameModifier;
     }
 
     public int getScreening() {
-        return screening;
+        return screening + gameModifier;
+    }
+
+    public int getOffBallMovement(){
+        return offBallMovement + gameModifier;
     }
 
     public int getPostDefense() {
-        return postDefense;
+        return postDefense + gameModifier;
     }
 
     public int getPerimeterDefense() {
-        return perimeterDefense;
+        return perimeterDefense + gameModifier;
     }
 
     public int getOnBallDefense() {
-        return onBallDefense;
+        return onBallDefense + gameModifier;
     }
 
     public int getOffBallDefense() {
-        return offBallDefense;
+        return offBallDefense + gameModifier;
     }
 
     public int getStealing() {
-        return stealing;
+        return stealing + gameModifier;
     }
 
     public int getRebounding() {
-        return rebounding;
+        return rebounding + gameModifier;
     }
 
     public int getStamina() {
@@ -323,4 +332,23 @@ public class Player {
     public int getTotalMinutes() {
         return totalMinutes;
     }
+
+    public void setGameModifiers(boolean homeTeam, int advantage){
+        gameModifier = (int) (Math.random() * 2 * gameVariability) - gameVariability;
+        if(homeTeam){
+            // players play better at home
+            gameModifier += 3;
+        }
+        if(advantage > 0){
+            if(advantage > 30){
+                gameModifier -= (int) (30 * 70.0);
+            }
+            else{
+                gameModifier -= (int) (advantage * (1 - advantage/100.0));
+            }
+
+        }
+
+    }
+
 }

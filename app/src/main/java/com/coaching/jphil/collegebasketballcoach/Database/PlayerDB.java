@@ -31,6 +31,7 @@ public class PlayerDB {
     public int ballHandling;
     public int passing;
     public int screening;
+    public int offBallMovement;
 
     // Defensive attributes
     public int postDefense;
