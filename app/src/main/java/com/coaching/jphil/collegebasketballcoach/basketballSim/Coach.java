@@ -27,6 +27,8 @@ public class Coach {
     private int workingWithGuards;
     private int workingWithBigs;
 
+    private int tendencyToSub = 50;
+
     public Coach(String firstName, String lastName, int position, int ability){
         this.firstName = firstName;
         this.lastName = lastName;
@@ -131,6 +133,10 @@ public class Coach {
 
     public int getWorkingWithBigs() {
         return workingWithBigs;
+    }
+
+    public int getTendencyToSub(){
+        return tendencyToSub;
     }
 
     private void generateAttributes(int ability){

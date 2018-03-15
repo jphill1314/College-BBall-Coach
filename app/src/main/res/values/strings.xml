@@ -115,16 +115,26 @@
     <string name="start_2nd">Start 2nd half</string>
     <string name="scores">%s\n%d</string>
     <string name="half">Half: %d</string>
+    <string name="game_time">%s (%d)</string>
     <string name="game_speed">Simulation speed</string>
     <string name="timeout_left">TO: %d</string>
     <string name="team_fouls">Fouls: %d</string>
+    <string name="fouled_out">One of your players has fouled out! Please select a substitute.</string>
 
     <string-array name="timeout_array">
-        <item>*Skip speech*</item>
+        <item>Skip speech</item>
         <item>Good work guys! Keep it up!</item>
         <item>Show me something else!</item>
         <item>I need you guys to focus on defense!</item>
         <item>Let\'s try to get some more shots to fall now!</item>
+    </string-array>
+
+    <string-array name="pre_game_speeches">
+        <item>Skip speech</item>
+        <item>If you just play your natural game, we will win.</item>
+        <item>We\'re going to have to work extra hard if we expect to pull this one off.</item>
+        <item>If you play hard on the defensive end, we\'ll get the result we\'re after.</item>
+        <item>You will have to make some shots to win this one.</item>
     </string-array>
 
     <string name="list_score">%s: %d - %s: %d</string>

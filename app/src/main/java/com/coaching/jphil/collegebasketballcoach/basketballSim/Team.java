@@ -6,6 +6,7 @@ import android.util.Log;
 import com.coaching.jphil.collegebasketballcoach.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -21,7 +22,7 @@ public class Team {
     private double maxOffensiveEfficiency = 120.0;
     private double minDefensiveEfficiency = 70.0;
 
-    private ArrayList<Player> players;
+    private ArrayList<Player> players, rosterPlayers, subPlayers;
     private ArrayList<Coach> coaches;
     private ArrayList<Recruit> recruits;
     private int gamesPlayed;
@@ -193,6 +194,15 @@ public class Team {
         }
     }
 
+    public void preGameSetup(){
+        rosterPlayers = new ArrayList<>(players);
+        subPlayers = new ArrayList<>(players);
+
+        for(Player p: players){
+            p.preGameSetup();
+        }
+    }
+
     public void playGame(boolean wonGame){
         gamesPlayed++;
         if(wonGame){
@@ -205,6 +215,7 @@ public class Team {
             p.playGame();
         }
 
+        players = new ArrayList<>(rosterPlayers);
         lastScoreDif = 0;
     }
 
@@ -377,4 +388,56 @@ public class Team {
                     r.nextInt(4) + 1, 0, overallRating - r.nextInt(10)));
         }
     }
+
+    public boolean updateSubs(int i1, int i2){
+        if(subPlayers.get(i2).isEligible()) {
+            Collections.swap(subPlayers, i1, i2);
+            return true;
+        }
+        return false;
+    }
+
+    public void makeSubs(){
+        players = new ArrayList<>(subPlayers);
+    }
+
+    public void aiMakeSubs(int half, int timeRemaining){
+        int tendToSub = coaches.get(0).getTendencyToSub();
+
+        Random r = new Random();
+
+        for(int x = 0; x < 5; x++){
+            if(subPlayers.get(x).getFatigue() > r.nextInt(101 - tendToSub) ||
+                    (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && r.nextInt(35) + tendToSub > 75)){
+                int sub = findSub(half, timeRemaining);
+                if(subPlayers.get(x).getOverallRating() / subPlayers.get(x).getFatigue() <
+                        subPlayers.get(sub).getOverallRating()/ subPlayers.get(sub).getFatigue()){
+                    updateSubs(x, sub);
+                }
+            }
+            else if(!subPlayers.get(x).isEligible()){
+                updateSubs(x, findSub(half, timeRemaining));
+            }
+        }
+    }
+
+    private int findSub(int half, int timeRemaining){
+        int indexOfBest = 5;
+        Random r = new Random();
+        Player best = subPlayers.get(5);
+        for(int x = 6; x < subPlayers.size(); x++){
+            if(subPlayers.get(x).isEligible()) {
+                if (best.getOverallRating() / best.getFatigue() <
+                        subPlayers.get(x).getOverallRating() / subPlayers.get(x).getFatigue() &&
+                        (!subPlayers.get(x).isInFoulTrouble(half, timeRemaining) &&
+                                r.nextInt(35) + coaches.get(0).getTendencyToSub() > 75)) {
+                    indexOfBest = x;
+                    best = subPlayers.get(indexOfBest);
+                }
+            }
+        }
+
+        return indexOfBest;
+    }
+
 }

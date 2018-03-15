@@ -59,6 +59,9 @@ public class Player {
     private int oRebounds;
     private int dRebounds;
 
+    private double fatigue;
+    private int timePlayed; // time in seconds
+
 
     public Player(String lName, String fName, int position, int year, int overallRating){
         this.lName = lName;
@@ -149,12 +152,13 @@ public class Player {
     }
 
     public void playGame(){
-        if(minutes > 0){
+        if(timePlayed > 0){
             gamesPlayed++;
-            totalMinutes += minutes;
+            totalMinutes += timePlayed / 60;
         }
         offensiveModifier = 0;
         defensiveModifier = 0;
+        fatigue = 0;
     }
 
     public void preGameSetup(){
@@ -168,6 +172,8 @@ public class Player {
         assists = 0;
         oRebounds = 0;
         dRebounds = 0;
+        timePlayed = 0;
+        fatigue = 0;
     }
 
     public void addFoul(){
@@ -246,6 +252,22 @@ public class Player {
 
     public int getdRebounds() {
         return dRebounds;
+    }
+
+    public void addTimePlayed(int time, int event){
+        // event: 0 = nothing, 1 = change of possession, -1 = timeout / on bench
+        timePlayed += time;
+        if(time > 0 && event != 0){
+            if(event == 1){
+                fatigue += 2 * (1.5 - (stamina / 100.0));
+                if(fatigue > 65){
+                    fatigue = 65.0;
+                }
+            }
+            else if(fatigue > 0){
+                fatigue--;
+            }
+        }
     }
 
     private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
@@ -375,63 +397,70 @@ public class Player {
     }
 
     public int getCloseRangeShot() {
-        return closeRangeShot + offensiveModifier;
+        return (int)((closeRangeShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getMidRangeShot() {
-        return midRangeShot + offensiveModifier;
+        return (int) ((midRangeShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getLongRangeShot() {
-        return longRangeShot + offensiveModifier;
+        return (int) ((longRangeShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getFreeThrowShot(){
-        return (int)((closeRangeShot + midRangeShot + longRangeShot) / 3.0);
+        return (int)(((getCloseRangeShot() + getMidRangeShot() + getLongRangeShot()) / 3.0) * getFatigueFactor());
     }
 
     public int getBallHandling() {
-        return ballHandling + offensiveModifier;
+        return (int) ((ballHandling + offensiveModifier) * getFatigueFactor());
     }
 
     public int getPassing() {
-        return passing + offensiveModifier;
+        return (int) ((passing + offensiveModifier) * getFatigueFactor());
     }
 
     public int getScreening() {
-        return screening + offensiveModifier;
+        return (int) ((screening + offensiveModifier) * getFatigueFactor());
     }
 
     public int getOffBallMovement(){
-        return offBallMovement + offensiveModifier;
+        return (int) ((offBallMovement + offensiveModifier) * getFatigueFactor());
     }
 
     public int getPostDefense() {
-        return postDefense + defensiveModifier;
+        return (int) ((postDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getPerimeterDefense() {
-        return perimeterDefense + defensiveModifier;
+        return (int) ((perimeterDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getOnBallDefense() {
-        return onBallDefense + defensiveModifier;
+        return (int) ((onBallDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getOffBallDefense() {
-        return offBallDefense + defensiveModifier;
+        return (int) ((offBallDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getStealing() {
-        return stealing + defensiveModifier;
+        return (int) ((stealing + defensiveModifier) * getFatigueFactor());
     }
 
     public int getRebounding() {
-        return rebounding + defensiveModifier;
+        return (int) ((rebounding + defensiveModifier) * getFatigueFactor());
     }
 
     public int getStamina() {
         return stamina;
+    }
+
+    public int getFatigue(){
+        if(fatigue < 1){
+            return 1;
+        }
+        return (int) fatigue;
     }
 
     public int getGamesPlayed() {
@@ -440,6 +469,14 @@ public class Player {
 
     public int getTotalMinutes() {
         return totalMinutes;
+    }
+
+    public int getMinutesPlayed(){
+        return timePlayed / 60;
+    }
+
+    private double getFatigueFactor(){
+        return (1 - ((Math.exp((fatigue) / 20)) / 100));
     }
 
     public void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
@@ -495,4 +532,41 @@ public class Player {
         }
     }
 
+    public boolean isEligible(){
+        return fouls < 5;
+    }
+
+    public boolean isInFoulTrouble(int half, int timeRemaining){
+        int min = timeRemaining / 60;
+        if(half == 1 && fouls == 2){
+            return true;
+        }
+        if(half == 2){
+            if(fouls == 3 && min > 14){
+                return true;
+            }
+            if(fouls == 4 && min > 6){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getTwoPointStats(){
+        return twoPointShotMade + "/" + twoPointShotAttempts;
+    }
+
+    public String getThreePointStats(){
+        return threePointShotMade + "/" + threePointShotAttempts;
+    }
+
+    public String getFreeThrowStats(){
+        return freeThrowMade + "/" + freeThrowAttempts;
+    }
+
+    public String getGameStatsAsString(){
+        return "mins:" + getMinutesPlayed() + " - 2s:" + getTwoPointStats() + " - 3s:" + getThreePointStats() + " - FT:" +
+                getFreeThrowStats() + "\nast:" + getAssists() + " - OB:" +getoRebounds() +
+                " - DB:" + getdRebounds() + " - F:" + getFouls();
+    }
 }

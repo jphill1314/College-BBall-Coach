@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.coaching.jphil.collegebasketballcoach.fragments.GameFragment">
 
     <LinearLayout
@@ -92,7 +93,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20sp"
-            android:padding="15dp" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
 
         <TextView
             android:id="@+id/current_time"
@@ -101,39 +103,25 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20sp"
-            android:padding="15dp" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"/>
     </LinearLayout>
 
     <Spinner
         android:id="@+id/game_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp"
+        android:paddingTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:layout_below="@id/time_layout"/>
-
-    <Button
-        android:id="@+id/call_timeout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible"
-        android:text="@string/timeout"/>
-
-    <Button
-        android:id="@+id/start_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"
-        android:text="@string/start_game"/>
 
     <SeekBar
         android:id="@+id/game_speed_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="16dp"
-        android:layout_above="@id/call_timeout"
+        android:layout_alignParentBottom="true"
         android:max="25"/>
 
     <TextView
@@ -141,7 +129,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:padding="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:layout_above="@id/game_speed_bar"
         android:text="@string/game_speed"/>
 
@@ -153,5 +142,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/game_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="21dp"
+        android:layout_above="@id/speed_text"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        app:fabSize="normal" />
+    
 </RelativeLayout>

@@ -139,7 +139,7 @@ public class Game {
         return plays;
     }
 
-    public boolean simulateGame() {
+    public void simulateGame() {
         savePlays = false;
         if (homeTeam.getTotalMinutes() == 200 && awayTeam.getTotalMinutes() == 200) {
             preGameSetUp();
@@ -150,6 +150,9 @@ public class Game {
                         homeTeam.getCoachTalk(awayScore - homeScore);
                         awayTeam.getCoachTalk(homeScore - awayScore);
                     }
+                    if(lastPlay == 3){
+
+                    }
 
                     lastPlay = simPlay();
                 }
@@ -158,19 +161,19 @@ public class Game {
 
             homeTeam.playGame(homeTeamWin());
             awayTeam.playGame(!homeTeamWin());
-            return true;
         }
-        return false;
     }
 
     //TODO: save game stats to DB and continue to balance for realism
     private ArrayList<String> plays;
-    private int half, timeRemaining, playerWithBall, location, passesSinceShot, shotClock, lastPlayerWithBall;
+    private int half, timeRemaining, playerWithBall, location, shotClock;
+    private int lastPlayerWithBall, lastShotClock, lastTimeRemaining, playType;
     private boolean madeShot, deadBall, homeTeamHasBall, homeTeamHasPosArrow;
     private boolean[] mediaTimeouts;
     private boolean playerWantsTO, recentTO;
     private int homeTimeouts, awayTimeouts, homeFouls, awayFouls;
     private boolean savePlays = false;
+    private boolean playerFouledOut = false;
     private Random r;
 
     private String currentPlay, foulString;
@@ -184,7 +187,9 @@ public class Game {
         r = new Random();
         half = 1;
         timeRemaining = 20 * 60;
+        lastTimeRemaining = timeRemaining;
         shotClock = 30;
+        lastShotClock = 0;
         homeScore = 0;
         awayScore = 0;
         homeFouls = 0;
@@ -192,7 +197,7 @@ public class Game {
         playerWithBall = 1;
         lastPlayerWithBall = 1;
         location = -1;
-        passesSinceShot = 0;
+        playType = 0;
 
         mediaTimeouts = new boolean[]{false, false, false, false, false, false, false, false, false, false};
         playerWantsTO = false;
@@ -213,12 +218,8 @@ public class Game {
             plays.add(getFormattedTime() + " (30) - " + awayTeam.getFullName() + " has won the tip off!");
         }
 
-        for(Player p: homeTeam.getPlayers()){
-            p.preGameSetup();
-        }
-        for(Player p: awayTeam.getPlayers()){
-            p.preGameSetup();
-        }
+        homeTeam.preGameSetup();
+        awayTeam.preGameSetup();
     }
 
     public void coachTalk(Team team, boolean homeCourt, int scoreDif){
@@ -340,6 +341,7 @@ public class Game {
             // setup 2nd half
             half++;
             timeRemaining = 20 * 60;
+            lastTimeRemaining = timeRemaining;
             shotClock = 30;
             homeTeamHasBall = homeTeamHasPosArrow;
             homeTeamHasPosArrow = !homeTeamHasPosArrow;
@@ -348,6 +350,8 @@ public class Game {
 
             homeFouls = 0;
             awayFouls = 0;
+
+            playType = 0;
 
             if(homeTimeouts == 4){
                 homeTimeouts = 3;
@@ -361,11 +365,13 @@ public class Game {
             // setup overtime
             half++;
             timeRemaining = 5 * 60;
+            lastTimeRemaining = timeRemaining;
             shotClock = 30;
             homeTeamHasBall = homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding();
             homeTeamHasPosArrow = !(homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding());
             madeShot = false;
             deadBall = false;
+            playType = 0;
 
             homeTimeouts++;
             awayTimeouts++;
@@ -383,34 +389,90 @@ public class Game {
                 -1 if there is no time remaining
                 1 if there is a timeout called
          */
+        if(playerFouledOut){
+            if(homeTeam.isPlayerControlled()){
+                homeTeam.makeSubs();
+                awayTeam.aiMakeSubs(half, timeRemaining);
+                if(playerFouledOut(homeTeam)){
+                    return 3;
+                }
+                else{
+                    playerFouledOut = false;
+                }
+            }
+            else if(awayTeam.isPlayerControlled()){
+                homeTeam.aiMakeSubs(half, timeRemaining);
+                awayTeam.makeSubs();
+                if(playerFouledOut(awayTeam)){
+                    return 3;
+                }
+                else{
+                    playerFouledOut = false;
+                }
+            }
+            else{
+                homeTeam.aiMakeSubs(half, timeRemaining);
+                awayTeam.aiMakeSubs(half, timeRemaining);
+                playerFouledOut = false;
+            }
+        }
+
+        playType = 0;
         if(callTimeout() && (!recentTO || playerWantsTO)){
             if(plays.size() != 1 && savePlays) {
                 plays.add(0, "Timeout called!");
             }
 
-            deadBall = true;
-            madeShot = true; // this is to prevent media TOs from being called immediately after player TOs
+            if(timeRemaining == 20 * 60 && half == 1){
+                deadBall = false;
+                madeShot = false;
+            }
+            else {
+                deadBall = true;
+                madeShot = true; // this is to prevent media TOs from being called immediately after player TOs
+            }
+            playType = -1;
+
+            if(homeTeam.isPlayerControlled()){
+                awayTeam.aiMakeSubs(half, timeRemaining);
+            }
+            else{
+                homeTeam.aiMakeSubs(half, timeRemaining);
+            }
+            homeTeam.makeSubs();
+            awayTeam.makeSubs();
+
             recentTO = true;
             return 1;
         }
 
         currentPlay = "";
         if (deadBall) {
+            if(!madeShot) {
+                if(homeTeam.isPlayerControlled()){
+                    awayTeam.aiMakeSubs(half, timeRemaining);
+                }
+                else{
+                    homeTeam.aiMakeSubs(half, timeRemaining);
+                }
+                homeTeam.makeSubs();
+                awayTeam.makeSubs();
+            }
+
             if (homeTeamHasBall) {
                 homeScore += getPass(homeTeam, awayTeam);
             } else {
                 awayScore += getPass(awayTeam, homeTeam);
             }
         } else {
-            int shotChance = passesSinceShot * r.nextInt(randomBoundValue);
-            int shotUrgency = 5;
+            int shotUrgency;
             if(homeTeamHasBall){
-                shotUrgency *= homeTeam.getPace() / 30;
+                shotUrgency = (20 * 60) / homeTeam.getPace();
             }
             else{
-                shotUrgency *= awayTeam.getPace() / 30;
+                shotUrgency = (20 * 60) / awayTeam.getPace();
             }
-            if (shotChance > 2 *randomBoundValue || (shotClock < shotUrgency && r.nextBoolean())) {
+            if (shotClock < shotUrgency && r.nextDouble() > .5) {
                 if (homeTeamHasBall) {
                     homeScore += getShot(homeTeam, awayTeam, false);
                 } else {
@@ -425,7 +487,7 @@ public class Game {
             }
         }
 
-        if(shotClock <= 0){
+        if(shotClock <= 0 && timeRemaining > 0){
             currentPlay += "\nTurnover! Shot clock violation!";
             deadBall = true;
             madeShot = false;
@@ -435,16 +497,68 @@ public class Game {
         if(!currentPlay.equals("") && savePlays) {
             if (plays.get(0).length() > 15) {
                 if (!currentPlay.contains(plays.get(0).substring(15))) {
-                    plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
+                    if(shotClock != 30) {
+                        plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
+                    }
+                    else{
+                        plays.add(0, getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay);
+                    }
                 }
             }
             else{
-                plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
+                if(shotClock != 30) {
+                    plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
+                }
+                else{
+                    plays.add(0, getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay);
+                }
             }
         }
         if (timeRemaining > 0) {
+            int count = 0;
+            for(Player p: homeTeam.getPlayers()){
+                if(count < 5) {
+                    p.addTimePlayed(lastTimeRemaining - timeRemaining, playType);
+                }
+                else{
+                    p.addTimePlayed(0, -1);
+                }
+                count++;
+            }
+            count = 0;
+            for(Player p: awayTeam.getPlayers()){
+                if(count < 5) {
+                    p.addTimePlayed(lastTimeRemaining - timeRemaining, playType);
+                }
+                else{
+                    p.addTimePlayed(0, -1);
+                }
+                count++;
+            }
+
+            lastTimeRemaining = timeRemaining;
             return 0;
         } else {
+            int count = 0;
+            for(Player p: homeTeam.getPlayers()){
+                if(count < 5) {
+                    p.addTimePlayed(lastTimeRemaining, playType);
+                }
+                else{
+                    p.addTimePlayed(0, -1);
+                }
+                count++;
+            }
+            count = 0;
+            for(Player p: awayTeam.getPlayers()){
+                if(count < 5) {
+                    p.addTimePlayed(lastTimeRemaining, playType);
+                }
+                else{
+                    p.addTimePlayed(0, -1);
+                }
+                count++;
+            }
             timeRemaining = 0;
             return -1;
         }
@@ -453,7 +567,6 @@ public class Game {
     private int getPass(Team offense, Team defense) {
         Player passer, target;
         Player passDef, targetDef;
-        passesSinceShot++;
 
         if (deadBall) {
             getInbounder(offense);
@@ -472,34 +585,59 @@ public class Game {
 
         if (passSuccess >= 0) {
             // successful pass
-            if (location < 1) {
-                location = 1;
-                int timeChange = (int) (8 - (offense.getPace() / 90.0) * r.nextInt(6));
-                timeRemaining -= timeChange;
-                shotClock -= timeChange;
-            }
             currentPlay += passer.getFullName() + " passes the ball to " + target.getFullName() + ".";
-            lastPlayerWithBall = playerWithBall;
-            playerWithBall = target.getPosition();
+            int ob = getBallOutOfBounds(target, targetDef);
+            if(ob == 0) {
+                boolean startInBackcourt = false;
+                if (location < 1) {
+                    startInBackcourt = true;
+                    location = 1;
+                    int timeChange = (int) (8 - (offense.getPace() / 90.0) * r.nextInt(6));
+                    timeRemaining -= timeChange;
+                    shotClock -= timeChange;
+                }
+                lastPlayerWithBall = playerWithBall;
+                playerWithBall = target.getPosition();
 
-            if(getFoul(1)){
+                if (getFoul(1)) {
+                    int timeChange = (int) (4 - (offense.getPace() / 90.0) * r.nextInt(3));
+                    timeRemaining -= timeChange;
+                    shotClock -= timeChange;
+                    currentPlay += foulString;
+                    return shootBonus();
+                }
+
+                if ((passSuccess > 50 && !startInBackcourt)) {
+                    // pass leading to a shot
+                    int timeChange = (int) (8 - (offense.getPace() / 90.0) * r.nextInt(4));
+                    timeRemaining -= timeChange;
+                    shotClock -= timeChange;
+                    return getShot(offense, defense, true);
+                }
+
+                if(!startInBackcourt) {
+                    int post = getPostMove(target, targetDef);
+                    if (post >= 0) {
+                        // pass to the post with a post move
+                        return post;
+                    }
+                }
+
+            }
+            else {
+                deadBall = true;
+                madeShot = false;
+
                 int timeChange = (int) (4 - (offense.getPace() / 90.0) * r.nextInt(3));
                 timeRemaining -= timeChange;
                 shotClock -= timeChange;
-                currentPlay += foulString;
-                return shootBonus();
-            }
 
-            if ((passSuccess > 50 && location > -1)) {
-                // pass leading to a shot
-                int timeChange = (int) (8 - (offense.getPace() / 90.0) * r.nextInt(4));
-                timeRemaining -= timeChange;
-                shotClock -= timeChange;
-                return getShot(offense, defense, true);
+                if(ob == -1){
+                    changePossession();
+                }
             }
         } else if (stealSuccess > 75) {
             // unsuccessful pass -> turnover
-            passesSinceShot = 0;
             currentPlay += passer.getFullName() + " turns the ball over! ";
             if (r.nextBoolean()) {
                 // ball is stolen by off ball defender
@@ -518,7 +656,13 @@ public class Game {
 
         if(currentPlay.length() == 0) {
             currentPlay += passer.getFullName() + " is dribbling with the ball";
-            if(getFoul(0)){
+
+            if(getBallOutOfBounds(passer, passDef) == -1){
+                deadBall = true;
+                madeShot = false;
+                changePossession();
+            }
+            else if(getFoul(0)){
                 currentPlay += foulString;
                 return shootBonus();
             }
@@ -546,7 +690,6 @@ public class Game {
         }
 
         currentPlay += team.getFullName() + " will run an inbounds play here.\n";
-        passesSinceShot--;
     }
 
     private Player getTarget(Team team) {
@@ -587,7 +730,6 @@ public class Game {
     }
 
     private int getShot(Team offense, Team defense, boolean assisted) {
-        passesSinceShot = 0;
         int shotLocation;
         Player shooter = offense.getPlayers().get(playerWithBall - 1);
 
@@ -807,6 +949,8 @@ public class Game {
     }
 
     private void getRebound(Team offense, Team defense) {
+        lastShotClock = shotClock;
+
         int[] offChance = getReboundChance(offense);
         int[] defChance = getReboundChance(defense);
 
@@ -983,6 +1127,7 @@ public class Game {
                 else{
                     shotClock = 30;
                 }
+                playerFouledOut = playerFouledOut(homeTeam);
                 return true;
             }
         }
@@ -997,13 +1142,93 @@ public class Game {
                 else{
                     shotClock = 30;
                 }
+                playerFouledOut = playerFouledOut(awayTeam);
                 return  true;
             }
         }
         return false;
     }
 
+    private boolean playerFouledOut(Team team){
+        for(int x = 0; x < 5; x++){
+            if(!team.getPlayers().get(x).isEligible()){
+                foulString += "\nThat's " + team.getPlayers().get(x).getFullName() + "'s 5th foul!" +
+                        " He has fouled out!";
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getBallOutOfBounds(Player withBall, Player ballDef){
+        // returns 0 if nothing happens, 1 if the defense knocks the ball out, and -1 if its a turnover
+        int chance = withBall.getBallHandling() + r.nextInt(randomBoundValue) -
+                (ballDef.getStealing() + ballDef.getOnBallDefense() + r.nextInt(randomBoundValue)) / 2;
+
+        if(chance < -20){
+            if(chance < -40){
+                currentPlay += " " + withBall.getFullName() + " has lost the ball out of bounds! You can credit " +
+                        ballDef.getFullName() + " with causing that turnover!";
+                return -1;
+            }
+            else{
+                currentPlay += " " + ballDef.getFullName() + " has knocked the ball out of bounds!";
+                return 1;
+            }
+        }
+
+
+        return 0;
+    }
+
+    private int getPostMove(Player withBall, Player ballDef) {
+        int postChance = withBall.getCloseRangeShot() - ballDef.getPostDefense() + r.nextInt(randomBoundValue);
+        if(withBall.getPosition() == 4 || withBall.getPosition() == 5){
+            postChance += r.nextInt(randomBoundValue);
+        }
+
+        // TODO: add a chance for fouls here
+        if(postChance > 30){
+            int timeChange;
+            if(homeTeamHasBall) {
+                timeChange = (int) (8 - (homeTeam.getPace() / 90.0) * r.nextInt(4));
+            }
+            else{
+                timeChange = (int) (8 - (awayTeam.getPace() / 90.0) * r.nextInt(4));
+            }
+            timeRemaining -= timeChange;
+            shotClock -= timeChange;
+            lastShotClock = shotClock;
+
+            currentPlay += " " + withBall.getFullName() + " goes to work in the post";
+            if(r.nextDouble() > .5 || postChance > 50){
+                currentPlay += " and scores!";
+                withBall.addTwoPointShot(true);
+
+                deadBall= true;
+                madeShot = true;
+                changePossession();
+                return 2;
+            }
+            else{
+                currentPlay += ", but cannot get his shot to fall.";
+                withBall.addTwoPointShot(false);
+
+                if(homeTeamHasBall) {
+                    getRebound(homeTeam, awayTeam);
+                }
+                else{
+                    getRebound(awayTeam, homeTeam);
+                }
+
+                return 0;
+            }
+        }
+        return -1;
+    }
+
     private void changePossession() {
+        lastShotClock = shotClock;
         homeTeamHasBall = !homeTeamHasBall;
         if (location == -1) {
             location = 1;
@@ -1016,8 +1241,8 @@ public class Game {
         else{
             shotClock = timeRemaining;
         }
-        passesSinceShot = 0;
         recentTO = false;
+        playType = 1;
     }
 
     public void setPlayerWantsTO(boolean to){

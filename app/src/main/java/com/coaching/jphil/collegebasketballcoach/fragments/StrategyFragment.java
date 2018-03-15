@@ -117,7 +117,8 @@ public class StrategyFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                paceProgress = (int)((paceProgress / 100.0) * 30 + 50);
+                // pace can be between 55 and 90
+                paceProgress = (int)((paceProgress / 100.0) * 35 + 55);
 
                 team.setPace(paceProgress);
             }
