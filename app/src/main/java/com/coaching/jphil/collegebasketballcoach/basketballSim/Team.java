@@ -38,6 +38,8 @@ public class Team {
     private int defenseTendToHelp = 50;
     private int pace = 70;
 
+    private int lastScoreDif = 0;
+
     private int id;
 
     public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches,
@@ -202,6 +204,27 @@ public class Team {
         for(Player p: players){
             p.playGame();
         }
+
+        lastScoreDif = 0;
+    }
+
+    public int getCoachTalk(int scoreDif){
+        if(scoreDif < lastScoreDif - 5){
+            lastScoreDif = scoreDif;
+            if(scoreDif > 15){
+                return 3; // more effect
+            }
+            return 0; // no effect
+        }
+        else{
+            lastScoreDif = scoreDif;
+            return 1; // smaller effect
+        }
+    }
+
+    public boolean getTimeout(int scoreDif){
+        // scoreDif needs to be teamScore - opponentScore
+        return (scoreDif < lastScoreDif - 8) && (Math.random() > .5) && (lastScoreDif < 30);
     }
 
     public int getWins(){

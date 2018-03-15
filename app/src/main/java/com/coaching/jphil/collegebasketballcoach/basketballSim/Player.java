@@ -16,7 +16,8 @@ public class Player {
     private int overallRating;
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
     private int gameVariability = 5;
-    private int gameModifier = 0;
+    private int offensiveModifier = 0;
+    private int defensiveModifier = 0;
 
     private int minutes;
 
@@ -46,6 +47,17 @@ public class Player {
     // Tracked Stats
     private int gamesPlayed;
     private int totalMinutes;
+
+    private int fouls;
+    private int twoPointShotAttempts;
+    private int twoPointShotMade;
+    private int threePointShotAttempts;
+    private int threePointShotMade;
+    private int freeThrowAttempts;
+    private int freeThrowMade;
+    private int assists;
+    private int oRebounds;
+    private int dRebounds;
 
 
     public Player(String lName, String fName, int position, int year, int overallRating){
@@ -141,7 +153,99 @@ public class Player {
             gamesPlayed++;
             totalMinutes += minutes;
         }
-        gameModifier = 0;
+        offensiveModifier = 0;
+        defensiveModifier = 0;
+    }
+
+    public void preGameSetup(){
+        fouls = 0;
+        twoPointShotAttempts = 0;
+        twoPointShotMade = 0;
+        threePointShotAttempts = 0;
+        threePointShotMade = 0;
+        freeThrowAttempts = 0;
+        freeThrowMade = 0;
+        assists = 0;
+        oRebounds = 0;
+        dRebounds = 0;
+    }
+
+    public void addFoul(){
+        fouls++;
+    }
+
+    public void addTwoPointShot(boolean made){
+        twoPointShotAttempts++;
+        if(made){
+            twoPointShotMade++;
+        }
+    }
+
+    public void addThreePointShot(boolean made){
+        threePointShotAttempts++;
+        if(made){
+            twoPointShotMade++;
+        }
+    }
+
+    public void addFreeThrowShot(boolean made){
+        freeThrowAttempts++;
+        if(made){
+            freeThrowMade++;
+        }
+    }
+
+    public void addAssist(){
+        assists++;
+    }
+
+    public void addRebound(boolean offensive){
+        if(offensive){
+            oRebounds++;
+        }
+        else{
+            dRebounds++;
+        }
+    }
+
+    public int getFouls() {
+        return fouls;
+    }
+
+    public int getTwoPointShotAttempts() {
+        return twoPointShotAttempts;
+    }
+
+    public int getTwoPointShotMade() {
+        return twoPointShotMade;
+    }
+
+    public int getThreePointShotAttempts() {
+        return threePointShotAttempts;
+    }
+
+    public int getThreePointShotMade() {
+        return threePointShotMade;
+    }
+
+    public int getFreeThrowAttempts() {
+        return freeThrowAttempts;
+    }
+
+    public int getFreeThrowMade() {
+        return freeThrowMade;
+    }
+
+    public int getAssists() {
+        return assists;
+    }
+
+    public int getoRebounds() {
+        return oRebounds;
+    }
+
+    public int getdRebounds() {
+        return dRebounds;
     }
 
     private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
@@ -271,55 +375,59 @@ public class Player {
     }
 
     public int getCloseRangeShot() {
-        return closeRangeShot + gameModifier;
+        return closeRangeShot + offensiveModifier;
     }
 
     public int getMidRangeShot() {
-        return midRangeShot + gameModifier;
+        return midRangeShot + offensiveModifier;
     }
 
     public int getLongRangeShot() {
-        return longRangeShot + gameModifier;
+        return longRangeShot + offensiveModifier;
+    }
+
+    public int getFreeThrowShot(){
+        return (int)((closeRangeShot + midRangeShot + longRangeShot) / 3.0);
     }
 
     public int getBallHandling() {
-        return ballHandling + gameModifier;
+        return ballHandling + offensiveModifier;
     }
 
     public int getPassing() {
-        return passing + gameModifier;
+        return passing + offensiveModifier;
     }
 
     public int getScreening() {
-        return screening + gameModifier;
+        return screening + offensiveModifier;
     }
 
     public int getOffBallMovement(){
-        return offBallMovement + gameModifier;
+        return offBallMovement + offensiveModifier;
     }
 
     public int getPostDefense() {
-        return postDefense + gameModifier;
+        return postDefense + defensiveModifier;
     }
 
     public int getPerimeterDefense() {
-        return perimeterDefense + gameModifier;
+        return perimeterDefense + defensiveModifier;
     }
 
     public int getOnBallDefense() {
-        return onBallDefense + gameModifier;
+        return onBallDefense + defensiveModifier;
     }
 
     public int getOffBallDefense() {
-        return offBallDefense + gameModifier;
+        return offBallDefense + defensiveModifier;
     }
 
     public int getStealing() {
-        return stealing + gameModifier;
+        return stealing + defensiveModifier;
     }
 
     public int getRebounding() {
-        return rebounding + gameModifier;
+        return rebounding + defensiveModifier;
     }
 
     public int getStamina() {
@@ -334,22 +442,57 @@ public class Player {
         return totalMinutes;
     }
 
-    public void setGameModifiers(boolean homeTeam, int advantage){
-        gameModifier = (int) (Math.random() * 2 * gameVariability) - gameVariability;
+    public void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
+        // for coach type: 0=no effect, 1=less variability, 2=extra variability (good or bad), 3=defensive focus, 4=offensive focus
+
+        double gameModifier = (Math.random() * 2 * gameVariability) - gameVariability;
+        if(coachType == 1){
+            gameModifier /= 2;
+        }
+        else if(coachType == 2){
+            gameModifier *= 2;
+        }
+
         if(homeTeam){
             // players play better at home
             gameModifier += 3;
         }
-        if(advantage > 0){
-            if(advantage > 30){
-                gameModifier -= (int) (30 * 0.7);
+        if(scoreDif > 0){
+            if(scoreDif > 30){
+                gameModifier -= 15 * 0.7;
             }
             else{
-                gameModifier -= (int) (advantage * (1 - advantage/100.0));
+                gameModifier -= (scoreDif / 2.0) * (1 - scoreDif/100.0);
             }
 
         }
 
+        if(coachType == 3){
+            offensiveModifier += gameModifier;
+            defensiveModifier += gameModifier + 3;
+        }
+        else if(coachType == 4){
+            offensiveModifier += gameModifier + 3;
+            defensiveModifier += gameModifier;
+        }
+        else{
+            offensiveModifier += gameModifier;
+            defensiveModifier += gameModifier;
+        }
+
+        if(offensiveModifier > (int) (15 * 0.7)){
+            offensiveModifier = (int) (15 * 0.7);
+        }
+        else if(offensiveModifier < (int) (-15 * 0.7)){
+            offensiveModifier = (int) (-15 * 0.7);
+        }
+
+        if(defensiveModifier > (int) (15 * 0.7)){
+            defensiveModifier = (int) (15 * 0.7);
+        }
+        else if(defensiveModifier < (int) (-15 * 0.7)){
+            defensiveModifier = (int) (-15 * 0.7);
+        }
     }
 
 }

@@ -110,11 +110,22 @@
 
     <!-- Game Fragment -->
     <string name="timeout">Call timeout</string>
+    <string name="end_timeout">Return to game</string>
     <string name="start_game">Start game</string>
     <string name="start_2nd">Start 2nd half</string>
-    <string name="scores">%s: %d</string>
+    <string name="scores">%s\n%d</string>
     <string name="half">Half: %d</string>
     <string name="game_speed">Simulation speed</string>
+    <string name="timeout_left">TO: %d</string>
+    <string name="team_fouls">Fouls: %d</string>
+
+    <string-array name="timeout_array">
+        <item>*Skip speech*</item>
+        <item>Good work guys! Keep it up!</item>
+        <item>Show me something else!</item>
+        <item>I need you guys to focus on defense!</item>
+        <item>Let\'s try to get some more shots to fall now!</item>
+    </string-array>
 
     <string name="list_score">%s: %d - %s: %d</string>
 
