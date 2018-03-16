@@ -119,7 +119,11 @@
     <string name="game_speed">Simulation speed</string>
     <string name="timeout_left">TO: %d</string>
     <string name="team_fouls">Fouls: %d</string>
-    <string name="fouled_out">One of your players has fouled out! Please select a substitute.</string>
+    <string name="fouled_out">One of your players has fouled out!\nPlease select a substitute.</string>
+    <string name="alert_dead_ball">Dead ball!\nMake any desired changes before pressing continue.</string>
+    <string name="alert_foul_trouble">One or more of your players may be in foul trouble!</string>
+    <string name="timeout_instruction">A timeout has been called.\nMake any desired changes before speaking to your players.</string>
+    <string name="pre_game_instruction">Address your players before starting the half.</string>
 
     <string-array name="timeout_array">
         <item>Skip speech</item>

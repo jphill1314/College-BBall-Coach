@@ -260,12 +260,12 @@ public class Player {
         if(time > 0 && event != 0){
             if(event == 1){
                 fatigue += 2 * (1.5 - (stamina / 100.0));
-                if(fatigue > 65){
-                    fatigue = 65.0;
+                if(fatigue > 100){
+                    fatigue = 100.0;
                 }
             }
             else if(fatigue > 0){
-                fatigue--;
+                fatigue -= 2;
             }
         }
     }
@@ -476,7 +476,7 @@ public class Player {
     }
 
     private double getFatigueFactor(){
-        return (1 - ((Math.exp((fatigue) / 20)) / 100));
+        return (1 - ((Math.exp((fatigue) / 25)) / 100));
     }
 
     public void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){

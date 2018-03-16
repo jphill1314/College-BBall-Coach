@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.ViewHolder> {
 
     private ArrayList<Player> players;
+    private boolean[] pendingSub;
     private int index1, index2;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
@@ -42,14 +43,31 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
         this.players = players;
         index1 = -1;
         index2 = -1;
+        pendingSub = new boolean[players.size()];
+        for(int x = 0; x < players.size(); x++){
+            pendingSub[x] = false;
+        }
     }
 
     public int[] getIndexes(){
         int[] values = new int[]{index1, index2};
+        if(index1 != -1) {
+            pendingSub[index1] = true;
+        }
+        if(index2 != -1) {
+            pendingSub[index2] = true;
+        }
         index1 = -1;
         index2 = -1;
         notifyDataSetChanged();
         return values;
+    }
+
+    public void clearPending(){
+        for(int x = 0; x < pendingSub.length; x++){
+            pendingSub[x] = false;
+        }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -84,14 +102,28 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
         holder.name.setText(players.get(position).getFullName());
         holder.stats.setText(players.get(position).getGameStatsAsString());
 
-        holder.view.setBackgroundColor(Color.rgb(250,250,250));
+        holder.view.setBackgroundColor(Color.rgb(250, 250,250));
+
+        if(players.get(position).getFatigue() > 60){
+            holder.name.setBackgroundColor(Color.rgb(255, 0, 0));
+        }
+        else if(players.get(position).getFatigue() > 40){
+            holder.name.setBackgroundColor(Color.rgb(255, 255, 0));
+        }
+        else {
+            holder.name.setBackgroundColor(Color.rgb(0, 255, 0));
+        }
 
         if(position == index1 || position == index2){
             holder.view.setBackgroundColor(Color.LTGRAY);
         }
 
+        if(pendingSub[position]){
+            holder.view.setBackgroundColor(Color.DKGRAY);
+        }
+
         if(!players.get(position).isEligible()){
-            holder.view.setBackgroundColor(Color.RED);
+            holder.view.setBackgroundColor(Color.BLACK);
             if(index1 == position){
                 index1 = -1;
                 index2 = -1;
@@ -105,10 +137,10 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(index1 == -1){
+                if(index1 == -1 && !pendingSub[pos]){
                     index1 = pos;
                 }
-                else if(pos != index1){
+                else if(pos != index1 && !pendingSub[pos]){
                     index2 = pos;
                 }
                 else{

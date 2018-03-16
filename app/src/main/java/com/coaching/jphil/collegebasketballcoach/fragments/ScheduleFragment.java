@@ -1,6 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,6 +44,8 @@ public class ScheduleFragment extends Fragment {
 
     private Button simGame, newSeason, startTournament;
 
+    private SimAsync async;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,6 +67,8 @@ public class ScheduleFragment extends Fragment {
         newSeason = view.findViewById(R.id.start_new_season);
         startTournament = view.findViewById(R.id.start_tournament);
 
+        async = null;
+
         if(!mainActivity.currentTeam.isPlayerControlled()){
             simGame.setVisibility(View.GONE);
             newSeason.setVisibility(View.GONE);
@@ -74,16 +79,18 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(mainActivity.championship == null) {
-                    for (Conference c : mainActivity.conferences) {
-                        if (c.equals(mainActivity.currentConference)) {
-                            simulateGames(c, mainActivity.currentTeam, false);
-                        } else {
-                            simulateGames(c, c.getTeams().get(0), false);
-                        }
+                    if(async == null) {
+                        async = new SimAsync(mainActivity.conferences, false);
+                        async.execute();
                     }
                 }
                 else{
-                    simulateGames(mainActivity.conferences.get(0), mainActivity.currentTeam, true);
+                    if(async == null) {
+                        ArrayList<Conference> conf = new ArrayList<>();
+                        conf.add(mainActivity.conferences.get(0));
+                        async = new SimAsync(conf, true);
+                        async.execute();
+                    }
                 }
 
                 ScheduleAdapter adapt = (ScheduleAdapter)adapter;
@@ -105,9 +112,9 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(!mainActivity.currentConference.isInPostSeason()) {
-                    for(Conference c: mainActivity.conferences){
-                        simulateGames(c, c.getTeams().get(0), true);
-                        c.generateTournament();
+                    if(async == null){
+                        async = new SimAsync(mainActivity.conferences, true);
+                        async.execute();
                     }
                 }
                 else{
@@ -127,65 +134,104 @@ public class ScheduleFragment extends Fragment {
                 ScheduleAdapter adapt = (ScheduleAdapter)adapter;
                 adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
                 adapter.notifyDataSetChanged();
-
-
             }
         });
 
         return view;
     }
 
-    private void simulateGames(Conference conference, Team team, boolean simAll){
-        if(!conference.isInPostSeason()) {
-            for (Game game : conference.getMasterSchedule()) {
-                if (!game.isPlayed()) {
-                    if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
-                       if(team.isPlayerControlled()){
-                            GameFragment frag = new GameFragment();
-                            Bundle args = new Bundle();
-                            for(int x = 0; x < conference.getMasterSchedule().size(); x++){
-                                if(game.equals(conference.getMasterSchedule().get(x))){
-                                    args.putInt("game", x);
-                                    break;
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+
+        if(async != null){
+            async.cancel(true);
+        }
+    }
+
+    private class SimAsync extends AsyncTask<String, Integer, Integer>{
+
+        private ArrayList<Conference> conferences;
+        private boolean simAll;
+
+        public SimAsync(ArrayList<Conference> conferences, boolean simAll){
+            this.conferences = conferences;
+            this.simAll = simAll;
+        }
+
+        @Override
+        protected Integer doInBackground(String... strings) {
+            int index = 0;
+            for(Conference c: conferences){
+                index = simulateGames(c, c.getTeams().get(0), simAll);
+                if(index > -1){
+                    return index;
+                }
+            }
+            return index;
+        }
+
+        @Override
+        protected void onPostExecute(Integer results){
+            if(results > -1){
+                GameFragment frag = new GameFragment();
+                Bundle args = new Bundle();
+                args.putInt("game", results);
+
+                frag.setArguments(args);
+
+                mainActivity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_frame, frag)
+                        .addToBackStack("games")
+                        .commit();
+            }
+            async = null;
+        }
+
+        private Integer simulateGames(Conference conference, Team team, boolean simAll){
+            if(!conference.isInPostSeason()) {
+                for (Game game : conference.getMasterSchedule()) {
+                    if (!game.isPlayed()) {
+                        if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
+                            if(team.isPlayerControlled()){
+                                for(int x = 0; x < conference.getMasterSchedule().size(); x++){
+                                    if(game.equals(conference.getMasterSchedule().get(x))){
+                                        return x;
+                                    }
                                 }
                             }
-
-                            frag.setArguments(args);
-
-                            mainActivity.getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.content_frame, frag)
-                                    .addToBackStack("games")
-                                    .commit();
-                       }
-                       else{
-                           game.simulateGame();
-                       }
-                        if(!simAll){
-                            return;
+                            else{
+                                game.simulateGame();
+                            }
+                            if(!simAll){
+                                return -1;
+                            }
+                        } else {
+                            game.simulateGame();
                         }
-                    } else {
-                        game.simulateGame();
                     }
                 }
             }
-        }
-        else if(!conference.isSeasonFinished()){
-            conference.generateTournament();
-            return;
-        }
-
-        if(mainActivity.championship != null){
-            mainActivity.championship.playNextRound();
-            if(mainActivity.championship.hasChampion()) {
-                newSeason.setVisibility(View.VISIBLE);
-                simGame.setVisibility(View.INVISIBLE);
+            else if(!conference.isSeasonFinished()){
+                conference.generateTournament();
+                return -2;
             }
-            return;
-        }
 
-        simGame.setVisibility(View.INVISIBLE);
-        startTournament.setVisibility(View.VISIBLE);
+            if(mainActivity.championship != null){
+                mainActivity.championship.playNextRound();
+                if(mainActivity.championship.hasChampion()) {
+                    newSeason.setVisibility(View.VISIBLE);
+                    simGame.setVisibility(View.INVISIBLE);
+                }
+                return -3;
+            }
+
+            simGame.setVisibility(View.INVISIBLE);
+            startTournament.setVisibility(View.VISIBLE);
+            return -100;
+        }
     }
+
 
     private ArrayList<Game> getTeamSchedule(Team team){
         ArrayList<Game> teamSchedule = new ArrayList<>();

@@ -125,6 +125,21 @@
         android:max="25"/>
 
     <TextView
+        android:id="@+id/alert_dead_ball"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="@string/alert_dead_ball"
+        android:visibility="invisible"/>
+
+    <TextView
         android:id="@+id/speed_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -132,6 +147,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:layout_above="@id/game_speed_bar"
+        android:layout_alignTop="@id/alert_dead_ball"
         android:text="@string/game_speed"/>
 
     <android.support.v7.widget.RecyclerView

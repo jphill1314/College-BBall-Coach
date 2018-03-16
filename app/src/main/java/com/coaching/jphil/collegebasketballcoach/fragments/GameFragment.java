@@ -48,9 +48,10 @@ public class GameFragment extends Fragment {
     private int gameSpeed = 10;
     private boolean isInTimeout = false;
     private boolean forceSub = false;
+    private boolean alertDeadBall = false;
 
     private FloatingActionButton fab;
-    private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls;
+    private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls, deadBall, gameSpeedText;
     private SeekBar gameSpeedBar;
     private Spinner spinner;
     private ArrayAdapter<String> spinnerAdapter;
@@ -58,6 +59,8 @@ public class GameFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager manager;
     private RecyclerView.Adapter adapter;
+    private GameRosterAdapter grAdapter;
+    private boolean updateGRA = false;
     private int adapterType = 0;
 
     private SimGame gameAsync;
@@ -83,6 +86,9 @@ public class GameFragment extends Fragment {
 
         homeFouls = view.findViewById(R.id.home_fouls);
         awayFouls = view.findViewById(R.id.away_fouls);
+
+        gameSpeedText = view.findViewById(R.id.speed_text);
+        deadBall = view.findViewById(R.id.alert_dead_ball);
 
         homeScore.setText(getString(R.string.scores, game.getHomeTeam().getFullName(), game.getHomeScore()));
         awayScore.setText(getString(R.string.scores, game.getAwayTeam().getFullName(), game.getAwayScore()));
@@ -117,6 +123,14 @@ public class GameFragment extends Fragment {
         spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
         spinner.setAdapter(spinnerAdapter);
         spinner.setSelection(0, false);
+        spinner.setVisibility(View.INVISIBLE);
+
+        if(game.getHomeTeam().isPlayerControlled()){
+            grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers());
+        }
+        else{
+            grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers());
+        }
 
         setClickListeners();
 
@@ -156,8 +170,29 @@ public class GameFragment extends Fragment {
                             }
                         }
                     }
+                    else if(playResult == 2){
+                        alertDeadBall = true;
+                        publishProgress();
+                        while(alertDeadBall){
+                            try {
+                                sleep(500);
+                            }
+                            catch (InterruptedException e){
+                                Log.e("sleep error", e.toString());
+                            }
+                        }
+                    }
                     else if(playResult == 3){
-                        forceSub();
+                        forceSub = true;
+                        publishProgress();
+                        while(forceSub){
+                            try {
+                                sleep(500);
+                            }
+                            catch (InterruptedException e){
+                                Log.e("sleep error", e.toString());
+                            }
+                        }
                     }
                     else{
                         publishProgress();
@@ -182,8 +217,22 @@ public class GameFragment extends Fragment {
         protected void onProgressUpdate(String... progress){
             updateUI();
 
+            if(forceSub){
+                forceSub();
+            }
+
+            if(alertDeadBall){
+                alertDeadBall();
+                alertFoulTrouble();
+            }
+
             if(isInTimeout){
                 callTimeout();
+                alertFoulTrouble();
+            }
+
+            if(updateGRA){
+                updateGRA();
             }
         }
 
@@ -214,7 +263,6 @@ public class GameFragment extends Fragment {
     }
 
     private void forceSub(){
-        forceSub = true;
         if(game.getHomeTeam().isPlayerControlled()){
             changeAdapters(2);
         }
@@ -222,10 +270,7 @@ public class GameFragment extends Fragment {
             changeAdapters(3);
         }
 
-        Toast toast = new Toast(getContext());
-        toast.setText(R.string.fouled_out);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.show();
+        Toast.makeText(getContext(), R.string.fouled_out, Toast.LENGTH_LONG).show();
     }
 
     private void callTimeout(){
@@ -240,8 +285,51 @@ public class GameFragment extends Fragment {
         spinner.setAdapter(spinnerAdapter);
         spinner.setSelection(3, true);
 
+        gameSpeedBar.setVisibility(View.INVISIBLE);
+        gameSpeedText.setVisibility(View.INVISIBLE);
+        deadBall.setVisibility(View.VISIBLE);
+        deadBall.setText(getString(R.string.timeout_instruction));
+
         homeTO.setText(getString(R.string.timeout_left, game.getHomeTimeouts()));
         awayTO.setText(getString(R.string.timeout_left, game.getAwayTimeouts()));
+    }
+
+    private void alertDeadBall(){
+        gameSpeedBar.setVisibility(View.INVISIBLE);
+        gameSpeedText.setVisibility(View.INVISIBLE);
+        deadBall.setVisibility(View.VISIBLE);
+        deadBall.setText(getString(R.string.alert_dead_ball));
+
+        spinner.setSelection(0, true);
+
+        changeAdapters(0);
+    }
+
+    private void alertFoulTrouble(){
+        boolean showToast = false;
+        int half = game.getHalf();
+        int time = game.getTimeRemaining();
+
+        if(game.getHomeTeam().isPlayerControlled()){
+            for(int x = 0; x < 5; x++){
+                if(game.getHomeTeam().getPlayers().get(x).isInFoulTrouble(half, time)){
+                    showToast = true;
+                    break;
+                }
+            }
+        }
+        else{
+            for(int x = 0; x < 5; x++){
+                if(game.getAwayTeam().getPlayers().get(x).isInFoulTrouble(half, time)){
+                    showToast = true;
+                    break;
+                }
+            }
+        }
+
+        if(showToast){
+            Toast.makeText(getContext(), getString(R.string.alert_foul_trouble), Toast.LENGTH_LONG).show();
+        }
     }
 
     private String[] getSpinnerList(){
@@ -289,12 +377,22 @@ public class GameFragment extends Fragment {
             public void onClick(View view) {
                 if(adapterType == 0){
                     if(gameAsync == null){
-                        recyclerView.setVisibility(View.VISIBLE);
                         gameAsync = new SimGame();
                         gameAsync.execute();
-                    }
 
-                    if(game.getPlayerWantsTO()){
+                        spinner.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                    else if(alertDeadBall){
+                        alertDeadBall = false;
+                        gameSpeedBar.setVisibility(View.VISIBLE);
+                        gameSpeedText.setVisibility(View.VISIBLE);
+                        deadBall.setVisibility(View.INVISIBLE);
+                        updateGRA = true;
+
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_black_24dp));
+                    }
+                    else if(game.getPlayerWantsTO()){
                         game.setPlayerWantsTO(false);
                     }
                     else {
@@ -317,18 +415,23 @@ public class GameFragment extends Fragment {
                         forceSub = false;
                     }
                 }
-                else if(adapterType == 3){
-                    if(game.getHomeTeam().isPlayerControlled()) {
-                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore()-game.getAwayScore(), ((GameSpeechAdapter)adapter).getSelectedValue());
-                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore()-game.getHomeScore());
-                    }
-                    else{
-                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore()-game.getAwayScore());
-                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore()-game.getHomeScore(), ((GameSpeechAdapter)adapter).getSelectedValue());
+                else if(adapterType == 3) {
+                    if (game.getHomeTeam().isPlayerControlled()) {
+                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
+                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore());
+                    } else {
+                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore());
+                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
                     }
                     spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
                     spinner.setAdapter(spinnerAdapter);
                     spinner.setSelection(0, true);
+
+                    gameSpeedBar.setVisibility(View.VISIBLE);
+                    gameSpeedText.setVisibility(View.VISIBLE);
+                    deadBall.setVisibility(View.INVISIBLE);
+
+                    updateGRA = true;
 
                     isInTimeout = false;
                     changeAdapters(0);
@@ -338,10 +441,23 @@ public class GameFragment extends Fragment {
         });
     }
 
+    private void updateGRA(){
+        updateGRA = false;
+        if(game.getHomeTeam().isPlayerControlled()) {
+            grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers());
+        }
+        else{
+            grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers());
+        }
+    }
+
     private void changeAdapters(int type){
         if(type == 0){
             adapter = new GameAdapter(new ArrayList<>(game.getPlays()));
             if(gameAsync == null){
+                fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
+            }
+            else if(alertDeadBall){
                 fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
             }
             else {
@@ -353,27 +469,31 @@ public class GameFragment extends Fragment {
             fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_black_24dp));
             if(game.getHomeTeam().isPlayerControlled()){
                 fab.setVisibility(View.VISIBLE);
+                adapter = grAdapter;
             }
             else{
                 fab.setVisibility(View.GONE);
+                adapter = new GameRosterAdapter(game.getHomeTeam().getPlayers());
             }
-            adapter = new GameRosterAdapter(game.getHomeTeam().getPlayers());
+
         }
         else if(type == 2){
             fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_black_24dp));
             if(game.getAwayTeam().isPlayerControlled()){
                 fab.setVisibility(View.VISIBLE);
+                adapter = grAdapter;
             }
             else{
                 fab.setVisibility(View.GONE);
+                adapter = new GameRosterAdapter(game.getAwayTeam().getPlayers());
             }
-            adapter = new GameRosterAdapter(game.getAwayTeam().getPlayers());
         }
         else if(type == 3){
             fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_black_24dp));
             fab.setVisibility(View.VISIBLE);
             if(game.getTimeRemaining() == 20 * 60 || (game.getHalf() > 2 && game.getTimeRemaining() == 5 * 60)){
                 adapter = new GameSpeechAdapter(getResources().getStringArray(R.array.pre_game_speeches));
+                deadBall.setText(getString(R.string.pre_game_instruction));
             }
             else {
                 adapter = new GameSpeechAdapter(getResources().getStringArray(R.array.timeout_array));
