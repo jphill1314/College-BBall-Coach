@@ -407,15 +407,17 @@ public class Team {
         Random r = new Random();
 
         for(int x = 0; x < 5; x++){
-            if(subPlayers.get(x).getFatigue() > r.nextInt(101) - tendToSub ||
-                    (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && r.nextInt(35) + tendToSub > 75)){
-                int sub = findSub(half, timeRemaining);
-                if(subPlayers.get(x).getOverallRating() / subPlayers.get(x).getFatigue() <
-                        subPlayers.get(sub).getOverallRating()/ subPlayers.get(sub).getFatigue()){
-                    updateSubs(x, sub);
+            if(subPlayers.get(x).isEligible()){
+                if(subPlayers.get(x).getFatigue() > r.nextInt(101) - tendToSub ||
+                        (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && r.nextInt(35) + tendToSub > 75)){
+                    int sub = findSub(half, timeRemaining);
+                    if(subPlayers.get(x).getOverallRating() / subPlayers.get(x).getFatigue() <
+                            subPlayers.get(sub).getOverallRating()/ subPlayers.get(sub).getFatigue()){
+                        updateSubs(x, sub);
+                    }
                 }
             }
-            else if(!subPlayers.get(x).isEligible()){
+            else{
                 updateSubs(x, findSub(half, timeRemaining));
             }
         }

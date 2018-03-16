@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -54,7 +56,12 @@ public class GameFragment extends Fragment {
     private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls, deadBall, gameSpeedText;
     private SeekBar gameSpeedBar;
     private Spinner spinner;
+    private FrameLayout frame;
+    private View strategyView;
     private ArrayAdapter<String> spinnerAdapter;
+
+    private SeekBar offThrees, defThrees, pace, help;
+    private int pendingOffThrees, pendingDefThrees, pendingPace, pendingHelp;
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager manager;
@@ -78,6 +85,9 @@ public class GameFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_game, container, false);
 
+        frame = view.findViewById(R.id.game_frame_layout);
+        strategyView = inflater.inflate(R.layout.fragment_strategy, container, false);
+
         homeScore = view.findViewById(R.id.home_score);
         awayScore = view.findViewById(R.id.away_score);
 
@@ -89,6 +99,11 @@ public class GameFragment extends Fragment {
 
         gameSpeedText = view.findViewById(R.id.speed_text);
         deadBall = view.findViewById(R.id.alert_dead_ball);
+
+        offThrees = strategyView.findViewById(R.id.seek_offense_three);
+        defThrees = strategyView.findViewById(R.id.seek_defense_three);
+        pace = strategyView.findViewById(R.id.seek_pace);
+        help = strategyView.findViewById(R.id.seek_help);
 
         homeScore.setText(getString(R.string.scores, game.getHomeTeam().getFullName(), game.getHomeScore()));
         awayScore.setText(getString(R.string.scores, game.getAwayTeam().getFullName(), game.getAwayScore()));
@@ -107,7 +122,7 @@ public class GameFragment extends Fragment {
 
         fab = view.findViewById(R.id.game_fab);
 
-        recyclerView = view.findViewById(R.id.game_list);
+        recyclerView = (RecyclerView) inflater.inflate(R.layout.game_list_view, container, false);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
 
@@ -115,6 +130,7 @@ public class GameFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         recyclerView.setVisibility(View.GONE);
+        frame.addView(recyclerView);
 
         gameSpeedBar = view.findViewById(R.id.game_speed_bar);
         gameSpeedBar.setProgress(gameSpeed);
@@ -133,6 +149,7 @@ public class GameFragment extends Fragment {
         }
 
         setClickListeners();
+        setStrategyView();
 
         return view;
     }
@@ -264,17 +281,19 @@ public class GameFragment extends Fragment {
 
     private void forceSub(){
         if(game.getHomeTeam().isPlayerControlled()){
-            changeAdapters(2);
+            changeAdapters(1);
+            spinner.setSelection(1, true);
         }
         else{
-            changeAdapters(3);
+            changeAdapters(2);
+            spinner.setSelection(2, true);
         }
 
         Toast.makeText(getContext(), R.string.fouled_out, Toast.LENGTH_LONG).show();
     }
 
     private void callTimeout(){
-        changeAdapters(3);
+        changeAdapters(4);
 
         String[] array = new String[getSpinnerList().length+1];
         for(int x = 0 ; x < getSpinnerList().length; x++){
@@ -283,12 +302,12 @@ public class GameFragment extends Fragment {
         array[array.length-1] = "Team speech";
         spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, array);
         spinner.setAdapter(spinnerAdapter);
-        spinner.setSelection(3, true);
+        spinner.setSelection(4, true);
 
         gameSpeedBar.setVisibility(View.INVISIBLE);
         gameSpeedText.setVisibility(View.INVISIBLE);
-        deadBall.setVisibility(View.VISIBLE);
         deadBall.setText(getString(R.string.timeout_instruction));
+        deadBall.setVisibility(View.VISIBLE);
 
         homeTO.setText(getString(R.string.timeout_left, game.getHomeTimeouts()));
         awayTO.setText(getString(R.string.timeout_left, game.getAwayTimeouts()));
@@ -303,6 +322,28 @@ public class GameFragment extends Fragment {
         spinner.setSelection(0, true);
 
         changeAdapters(0);
+
+        Team playerTeam;
+        if(game.getHomeTeam().isPlayerControlled()){
+            playerTeam = game.getHomeTeam();
+        }
+        else{
+            playerTeam = game.getAwayTeam();
+        }
+
+        if(pendingPace > 0) {
+            playerTeam.setPace(pendingPace);
+        }
+        if(pendingHelp > 0) {
+            playerTeam.setDefenseTendToHelp(pendingHelp);
+        }
+        if(pendingOffThrees > 0){
+            playerTeam.setOffenseFavorsThrees(pendingOffThrees);
+        }
+        if(pendingDefThrees > 0) {
+            playerTeam.setDefenseFavorsThrees(pendingDefThrees);
+        }
+
     }
 
     private void alertFoulTrouble(){
@@ -336,7 +377,8 @@ public class GameFragment extends Fragment {
         return new String[]{
                 "Play-by-Play",
                 game.getHomeTeamName() + " Roster",
-                game.getAwayTeamName() + " Roster"
+                game.getAwayTeamName() + " Roster",
+                "Team Strategy"
         };
     }
 
@@ -415,7 +457,7 @@ public class GameFragment extends Fragment {
                         forceSub = false;
                     }
                 }
-                else if(adapterType == 3) {
+                else if(adapterType == 4) {
                     if (game.getHomeTeam().isPlayerControlled()) {
                         game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
                         game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore());
@@ -430,6 +472,7 @@ public class GameFragment extends Fragment {
                     gameSpeedBar.setVisibility(View.VISIBLE);
                     gameSpeedText.setVisibility(View.VISIBLE);
                     deadBall.setVisibility(View.INVISIBLE);
+                    deadBall.setText(getString(R.string.alert_dead_ball));
 
                     updateGRA = true;
 
@@ -439,6 +482,104 @@ public class GameFragment extends Fragment {
 
             }
         });
+    }
+
+    private void setStrategyView(){
+        Team playerTeam;
+        if(game.getHomeTeam().isPlayerControlled()){
+           playerTeam = game.getHomeTeam();
+        }
+        else{
+            playerTeam = game.getAwayTeam();
+        }
+
+        pendingOffThrees = playerTeam.getOffenseFavorsThrees();
+        pendingDefThrees = playerTeam.getDefenseFavorsThrees();
+        pendingHelp = playerTeam.getDefenseTendToHelp();
+        pendingPace = playerTeam.getPace();
+
+        offThrees.setProgress((int) (pendingOffThrees / 70.0 * 100.0 - 30));
+        defThrees.setProgress((int) (pendingDefThrees / 70.0 * 100.0 - 30));
+        help.setProgress((int) (pendingHelp / 70.0 * 100.0 - 30));
+        pace.setProgress((int) ((pendingPace - 55) / 35.0 * 100.0));
+
+        offThrees.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int offThreeProgress;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                offThreeProgress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                offThreeProgress = (int) (((offThreeProgress + 30) / 100.0) * 70);
+                pendingOffThrees = offThreeProgress;
+            }
+        });
+
+        defThrees.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int defThreeProgress;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                defThreeProgress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                defThreeProgress = (int) (((defThreeProgress + 30) / 100.0) * 70);
+                pendingDefThrees = defThreeProgress;
+            }
+        });
+
+        help.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int defHelpProgress;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                defHelpProgress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                defHelpProgress = (int) (((defHelpProgress + 30) / 100.0) * 70);
+                pendingHelp = defHelpProgress;
+            }
+        });
+
+        pace.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int paceProgress;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                paceProgress = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // pace can be between 55 and 90
+                paceProgress = (int)((paceProgress / 100.0) * 35 + 55);
+                pendingPace = paceProgress;
+            }
+        });
+
     }
 
     private void updateGRA(){
@@ -452,6 +593,16 @@ public class GameFragment extends Fragment {
     }
 
     private void changeAdapters(int type){
+        if(adapterType == 3 && type != 3){
+            frame.removeView(strategyView);
+            frame.addView(recyclerView);
+
+            fab.setVisibility(View.VISIBLE);
+            gameSpeedText.setVisibility(View.VISIBLE);
+            gameSpeedBar.setVisibility(View.VISIBLE);
+            deadBall.setVisibility(View.INVISIBLE);
+        }
+
         if(type == 0){
             adapter = new GameAdapter(new ArrayList<>(game.getPlays()));
             if(gameAsync == null){
@@ -489,6 +640,15 @@ public class GameFragment extends Fragment {
             }
         }
         else if(type == 3){
+            frame.removeView(recyclerView);
+            frame.addView(strategyView);
+
+            fab.setVisibility(View.INVISIBLE);
+            gameSpeedText.setVisibility(View.GONE);
+            gameSpeedBar.setVisibility(View.GONE);
+            deadBall.setVisibility(View.GONE);
+        }
+        else if(type == 4){
             fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_black_24dp));
             fab.setVisibility(View.VISIBLE);
             if(game.getTimeRemaining() == 20 * 60 || (game.getHalf() > 2 && game.getTimeRemaining() == 5 * 60)){

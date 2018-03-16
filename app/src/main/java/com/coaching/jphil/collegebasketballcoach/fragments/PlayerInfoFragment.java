@@ -30,7 +30,7 @@ public class PlayerInfoFragment extends Fragment {
     private TextView postDef, perimDef, onBall, offBall, steal, rebound;
     private TextView stamina;
     private TextView gamesPlayed, totalMinutes;
-    private TextView playerName, playerMinutes, teamMinutes;
+    private TextView playerName;
 
     private ImageView star1, star2, star3, star4, star5;
 
@@ -65,8 +65,7 @@ public class PlayerInfoFragment extends Fragment {
         stamina = view.findViewById(R.id.stamina);
 
         playerName = view.findViewById(R.id.player_name);
-        playerMinutes = view.findViewById(R.id.minutes_text);
-        teamMinutes = view.findViewById(R.id.team_minutes);
+
 
         gamesPlayed = view.findViewById(R.id.games_played);
         totalMinutes = view.findViewById(R.id.total_minutes);
@@ -78,34 +77,6 @@ public class PlayerInfoFragment extends Fragment {
         star5 = view.findViewById(R.id.player_star_5);
 
         setAttributes();
-
-        SeekBar minutes = view.findViewById(R.id.minutes_seek);
-        if(mainActivity.currentTeam.isPlayerControlled()) {
-            minutes.setProgress(mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes());
-            minutes.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    mainActivity.currentTeam.getPlayers().get(playerIndex).setMinutes(i);
-                    playerMinutes.setText(getResources().getString(R.string.player_minutes,
-                            mainActivity.currentTeam.getPlayers().get(playerIndex).getMinutes()));
-                    teamMinutes.setText(getResources().getString(R.string.team_minutes,
-                            200 - mainActivity.currentTeam.getTotalMinutes()));
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-        }
-        else{
-            view.findViewById(R.id.seek_layout).setVisibility(View.GONE);
-        }
 
         return view;
     }
@@ -130,8 +101,6 @@ public class PlayerInfoFragment extends Fragment {
         stamina.setText(getResources().getString(R.string.stamina, player.getStamina()));
 
         playerName.setText(getResources().getString(R.string.player_name_pos, player.getFullName(), player.getYearAsString(), player.getPositionAbr()));
-        playerMinutes.setText(getResources().getString(R.string.player_minutes, player.getMinutes()));
-        teamMinutes.setText(getResources().getString(R.string.team_minutes, 200 - mainActivity.currentTeam.getTotalMinutes()));
 
         gamesPlayed.setText(getResources().getString(R.string.games_played, player.getGamesPlayed()));
         totalMinutes.setText(getResources().getString(R.string.total_minutes, player.getTotalMinutes()));

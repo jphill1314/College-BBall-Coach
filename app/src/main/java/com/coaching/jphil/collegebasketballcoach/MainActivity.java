@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager manager;
 
     private AppDatabase db;
+    private DataAsync dataAsync;
 
     public ArrayList<Conference> conferences;
 
@@ -81,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
         if(db == null){
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
-            new DataAsync().execute("load");
+            dataAsync = new DataAsync();
+            dataAsync.execute("load");
         }
     }
 
@@ -89,7 +91,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
 
-        new DataAsync().execute("save");
+        if(dataAsync != null) {
+            dataAsync.cancel(true);
+            dataAsync = new DataAsync();
+        }
+        dataAsync = new DataAsync();
+        dataAsync.execute("save");
     }
 
     public void updateFragment(int position){
@@ -262,6 +269,8 @@ public class MainActivity extends AppCompatActivity {
                             .replace(R.id.content_frame, new RosterFragment())
                             .commit();
                 }
+
+                dataAsync = null;
             }
         }
 
@@ -272,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
             int playerIndex = 0;
             int tournamentIndex = 0;
 
+            Log.d("save", "Saving data...");
+
             if(db != null){
                 if(!db.isOpen()) {
                     db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -281,6 +292,8 @@ public class MainActivity extends AppCompatActivity {
                     conferenceDB.conferenceID = q;
                     conferenceDB.name = conferences.get(q).getName();
                     conferenceDB.type = conferences.get(q).getType();
+
+                    Log.d("save", "Saving conference: " + conferences.get(q).getName());
 
                     db.appDAO().insertConferences(conferenceDB);
 
@@ -313,10 +326,13 @@ public class MainActivity extends AppCompatActivity {
 
                         teams.get(i).setId(i);
 
+                        Log.d("save", "Saving team: " + teams.get(i).getFullName());
+
                         if(teams.get(i).isPlayerControlled()){
                             recruits = new RecruitDB[teams.get(i).getRecruits().size()];
                             int rIndex = 0;
                             for (Recruit recruit : teams.get(i).getRecruits()) {
+                                Log.d("save", "Saving recruit: " + rIndex);
                                 recruits[rIndex] = new RecruitDB();
 
                                 recruits[rIndex].recruitID = rIndex;
@@ -349,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < teams.size(); i++) {
                         for (Player player : teams.get(i).getPlayers()) {
                             players[pIndex] = new PlayerDB();
+                            player.prepareForSaving();
                             players[pIndex].playerId = pIndex + playerIndex;
                             players[pIndex].teamID = i + teamIndex;
                             players[pIndex].lastName = player.getlName();
@@ -421,6 +438,7 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<Game> masterSchedule = conferences.get(q).getMasterSchedule();
                     GameDB[] games = new GameDB[masterSchedule.size()];
                     for (int z = 0; z < masterSchedule.size(); z++) {
+                        Log.d("save", "Saving game: " + (z + gameIndex));
                         games[z] = new GameDB();
                         games[z].gameID = z + gameIndex;
                         games[z].homeTeamID = masterSchedule.get(z).getHomeTeam().getId() + teamIndex;
@@ -440,6 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if(conferences.get(q).getTournaments() != null) {
                         TournamentDB[] tournaments = new TournamentDB[conferences.get(q).getTournaments().size()];
+                        Log.d("save", "Saving conference tournament.");
                         for(int x = 0; x < tournaments.length; x++){
                             tournaments[x] = new TournamentDB();
                             tournaments[x].tournamentID = x + tournamentIndex;
@@ -466,6 +485,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 if(championship != null){
+                    Log.d("save", "Saving championship");
                     TournamentDB champ = new TournamentDB();
                     champ.tournamentID = -1;
                     champ.name = championship.getTournament().getName();
@@ -508,10 +528,13 @@ public class MainActivity extends AppCompatActivity {
 
                 db.close();
             }
+
+            Log.d("save", "finished saving");
         }
 
         private void loadData(){
             if(db != null) {
+                Log.d("load", "loading data");
                 TeamDB[] teamsDB = db.appDAO().loadAllTeams();
                 PlayerDB[] players = db.appDAO().loadAllPlayers();
                 GameDB[] games = db.appDAO().loadAllGames();
@@ -522,6 +545,7 @@ public class MainActivity extends AppCompatActivity {
 
                 conferences = new ArrayList<>();
                 for (int c = 0; c < conference.length; c++) {
+                    Log.d("load", "loading conference: " + conference[c].name);
                     if(conference[c].type == 0) {
                         conferences.add(new StandardTenTeam(conference[c].name, getApplicationContext()));
                     }
@@ -533,6 +557,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ArrayList<Team> teams = new ArrayList<>();
                 for (int i = 0; i < teamsDB.length; i++) {
+                    Log.d("load", "loading team: " + teamsDB[i].schoolName);
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                             teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
                             teamsDB[i].defFavorsThrees, teamsDB[i].defTendToHelp, teamsDB[i].pace,
@@ -556,12 +581,14 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for (RecruitDB recruit : recruits) {
+                    Log.d("load", "loading recruit: " + recruit.recruitID + " school: " + recruit.teamID);
                     teams.get(recruit.teamID).addRecruit(new Recruit(recruit.firstName, recruit.lastName,
                             recruit.pos, recruit.rating, recruit.interest, recruit.isCommitted,
                             recruit.isRecentlyRecruited));
                 }
 
                 for (GameDB game : games) {
+                    Log.d("load", "loading game: " + game.gameID);
                     if(game.gameID < nationalChampGameIndex) {
                         conferences.get(teamsDB[game.homeTeamID].conferenceID).addGame(new Game(teams.get(game.homeTeamID), teams.get(game.awayTeamID),
                                 game.homeScore, game.awayScore, game.isPlayed, game.isNeutralCourt));

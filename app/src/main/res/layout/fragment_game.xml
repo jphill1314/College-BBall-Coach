@@ -150,13 +150,13 @@
         android:layout_alignTop="@id/alert_dead_ball"
         android:text="@string/game_speed"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/game_list"
+    <FrameLayout
+        android:id="@+id/game_frame_layout"
         android:layout_above="@id/speed_text"
         android:layout_below="@id/game_spinner"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/game_fab"

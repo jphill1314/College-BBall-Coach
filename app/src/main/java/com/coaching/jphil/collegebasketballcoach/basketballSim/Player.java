@@ -62,6 +62,8 @@ public class Player {
     private double fatigue;
     private int timePlayed; // time in seconds
 
+    private boolean prepareForSave = false;
+
 
     public Player(String lName, String fName, int position, int year, int overallRating){
         this.lName = lName;
@@ -74,6 +76,8 @@ public class Player {
         totalMinutes = 0;
 
         minutes = 20;
+
+        prepareForSave = false;
     }
 
     public Player(String lName, String fName, int position, int year, int minutes, int closeShot, int midShot,
@@ -103,6 +107,8 @@ public class Player {
 
         this.gamesPlayed = gamesPlayed;
         this.totalMinutes = totalMinutes;
+
+        prepareForSave = false;
 
         calculateRating();
     }
@@ -138,6 +144,15 @@ public class Player {
         return "Error";
     }
 
+    public void prepareForSaving(){
+        fatigue = 0;
+        timePlayed = 0;
+        offensiveModifier = 0;
+        defensiveModifier = 0;
+
+        prepareForSave = true;
+    }
+
     public void newSeason(int maxImprovement, int games, int offenseFocus, int perimeterFocus, int skillFocus){
         year++;
         int improve = maxImprovement * totalMinutes / (games * 30);
@@ -155,6 +170,9 @@ public class Player {
         if(timePlayed > 0){
             gamesPlayed++;
             totalMinutes += timePlayed / 60;
+            if(timePlayed % 60 > 30){
+                totalMinutes++;
+            }
         }
         offensiveModifier = 0;
         defensiveModifier = 0;
@@ -174,6 +192,8 @@ public class Player {
         dRebounds = 0;
         timePlayed = 0;
         fatigue = 0;
+
+        prepareForSave = false;
     }
 
     public void addFoul(){
@@ -190,7 +210,7 @@ public class Player {
     public void addThreePointShot(boolean made){
         threePointShotAttempts++;
         if(made){
-            twoPointShotMade++;
+            threePointShotMade++;
         }
     }
 
@@ -255,18 +275,22 @@ public class Player {
     }
 
     public void addTimePlayed(int time, int event){
-        // event: 0 = nothing, 1 = change of possession, -1 = timeout / on bench
+        // event: 0 = nothing, 1 = change of possession, -1 = timeout / on bench, 10 = halftime
         timePlayed += time;
-        if(time > 0 && event != 0){
+        if(time > 0){
             if(event == 1){
-                fatigue += 2 * (1.5 - (stamina / 100.0));
+                fatigue += 3 * (1.5 - (stamina / 100.0));
                 if(fatigue > 100){
                     fatigue = 100.0;
                 }
             }
-            else if(fatigue > 0){
-                fatigue -= 2;
-            }
+        }
+
+        if(event == 10){
+            fatigue *= .5;
+        }
+        else if(event < 0){
+            fatigue -= 1;
         }
     }
 
@@ -322,7 +346,12 @@ public class Player {
     }
 
     public int getMinutes(){
-        return minutes;
+        if(gamesPlayed == 0){
+            return 0;
+        }
+        else {
+            return totalMinutes / gamesPlayed;
+        }
     }
 
     public void setMinutes(int minutes){
@@ -476,6 +505,9 @@ public class Player {
     }
 
     private double getFatigueFactor(){
+        if(prepareForSave){
+            return 1;
+        }
         return (1 - ((Math.exp((fatigue) / 25)) / 100));
     }
 

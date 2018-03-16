@@ -43,7 +43,7 @@ public class StrategyFragment extends Fragment {
         offThree.setProgress((int) (team.getOffenseFavorsThrees() / 70.0 * 100.0 - 30));
         defThree.setProgress((int) (team.getDefenseFavorsThrees() / 70.0 * 100.0 - 30));
         defHelp.setProgress((int) (team.getDefenseTendToHelp() / 70.0 * 100.0 - 30));
-        pace.setProgress((int) ((team.getPace() - 50) / 30.0 * 100.0));
+        pace.setProgress((int) ((team.getPace() - 55) / 35.0 * 100.0));
 
 
         offThree.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -119,7 +119,6 @@ public class StrategyFragment extends Fragment {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 // pace can be between 55 and 90
                 paceProgress = (int)((paceProgress / 100.0) * 35 + 55);
-
                 team.setPace(paceProgress);
             }
         });

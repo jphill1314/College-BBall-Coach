@@ -217,10 +217,9 @@ public class Game {
         madeShot = false;
         deadBall = false;
 
-        if(homeTeamHasBall){
+        if (homeTeamHasBall) {
             plays.add(getFormattedTime() + " (30) - " + homeTeam.getFullName() + " has won the tip off!");
-        }
-        else{
+        } else {
             plays.add(getFormattedTime() + " (30) - " + awayTeam.getFullName() + " has won the tip off!");
         }
 
@@ -366,6 +365,13 @@ public class Game {
                 awayTimeouts = 3;
             }
 
+            for(Player p: homeTeam.getPlayers()){
+                p.addTimePlayed(0, 10);
+            }
+            for(Player p: awayTeam.getPlayers()){
+                p.addTimePlayed(0, 10);
+            }
+
             return true;
         } else if (homeScore == awayScore) {
             // setup overtime
@@ -436,7 +442,7 @@ public class Game {
             }
             else {
                 deadBall = true;
-                madeShot = true; // this is to prevent media TOs from being called immediately after player TOs
+                madeShot = false;
             }
             playType = -1;
 
@@ -517,24 +523,7 @@ public class Game {
         }
 
         if(!currentPlay.equals("") && savePlays) {
-            if (plays.get(0).length() > 15) {
-                if (!currentPlay.contains(plays.get(0).substring(15))) {
-                    if(shotClock != 30) {
-                        plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
-                    }
-                    else{
-                        plays.add(0, getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay);
-                    }
-                }
-            }
-            else{
-                if(shotClock != 30) {
-                    plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
-                }
-                else{
-                    plays.add(0, getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay);
-                }
-            }
+            plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
         }
         if (timeRemaining > 0) {
             int count = 0;
@@ -889,7 +878,7 @@ public class Game {
                 madeShot = false;
                 alertedDeadBall = false;
                 freeThrowShooter = shooter;
-                freeThrows = 2;
+                freeThrows = 3;
                 shootFreeThrows = true;
                 return 0;
             }
@@ -1012,6 +1001,8 @@ public class Game {
 
     private void getRebound(Team offense, Team defense) {
         lastShotClock = shotClock;
+        deadBall = false;
+        madeShot = false;
 
         int[] offChance = getReboundChance(offense);
         int[] defChance = getReboundChance(defense);

@@ -4,41 +4,87 @@ Attempt at an Android game that simulates the experience of being the head coach
 
 Users will get to manage their team's roster, recruiting, strategy, staff, and training. All of the features have been added in some form.
 
-List of improvments to be made for the user:
-- [ ] Games are simulated on a play-by-play basis. The user is able to call timeouts, adjust strategy sliders,
-make subsitutions, give team talks (pre-game, during the game, half time, and post-game).
-- [ ] Players have a condition attribute that degrades while playing and recoveres while on the bench. Other attributes should degrade as condition gets lower. The player's condition will take a few days to fully recover after a game.
-- [ ] Players have a morale attribute that affects their performance in games and training. Morale lowers with bad loses and losing streaks, stays the same with expected loses or wins, and increases with good wins and win streaks.
-- [ ] Players (and recruits) have a work ethic attribute. It is their potential to improve their other abilities. Also high work ethic should result in a lower impact for low morale.
-- [ ] Games are seperated by time. The sim goes day-to-day so the user can adjust the intensity of practices (etc.) to get players recovered in time for next game.
-- [ ] During off-season, the user can schedule non-conference oppenents. Who the user can schedule and where the game is played should depend upon the school's budget and prestige or overall rating.
-- [ ] A player's improvement is dependent upon the coaching staff, the quality of oppenents played, and minuted played.
-- [ ] More immersive schools: scheduling budget (does the team need to play at bigger oppenents in buy games or can they play home-and-homes with similar sized schools or maybe even schedule non-D1s), recruiting budget (how many players can the user recruit at once), coaching budget (how many coaches the player can have on staff), player budget (how many scholarships does the user have to offer). These budgets can change based the team's performance year-to-year.
-- [ ] Recruiting should work like this. Assign a coach to recruit a player. Coaches have a recruiting ability. The higher the ability, the more likely the player will be to gain interest in the team. The player's interest also can change based on how the team performs based on expectations. The user can also make promises (playing time, starter status, team success) to the recruit to try to increase interest. Failure to keep these promises can result in the player transfering. Once a recruit reaches a certain level of interest, the user can offer the recruit a scholarship. Other recruits should react to the offer (positively if they want to play with said player and negatively if they have the same position).
-- [ ] During the off-season, the user can cut players (cutting a player with a scholarship should result in a massive hit to the next season's recruits interst).
-- [x] The user should be able to view other teams and conferences (but not make changes).
-- [ ] Add a button to return to the player's own team.
-- [x] Attribute masking. Star ratings instead of actual numeric values.
-- [ ] Improved player generation. Attributes should depend on the player's position.
-- [ ] Individualize training. Set each player to train as a certain position and with a certain focus.
-- [ ] Conference realignment
-- [ ] Coaching changes and ability for the user to be hired by other schools or fired by their own
-- [ ] Promotion / Relegation game mode
-- [ ] An actual, full-on basketball sim like in FM
+List of improvements to add (for version 1.0):
+* Roster
+- [ ] Set starting lineup
 
+* Schedule
+- [ ] Non-conference games
+- [ ] Games are seperated by time -> in between teams can practice + players' recover from games
+- [ ] When the player has no games left, it should only take one press of the sim button to simulate the rest of the season
+- [ ] The button should show the proper next action when the fragment loads (ie will show start tournament when it's tournament time)
 
-List of improvments to be made for the AI:
-- [ ] AI will adjust starting lineups based on player's ability.
-- [ ] AI teams will have a randomly (maybe based on coaching and player abilites) set strategy and practice plan.
+* Standings
+- [ ] Sort by win % first and # of wins second
+- [ ] Show rankings and RPI (or something like strength of schedule)
 
+* Recruiting
+- [ ] Assign a coach to recruit a certain player instead of pressing a button after every game
+- [ ] Recruits that are not recruited will gradually lose interest
+- [ ] Recruits that are recruited will gain interest based on the coach's ability and the team's results
+- [ ] Each recruit has a scouting report that is gradually revealed the longer they are recruited (probably best and worst abilities and work ethic)
+- [ ] Once a recruit reaches a certain level of interest, he will have a chance to commit after every game
+- [ ] When a recruit commits, all other recruits' interest is effected based on the position of the commit and the number of spots left on the team
+- [ ] The recruits should be generated based on the team's expected needs and their current ability, but there should be a couple of hard to get players that are much better
 
-Ideas for Play-by-Play Basketball Sim:
-* A player's ability depends on their position and the opponent's player at the same position
-* Condition affects ability in a log fashon (100-~85 is fairly similar, but steep drop in performace after).
-* Big Question: How to deciede which player makes a play and what the play is?
+* Strategy
+- [ ] Add ability to press with varring intensity (to slow the pace or to steal the ball) and frequency (never, sometimes, always)
+- [ ] Add ability to intentionally foul
+- [ ] Add ability to set overal aggression level (lower means fewer fouls, but not as good defense)
 
+* Staff
+- [ ] Add recruiting ability
+- [ ] Hire and fire staff
 
-Current issues that need to be addressed:
-- [ ] The number of clicks it takes of the sim game button during tournaments before it changes to start new season. Once the tournament is over, the button should change.
-- [ ] When the user's team's season is over, the sim next button should sim the rest of the season.
-- [ ] The button on the schedule fragment should update when the fragment loads.
+* Training
+- [ ] Add intensity slider which affects how much the players improve and how quickly they recover from games
+- [ ] Train each position differently
+- [ ] A player's improvement depends on playing time, practice intensity, work ethic, and the coaches' abilities
+
+* Game Viewer
+- [ ] Add empty list items so that the FAB doesn't always block bottom item in lists
+- [ ] Indicate which team has the ball in the Play-by-Play screen
+- [ ] Add more varriety to team talks
+- [ ] Give better indication of a player's rating, prefered position, condition, and if they are a pending sub on roster page
+- [ ] Add additional screen on roster page to get a better view of stats
+- [ ] Add team stats
+- [ ] (maybe 1.0) Add ability to 'run a play' out of a timeout in close and late situations
+- [ ] Prevent the user from accessing other parts of the game while in the game view
+- [ ] If the user quits while in game, reopening the app should place the user back into the game
+- [ ] Add ability to pause the sim
+
+* Game Simulation
+- [ ] Save games that are quit while in progress
+- [ ] Prevent a player that is shooting free throws from being subbed out if they don't make their final free throw
+- [ ] Find better balance between which plays occur
+- [ ] Improve balance of gaining fatigue vs losing fatigue
+- [ ] Have the AI modify strategy based on the situation
+- [ ] Track more stats like steals and turnovers
+
+* Players
+- [ ] Save game stats
+- [ ] Generate initial abilities based on position
+- [ ] Calculate overall rating based on position 
+- [ ] A player can be set to train as a different position, but will improve slower than if they trained as their best position
+
+* Offseason
+- [ ] Team has a maximum and minimum size. The user can cut players if they have too many and can add walk-ons to reach the minimum
+- [ ] The user can schedule non-conference games or let the computer pick (Maybe generate an initial schedule that the user can modify if they wish)
+- [ ] Generate other teams' schedules after the player creates theirs
+
+* General UI
+- [ ] Add a team overview screen
+- [ ] Add a button that will take the user to the overview screen from anywhere in the game (except while in game)
+- [ ] Indicate which team is being viewed
+- [ ] Add a start screen from which the user can load a save or start a new one (there can only ever be one saved game [for now])
+- [ ] Add a team creation page for starting a new game
+- [ ] Add loading indicators whenever an AsyncTask is running
+
+* Team Creation
+- [ ] User can name the school, the mascot, the conference, and the head coach's name
+- [ ] User can choose the average rating of the other schools in the conference and their own team's overall rating
+- [ ] There should be a couple of pre-made options
+
+* Teams and Conferences
+- [ ] Aim for 100 teams in at least 10 conferences
+- [ ] National Championship should take all conference champs + some at large teams based on their RPI (16 or 32 teams?)
