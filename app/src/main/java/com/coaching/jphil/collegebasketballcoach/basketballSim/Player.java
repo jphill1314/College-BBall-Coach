@@ -12,6 +12,7 @@ public class Player {
 
     private String lName, fName;
     private int position;
+    private int currentPosition;
     private int year;
     private int overallRating;
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
@@ -155,9 +156,12 @@ public class Player {
 
     public void newSeason(int maxImprovement, int games, int offenseFocus, int perimeterFocus, int skillFocus){
         year++;
-        int improve = maxImprovement * totalMinutes / (games * 30);
+        int improve = (int)Math.ceil(maxImprovement * totalMinutes / (games * 30));
         if(improve > maxImprovement){
             improve = maxImprovement;
+        }
+        if(improve < 1){
+            improve = 1;
         }
 
         improveAttributes(improve, offenseFocus, perimeterFocus, skillFocus);
@@ -192,6 +196,8 @@ public class Player {
         dRebounds = 0;
         timePlayed = 0;
         fatigue = 0;
+
+        currentPosition = position;
 
         prepareForSave = false;
     }
@@ -232,6 +238,16 @@ public class Player {
         else{
             dRebounds++;
         }
+    }
+
+    public void setCurrentPosition(int pos){
+        if(pos < 4) {
+            currentPosition = pos + 1;
+        }
+    }
+
+    public int getCurrentPosition(){
+        return currentPosition;
     }
 
     public int getFouls() {
@@ -297,21 +313,21 @@ public class Player {
     private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
         Random r = new Random();
 
-        closeRangeShot += r.nextInt((int)(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
-        midRangeShot += r.nextInt((int)(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
-        longRangeShot += r.nextInt((int)(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
-        ballHandling += r.nextInt((int)(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
-        passing += r.nextInt((int)(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
-        screening += r.nextInt((int)(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
+        closeRangeShot += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
+        midRangeShot += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
+        longRangeShot += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
+        ballHandling += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
+        passing += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
+        screening += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
 
-        postDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
-        perimeterDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
-        onBallDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
-        offBallDefense += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
-        stealing += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
-        rebounding += r.nextInt((int)(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
+        postDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
+        perimeterDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
+        onBallDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
+        offBallDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
+        stealing += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
+        rebounding += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
 
-        stamina += r.nextInt((int)(maxImprovement * (1 - skillFocus/100.0)));
+        stamina += r.nextInt((int)Math.ceil(maxImprovement * (1 - skillFocus/100.0)));
 
         calculateRating();
     }
@@ -513,7 +529,7 @@ public class Player {
 
     public void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
         // for coach type: 0=no effect, 1=less variability, 2=extra variability (good or bad), 3=defensive focus, 4=offensive focus
-
+        int maxModifier = 20;
         double gameModifier = (Math.random() * 2 * gameVariability) - gameVariability;
         if(coachType == 1){
             gameModifier /= 2;
@@ -528,10 +544,10 @@ public class Player {
         }
         if(scoreDif > 0){
             if(scoreDif > 30){
-                gameModifier -= 15 * 0.7;
+                gameModifier -= maxModifier;
             }
             else{
-                gameModifier -= (scoreDif / 2.0) * (1 - scoreDif/100.0);
+                gameModifier -= scoreDif * (1 - scoreDif/100.0);
             }
 
         }
@@ -549,18 +565,18 @@ public class Player {
             defensiveModifier += gameModifier;
         }
 
-        if(offensiveModifier > (int) (15 * 0.7)){
-            offensiveModifier = (int) (15 * 0.7);
+        if(offensiveModifier > maxModifier){
+            offensiveModifier = maxModifier;
         }
-        else if(offensiveModifier < (int) (-15 * 0.7)){
-            offensiveModifier = (int) (-15 * 0.7);
+        else if(offensiveModifier < -maxModifier){
+            offensiveModifier = -maxModifier;
         }
 
-        if(defensiveModifier > (int) (15 * 0.7)){
-            defensiveModifier = (int) (15 * 0.7);
+        if(defensiveModifier > maxModifier){
+            defensiveModifier = maxModifier;
         }
-        else if(defensiveModifier < (int) (-15 * 0.7)){
-            defensiveModifier = (int) (-15 * 0.7);
+        else if(defensiveModifier < -maxModifier){
+            defensiveModifier = -maxModifier;
         }
     }
 

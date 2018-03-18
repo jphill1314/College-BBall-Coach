@@ -32,7 +32,7 @@ public class NationalChampionship {
         tournament = new Tournament(teams, "National Championship", true);
     }
 
-    public void playNextRound(){
+    public void generateNextRound(){
         if(!tournament.isHasChampion()) {
             tournament.playNextRound();
         }

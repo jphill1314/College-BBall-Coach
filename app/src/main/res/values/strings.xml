@@ -18,7 +18,7 @@
     <string name="name">Name</string>
     <string name="year">Class</string>
     <string name="rating">Rating</string>
-    <string name="pt">PT</string>
+    <string name="pref_position">Pref. Pos.</string>
 
     <!-- Standings Fragment -->
     <string name="standing">%s Standings</string>
@@ -65,7 +65,7 @@
     <string name="defense">Defense</string>
     <string name="favor_three">Favors threes</string>
     <string name="pace">Pace</string>
-    <string name="tend_to_help">Tendency for help</string>
+    <string name="aggression">Aggression</string>
 
     <string name="slower">Slower</string>
     <string name="faster">Faster</string>
@@ -73,8 +73,10 @@
     <string name="more_three">More threes</string>
     <string name="few_three">Fewer threes</string>
 
-    <string name="more_help">More help</string>
-    <string name="less_help">Less help</string>
+    <string name="more_agro">More aggressive</string>
+    <string name="less_agro">Less aggressive</string>
+    
+    <string name="intentional_foul">Intentionally Foul</string>
 
     <!-- Training Fragment -->
     <string name="practice">Practice Plan</string>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.R;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,12 +20,12 @@ public class Team {
     private boolean isPlayerControlled;
     private Context context;
 
-    private double maxOffensiveEfficiency = 120.0;
-    private double minDefensiveEfficiency = 70.0;
-
     private ArrayList<Player> players, rosterPlayers, subPlayers;
     private ArrayList<Coach> coaches;
     private ArrayList<Recruit> recruits;
+    private ArrayList<Team> opponents;
+    private ArrayList<Game> schedule;
+    private Conference conference;
     private int gamesPlayed;
 
     private int wins, loses, overallRating;
@@ -33,10 +34,12 @@ public class Team {
 
     private int offenseFocus, perimeterFocus, skillFocus;
 
+    private int numberOfGames;
+
     // Strategy
     private int offenseFavorsThrees = 50;
     private int defenseFavorsThrees = 50;
-    private int defenseTendToHelp = 50;
+    private int aggression = 0;
     private int pace = 70;
 
     private int lastScoreDif = 0;
@@ -57,26 +60,44 @@ public class Team {
         wins = 0;
         loses = 0;
 
+        numberOfGames = 0;
+
+        opponents = new ArrayList<>();
+
         setEqualTrainingFocus();
         setOverallRating();
     }
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
-                int defenseFavorsThrees, int defenseTendToHelp, int pace, int offenseFocus,
+                int defenseFavorsThrees, int agression, int pace, int offenseFocus,
                 int perimeterFocus, int skillFocus, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.isPlayerControlled = isPlayerControlled;
         this.context = context;
 
+        opponents = new ArrayList<>();
+
         this.wins = wins;
         this.loses = loses;
         gamesPlayed = this.wins + this.loses;
 
+        numberOfGames = 0;
+
         this.offenseFavorsThrees = offenseFavorsThrees;
         this.defenseFavorsThrees = defenseFavorsThrees;
-        this.defenseTendToHelp = defenseTendToHelp;
+        this.aggression = agression;
         this.pace = pace;
+
+        if(this.offenseFavorsThrees == 0){
+            this.offenseFavorsThrees = 50;
+        }
+        if(this.defenseFavorsThrees == 0){
+            this.defenseFavorsThrees = 50;
+        }
+        if(this.pace < 55){
+            this.pace = 70;
+        }
 
         this.offenseFocus = offenseFocus;
         this.perimeterFocus = perimeterFocus;
@@ -188,6 +209,10 @@ public class Team {
         wins = 0;
         loses = 0;
         gamesPlayed = 0;
+        numberOfGames = 0;
+
+        schedule = new ArrayList<>();
+        opponents = new ArrayList<>();
 
         if(players.size() < 10){
             generateFreshman(10 - players.size());
@@ -262,8 +287,8 @@ public class Team {
         defenseFavorsThrees = value;
     }
 
-    public void setDefenseTendToHelp(int value){
-        defenseTendToHelp = value;
+    public void setAggression(int value){
+        aggression = value;
     }
 
     public void setPace(int value){
@@ -278,8 +303,8 @@ public class Team {
         return defenseFavorsThrees;
     }
 
-    public int getDefenseTendToHelp() {
-        return defenseTendToHelp;
+    public int getAggression() {
+        return aggression;
     }
 
     public int getPace(){
@@ -295,6 +320,18 @@ public class Team {
         return minutes;
     }
 
+    public int getWinPercent(){
+        if(wins == 0){
+            return 0;
+        }
+        if(loses == 0){
+            return 100;
+        }
+        else{
+            return (int) ((wins * 1.0) / gamesPlayed * 100);
+        }
+    }
+
     private void setOverallRating(){
         overallRating = 0;
         for(Player p : players){
@@ -302,38 +339,6 @@ public class Team {
         }
 
         overallRating = overallRating / players.size();
-    }
-
-    public double getTotalEfficiency(){
-        double offense = 0;
-        double defense = 0;
-
-        for(Player player:players){
-            offense += player.getMinutes()/40.0 * player.getOffensiveEfficiency(offenseFavorsThrees, pace);
-            defense += player.getMinutes()/40.0 * player.getDefensiveEfficiency(defenseTendToHelp, defenseFavorsThrees, pace);
-        }
-
-        offense = offense / 3.2;
-        defense = defense / 4.5;
-
-        offense = offense / 100 * maxOffensiveEfficiency;
-        defense = 100 / defense * minDefensiveEfficiency;
-
-        Log.v("eff", offense + " " + defense);
-        return offense - defense;
-    }
-
-    public double getOffensiveEfficiency(){
-        double offense = 0;
-
-        for(Player player:players){
-            offense += player.getMinutes()/40.0 * player.getOffensiveEfficiency(offenseFavorsThrees, pace);
-        }
-
-        offense = offense / 2.5;
-        offense = offense / 100 * maxOffensiveEfficiency;
-
-        return  offense;
     }
 
     private void setEqualTrainingFocus(){
@@ -399,6 +404,18 @@ public class Team {
 
     public void makeSubs(){
         players = new ArrayList<>(subPlayers);
+        updateCurrentPositions();
+    }
+
+    public void makeSubs(ArrayList<Player> subs){
+        players = new ArrayList<>(subs);
+        updateCurrentPositions();
+    }
+
+    private void updateCurrentPositions(){
+        for(int x = 0; x < players.size(); x++){
+            players.get(x).setCurrentPosition(x);
+        }
     }
 
     public void aiMakeSubs(int half, int timeRemaining){
@@ -442,4 +459,48 @@ public class Team {
         return indexOfBest;
     }
 
+    public int getNumberOfGames(){
+        return numberOfGames;
+    }
+
+    public void addOpponent(Team team){
+        opponents.add(team);
+        numberOfGames++;
+    }
+
+    public ArrayList<Team> getOpponents(){
+        return opponents;
+    }
+
+    public void setConference(Conference conference){
+        this.conference = conference;
+    }
+
+    public Conference getConference(){
+        return conference;
+    }
+
+    public void setSchedule(ArrayList<Game> games){
+        schedule = games;
+    }
+
+    public void addGameToSchedule(Game game){
+        if(schedule == null){
+            schedule = new ArrayList<>();
+        }
+        schedule.add(game);
+    }
+
+    public boolean hasUnplayedGames(){
+        for(Game g: schedule){
+            if(!g.isPlayed()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<Game> getSchedule(){
+        return schedule;
+    }
 }

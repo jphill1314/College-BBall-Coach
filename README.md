@@ -6,16 +6,16 @@ Users will get to manage their team's roster, recruiting, strategy, staff, and t
 
 List of improvements to add (for version 1.0):
 * Roster
-- [ ] Set starting lineup
+- [x] Set starting lineup
 
 * Schedule
-- [ ] Non-conference games
-- [ ] Games are seperated by time -> in between teams can practice + players' recover from games
+- [x] Non-conference games
+- [ ] Games are seperated by time -> in between teams can practice + players' recover from games (after 1.0)
 - [ ] When the player has no games left, it should only take one press of the sim button to simulate the rest of the season
 - [ ] The button should show the proper next action when the fragment loads (ie will show start tournament when it's tournament time)
 
 * Standings
-- [ ] Sort by win % first and # of wins second
+- [x] Sort by win % first and # of wins second
 - [ ] Show rankings and RPI (or something like strength of schedule)
 
 * Recruiting
@@ -29,15 +29,15 @@ List of improvements to add (for version 1.0):
 
 * Strategy
 - [ ] Add ability to press with varring intensity (to slow the pace or to steal the ball) and frequency (never, sometimes, always)
-- [ ] Add ability to intentionally foul
-- [ ] Add ability to set overal aggression level (lower means fewer fouls, but not as good defense)
+- [x] Add ability to intentionally foul
+- [x] Add ability to set overal aggression level (lower means fewer fouls, but not as good defense)
 
 * Staff
 - [ ] Add recruiting ability
 - [ ] Hire and fire staff
 
 * Training
-- [ ] Add intensity slider which affects how much the players improve and how quickly they recover from games
+- [ ] Add intensity slider which affects how much the players improve and how quickly they recover from games (after 1.0)
 - [ ] Train each position differently
 - [ ] A player's improvement depends on playing time, practice intensity, work ethic, and the coaches' abilities
 
@@ -67,14 +67,14 @@ List of improvements to add (for version 1.0):
 - [ ] Calculate overall rating based on position 
 - [ ] A player can be set to train as a different position, but will improve slower than if they trained as their best position
 
-* Offseason
+* Offseason (Pushed to after 1.0)
 - [ ] Team has a maximum and minimum size. The user can cut players if they have too many and can add walk-ons to reach the minimum
 - [ ] The user can schedule non-conference games or let the computer pick (Maybe generate an initial schedule that the user can modify if they wish)
 - [ ] Generate other teams' schedules after the player creates theirs
 
 * General UI
 - [ ] Add a team overview screen
-- [ ] Add a button that will take the user to the overview screen from anywhere in the game (except while in game)
+- [x] Add a button that will take the user to the overview screen from anywhere in the game (except while in game)[This is effectively added)
 - [ ] Indicate which team is being viewed
 - [ ] Add a start screen from which the user can load a save or start a new one (there can only ever be one saved game [for now])
 - [ ] Add a team creation page for starting a new game

@@ -124,13 +124,6 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
 
         if(!players.get(position).isEligible()){
             holder.view.setBackgroundColor(Color.BLACK);
-            if(index1 == position){
-                index1 = -1;
-                index2 = -1;
-            }
-            else if(index2 == position){
-                index2 = -1;
-            }
         }
 
         final int pos = position;

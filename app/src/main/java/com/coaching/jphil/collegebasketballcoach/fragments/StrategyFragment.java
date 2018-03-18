@@ -24,7 +24,7 @@ public class StrategyFragment extends Fragment {
 
     MainActivity mainActivity;
     Team team;
-    SeekBar offThree, defThree, defHelp, pace;
+    SeekBar offThree, defThree, agro, pace;
 
 
     @Override
@@ -37,12 +37,12 @@ public class StrategyFragment extends Fragment {
         team = mainActivity.currentTeam;
         offThree = view.findViewById(R.id.seek_offense_three);
         defThree = view.findViewById(R.id.seek_defense_three);
-        defHelp = view.findViewById(R.id.seek_help);
+        agro = view.findViewById(R.id.seek_agro);
         pace = view.findViewById(R.id.seek_pace);
 
         offThree.setProgress((int) (team.getOffenseFavorsThrees() / 70.0 * 100.0 - 30));
         defThree.setProgress((int) (team.getDefenseFavorsThrees() / 70.0 * 100.0 - 30));
-        defHelp.setProgress((int) (team.getDefenseTendToHelp() / 70.0 * 100.0 - 30));
+        agro.setProgress(team.getAggression() + 10);
         pace.setProgress((int) ((team.getPace() - 55) / 35.0 * 100.0));
 
 
@@ -84,11 +84,11 @@ public class StrategyFragment extends Fragment {
             }
         });
 
-        defHelp.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int defHelpProgress = 0;
+        agro.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int aggression = 0;
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                defHelpProgress = i;
+                aggression = i;
             }
 
             @Override
@@ -98,8 +98,7 @@ public class StrategyFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                defHelpProgress = (int) (((defHelpProgress + 30) / 100.0) * 70);
-                team.setDefenseTendToHelp(defHelpProgress);
+                team.setAggression(aggression - 10);
             }
         });
 

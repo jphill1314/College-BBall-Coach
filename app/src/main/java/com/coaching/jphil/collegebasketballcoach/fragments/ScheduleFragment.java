@@ -21,7 +21,9 @@ import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.NationalChampionship;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -42,7 +44,11 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
     private MainActivity mainActivity;
 
-    private Button simGame, newSeason, startTournament;
+    private Button simGame;
+    private boolean playerSeasonFinished = false;
+    private boolean startNewSeason = false;
+    private boolean allConferencesInPostSeason;
+    private boolean allConferencesHaveChamp;
 
     private SimAsync async;
 
@@ -59,80 +65,40 @@ public class ScheduleFragment extends Fragment {
         recyclerView = view.findViewById(R.id.schedule_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(getTeamSchedule(mainActivity.currentTeam)
+        adapter = new ScheduleAdapter(mainActivity.currentTeam.getSchedule()
                 , mainActivity.currentTeam);
         recyclerView.setAdapter(adapter);
 
         simGame = view.findViewById(R.id.sim_game);
-        newSeason = view.findViewById(R.id.start_new_season);
-        startTournament = view.findViewById(R.id.start_tournament);
 
         async = null;
+        updateUI();
 
         if(!mainActivity.currentTeam.isPlayerControlled()){
             simGame.setVisibility(View.GONE);
-            newSeason.setVisibility(View.GONE);
-            startTournament.setVisibility(View.GONE);
         }
 
         simGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mainActivity.championship == null) {
-                    if(async == null) {
-                        async = new SimAsync(mainActivity.conferences, false);
-                        async.execute();
-                    }
+                if(simGame.getText().equals(getString(R.string.new_season))){
+                    startNewSeason();
                 }
-                else{
-                    if(async == null) {
-                        ArrayList<Conference> conf = new ArrayList<>();
-                        conf.add(mainActivity.conferences.get(0));
-                        async = new SimAsync(conf, true);
-                        async.execute();
-                    }
-                }
-
-                ScheduleAdapter adapt = (ScheduleAdapter)adapter;
-                adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
-                adapter.notifyDataSetChanged();
-            }
-        });
-
-        newSeason.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainActivity.startNewSeason();
-                newSeason.setVisibility(View.GONE);
-                simGame.setVisibility(View.VISIBLE);
-            }
-        });
-
-        startTournament.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!mainActivity.currentConference.isInPostSeason()) {
+                else if(playerSeasonFinished){
                     if(async == null){
-                        async = new SimAsync(mainActivity.conferences, true);
+                        async = new SimAsync();
                         async.execute();
                     }
                 }
-                else{
-                    int count = 0;
-                    for(Conference c: mainActivity.conferences){
-                        if(c.isSeasonFinished()){
-                            count++;
-                        }
-                    }
-                    if(count == mainActivity.conferences.size()){
-                        mainActivity.generateNationalChampionship();
+                else if(!startNewSeason){
+                    if(async == null){
+                        async = new SimAsync();
+                        async.execute();
                     }
                 }
-                startTournament.setVisibility(View.GONE);
-                simGame.setVisibility(View.VISIBLE);
 
                 ScheduleAdapter adapt = (ScheduleAdapter)adapter;
-                adapt.changeGames(getTeamSchedule(mainActivity.currentTeam));
+                adapt.changeGames(mainActivity.currentTeam.getSchedule());
                 adapter.notifyDataSetChanged();
             }
         });
@@ -151,23 +117,20 @@ public class ScheduleFragment extends Fragment {
 
     private class SimAsync extends AsyncTask<String, Integer, Integer>{
 
-        private ArrayList<Conference> conferences;
-        private boolean simAll;
+        public SimAsync(){}
 
-        public SimAsync(ArrayList<Conference> conferences, boolean simAll){
-            this.conferences = conferences;
-            this.simAll = simAll;
+        @Override
+        protected void onPreExecute(){
+            simGame.setEnabled(false);
         }
 
         @Override
         protected Integer doInBackground(String... strings) {
-            int index = 0;
-            for(Conference c: conferences){
-                index = simulateGames(c, c.getTeams().get(0), simAll);
-                if(index > -1){
-                    return index;
-                }
+            int index = simulateGames(mainActivity.currentTeam);
+            if(index > -1){
+                return index;
             }
+
             return index;
         }
 
@@ -185,73 +148,152 @@ public class ScheduleFragment extends Fragment {
                         .addToBackStack("games")
                         .commit();
             }
+            else if(results == -2){
+                //playerSeasonFinished = true;
+                startTournament(!allConferencesHaveChamp);
+            }
+            else if(results == -100){
+                if(mainActivity.championship != null && mainActivity.championship.hasChampion()) {
+                    startNewSeason = true;
+                }
+                else if(mainActivity.championship != null){
+                    for(Game g: mainActivity.championship.getGames()){
+                        Log.d("champs", g.getHomeTeamName() + " vs. " + g.getAwayTeamName());
+                    }
+                }
+                else{
+                    startTournament(false);
+                }
+            }
             async = null;
+            adapter.notifyDataSetChanged();
+            simGame.setEnabled(true);
+            updateUI();
+
+            Log.d("sim", "finished simming: " + results);
         }
 
-        private Integer simulateGames(Conference conference, Team team, boolean simAll){
-            if(!conference.isInPostSeason()) {
-                for (Game game : conference.getMasterSchedule()) {
+        @Override
+        protected void onProgressUpdate(Integer... integers){
+            adapter.notifyDataSetChanged();
+        }
+
+        private Integer simulateGames(Team team) {
+            if (!allConferencesInPostSeason) {
+                for (Game game : mainActivity.masterSchedule) {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
-                            if(team.isPlayerControlled()){
-                                for(int x = 0; x < conference.getMasterSchedule().size(); x++){
-                                    if(game.equals(conference.getMasterSchedule().get(x))){
-                                        return x;
-                                    }
-                                }
-                            }
-                            else{
-                                game.simulateGame();
-                            }
-                            if(!simAll){
-                                return -1;
+                            if (team.isPlayerControlled()) {
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             game.simulateGame();
                         }
                     }
                 }
-            }
-            else if(!conference.isSeasonFinished()){
-                conference.generateTournament();
                 return -2;
             }
-
-            if(mainActivity.championship != null){
-                mainActivity.championship.playNextRound();
-                if(mainActivity.championship.hasChampion()) {
-                    newSeason.setVisibility(View.VISIBLE);
-                    simGame.setVisibility(View.INVISIBLE);
+            else if (!allConferencesHaveChamp) {
+                allConferencesHaveChamp = true;
+                for (Conference c : mainActivity.conferences) {
+                    for (Tournament t : c.getTournaments()) {
+                        for (Game game : t.getGames()) {
+                            if (!game.isPlayed()) {
+                                if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
+                                    if (team.isPlayerControlled()) {
+                                        return mainActivity.masterSchedule.indexOf(game);
+                                    }
+                                } else {
+                                    game.simulateGame();
+                                }
+                            }
+                        }
+                        t.generateNextRound();
+                    }
+                    if(c.getChampion() == null){
+                        Log.d("champs", c.getName() + " doesn't have a champ yet");
+                        allConferencesHaveChamp = false;
+                        c.generateTournament();
+                    }
                 }
-                return -3;
+                return -2;
+            }
+            else if(mainActivity.championship != null){
+                for (Game game : mainActivity.championship.getGames()) {
+                    if (!game.isPlayed()) {
+                        if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
+                            if (team.isPlayerControlled()) {
+                                return mainActivity.masterSchedule.indexOf(game);
+                            }
+                        } else {
+                            game.simulateGame();
+                        }
+                    }
+                }
+                mainActivity.championship.generateNextRound();
             }
 
-            simGame.setVisibility(View.INVISIBLE);
-            startTournament.setVisibility(View.VISIBLE);
             return -100;
         }
     }
 
+    private void updateUI(){
+        allConferencesInPostSeason = true;
+        allConferencesHaveChamp = true;
+        for(Conference c: mainActivity.conferences){
+            if(!c.isInPostSeason()){
+                allConferencesInPostSeason = false;
+                allConferencesHaveChamp = false;
+            }
+        }
 
-    private ArrayList<Game> getTeamSchedule(Team team){
-        ArrayList<Game> teamSchedule = new ArrayList<>();
-
-        for(Conference c: mainActivity.conferences) {
-            for (Game game : c.getMasterSchedule()) {
-                if (game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())) {
-                    teamSchedule.add(game);
+        if(allConferencesInPostSeason){
+            for(Conference c: mainActivity.conferences){
+                if(!c.isSeasonFinished()){
+                    allConferencesHaveChamp = false;
                 }
             }
         }
 
-        if(mainActivity.championship != null){
-            for(Game game : mainActivity.championship.getGames()){
-                if (game.getHomeTeam().getFullName().equals(team.getFullName()) || game.getAwayTeam().getFullName().equals(team.getFullName())) {
-                    teamSchedule.add(game);
+        if(!mainActivity.getPlayerTeam().hasUnplayedGames()){
+            if(!mainActivity.getPlayerTeam().getConference().isInPostSeason()){
+                simGame.setText(getString(R.string.start_tournament));
+                playerSeasonFinished = false;
+            }
+            else if(mainActivity.championship != null){
+                if(mainActivity.championship.hasChampion()){
+                    playerSeasonFinished = true;
+                    startNewSeason = true;
+                    simGame.setText(getString(R.string.new_season));
+                }
+                else {
+                    playerSeasonFinished = false;
                 }
             }
+            else {
+                playerSeasonFinished = true;
+            }
+        }
+    }
+
+    private void startTournament(boolean generateConfTourn){
+        if(generateConfTourn) {
+            for (Conference c : mainActivity.conferences) {
+                c.generateTournament();
+            }
+        }
+        else{
+            mainActivity.generateNationalChampionship();
         }
 
-        return teamSchedule;
+        simGame.setText(R.string.sim_game);
+        ScheduleAdapter adapt = (ScheduleAdapter)adapter;
+        adapt.changeGames(mainActivity.currentTeam.getSchedule());
+        adapter.notifyDataSetChanged();
+    }
+
+    private void startNewSeason(){
+        mainActivity.startNewSeason();
+        startNewSeason = false;
     }
 }

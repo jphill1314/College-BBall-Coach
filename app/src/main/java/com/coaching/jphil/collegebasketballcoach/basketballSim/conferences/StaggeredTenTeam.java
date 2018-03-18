@@ -37,11 +37,9 @@ public class StaggeredTenTeam extends Conference {
             addTournament(new Tournament(FirstRound58, getName() + " Championship First Round", true));
             addTournament(new Tournament(FirstRound67,  getName() + " Championship First Round", true));
         }
-        else if(getTournaments().size() == 2){
+        else if(getTournaments().size() == 2 && allGamesPlayed()){
             for(Tournament t: getTournaments()){
-                while(!t.isHasChampion()) {
-                    t.playNextRound();
-                }
+                t.playNextRound();
             }
             ArrayList<Team> SecondRound4 = new ArrayList<>();
             ArrayList<Team> SecondRound3 = new ArrayList<>();
@@ -55,11 +53,9 @@ public class StaggeredTenTeam extends Conference {
             addTournament(new Tournament(SecondRound4, getName() + " Championship Second Round", true));
             addTournament(new Tournament(SecondRound3, getName() + " Championship Second Round", true));
         }
-        else if(getTournaments().size() == 4){
+        else if(getTournaments().size() == 4 && allGamesPlayed()){
             for(Tournament t: getTournaments()){
-                while(!t.isHasChampion()) {
-                    t.playNextRound();
-                }
+                t.playNextRound();
             }
             ArrayList<Team> FinalFour = new ArrayList<>();
 
@@ -70,9 +66,10 @@ public class StaggeredTenTeam extends Conference {
 
             addTournament(new Tournament(FinalFour, getName() + " Championship", true));
         }
-        else if(getTournaments().size() == 5){
-            Tournament t = getTournaments().get(4);
-            t.playNextRound();
+        else if(allGamesPlayed()){
+            for(Tournament t: getTournaments()){
+                t.playNextRound();
+            }
         }
         addTournamentGames();
     }

@@ -3,6 +3,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 import android.content.Context;
 import android.util.Log;
 
+import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
@@ -37,6 +38,7 @@ public abstract class Conference {
 
         generateMasterSchedule();
         for(Team t: teams){
+            t.setConference(this);
             if(t.isPlayerControlled()){
                 t.setRecruits(getRecruits(t.getOverallRating(), t));
             }
@@ -62,6 +64,7 @@ public abstract class Conference {
             teams = new ArrayList<>();
         }
         teams.add(team);
+        team.setConference(this);
     }
 
     public void addGame(Game game){
@@ -79,14 +82,15 @@ public abstract class Conference {
     }
 
     public void startNewSeason(){
-        generateMasterSchedule();
-        for(Team t: teams){
-            if(t.isPlayerControlled()){
+        tournaments = null;
+        for(Team t: teams) {
+            if (t.isPlayerControlled()) {
                 t.setRecruits(getRecruits(t.getOverallRating(), t));
             }
             t.newSeason();
         }
-        tournaments = null;
+        generateMasterSchedule();
+
     }
 
     private ArrayList<Recruit> getRecruits(int teamRating, Team team){
@@ -131,6 +135,7 @@ public abstract class Conference {
                     if(!masterSchedule.contains(g)) {
                         addGame(g);
                     }
+                    ((MainActivity)context).addGameToMasterSchedule(g);
                 }
             }
         }
@@ -140,17 +145,16 @@ public abstract class Conference {
         ArrayList<Team> standing = new ArrayList<>(teams);
 
         int changes = 0;
-        //TODO: sort by win percentage instead of # of wins
         do{
             changes = 0;
             for(int x = 0; x < standing.size() - 1; x++){
                 for(int y = x + 1; y < standing.size(); y++) {
-                    if (standing.get(x).getWins() < standing.get(y).getWins()) {
+                    if (standing.get(x).getWinPercent() < standing.get(y).getWinPercent()) {
                         Collections.swap(standing, x, y);
                         changes++;
                     }
-                    else if(standing.get(x).getWins() == standing.get(y).getWins()){
-                        if(standing.get(x).getLoses() > standing.get(y).getLoses()){
+                    else if(standing.get(x).getWinPercent() == standing.get(y).getWinPercent()){
+                        if(standing.get(x).getWins() > standing.get(y).getWins()){
                             Collections.swap(standing, x, y);
                             changes++;
                         }
@@ -164,6 +168,19 @@ public abstract class Conference {
 
     public ArrayList<Game> getMasterSchedule(){
         return masterSchedule;
+    }
+
+    public ArrayList<Game> getTeamSchedule(Team team){
+        if(teams.contains(team)){
+            ArrayList<Game> schedule = new ArrayList<>();
+            for(Game g: masterSchedule){
+                if(g.getHomeTeam().equals(team) || g.getAwayTeam().equals(team)){
+                    schedule.add(g);
+                }
+            }
+            return schedule;
+        }
+        return null;
     }
 
     public String getName() {
@@ -180,6 +197,17 @@ public abstract class Conference {
 
     public boolean isInPostSeason(){
         return tournaments != null;
+    }
+
+    public boolean allGamesPlayed(){
+        for(Tournament t: getTournaments()){
+            for(Game g: t.getGames()){
+                if(!g.isPlayed()){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public abstract void generateTournament();

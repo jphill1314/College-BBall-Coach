@@ -26,7 +26,7 @@ public class TeamDB {
 
     public int offFavorsThrees;
     public int defFavorsThrees;
-    public int defTendToHelp;
+    public int aggression;
     public int pace;
 
     public int offenseFocus;

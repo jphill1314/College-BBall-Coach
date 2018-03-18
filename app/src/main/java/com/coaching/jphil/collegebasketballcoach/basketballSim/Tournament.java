@@ -76,7 +76,7 @@ public class Tournament {
         return playAtNeutralCourt;
     }
 
-    private void generateNextRound(){
+    public void generateNextRound(){
         if(games.size() == 0){
             if(teams.size() == 2){
                 games.add(new Game(teams.get(0), teams.get(1), playAtNeutralCourt));

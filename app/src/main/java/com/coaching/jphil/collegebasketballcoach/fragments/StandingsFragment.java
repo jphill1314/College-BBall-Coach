@@ -73,7 +73,13 @@ public class StandingsFragment extends Fragment {
                 adapter = new StandingAdapter(mainActivity.currentConference.getTeams());
                 recyclerView.setAdapter(adapter);
 
-                mainActivity.currentTeam = mainActivity.currentConference.getTeams().get(0);
+                if(!mainActivity.currentConference.equals(mainActivity.getPlayerConference())) {
+                    mainActivity.currentTeam = mainActivity.currentConference.getTeams().get(0);
+                    mainActivity.homeButton.setVisibility(View.VISIBLE);
+                }
+                else{
+                    mainActivity.currentTeam = mainActivity.getPlayerTeam();
+                }
             }
 
             @Override

@@ -13,13 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
@@ -31,7 +31,6 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import static java.lang.Thread.sleep;
 
@@ -53,15 +52,17 @@ public class GameFragment extends Fragment {
     private boolean alertDeadBall = false;
 
     private FloatingActionButton fab;
-    private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls, deadBall, gameSpeedText;
+    private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls;
+    private TextView deadBall, gameSpeedText, tvIntentFoul;
     private SeekBar gameSpeedBar;
     private Spinner spinner;
+    private ToggleButton tbIntentFoul;
     private FrameLayout frame;
     private View strategyView;
     private ArrayAdapter<String> spinnerAdapter;
 
-    private SeekBar offThrees, defThrees, pace, help;
-    private int pendingOffThrees, pendingDefThrees, pendingPace, pendingHelp;
+    private SeekBar offThrees, defThrees, pace, agro;
+    private int pendingOffThrees, pendingDefThrees, pendingPace, pendingAgro;
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager manager;
@@ -79,7 +80,7 @@ public class GameFragment extends Fragment {
         final MainActivity activity = (MainActivity) getActivity();
         if(args != null){
             gameIndex = args.getInt("game");
-            game = activity.getPlayerConference().getMasterSchedule().get(gameIndex);
+            game = activity.masterSchedule.get(gameIndex);
 
         }
 
@@ -103,7 +104,9 @@ public class GameFragment extends Fragment {
         offThrees = strategyView.findViewById(R.id.seek_offense_three);
         defThrees = strategyView.findViewById(R.id.seek_defense_three);
         pace = strategyView.findViewById(R.id.seek_pace);
-        help = strategyView.findViewById(R.id.seek_help);
+        agro = strategyView.findViewById(R.id.seek_agro);
+        tvIntentFoul = strategyView.findViewById(R.id.tv_foul);
+        tbIntentFoul = strategyView.findViewById(R.id.foul_button);
 
         homeScore.setText(getString(R.string.scores, game.getHomeTeam().getFullName(), game.getHomeScore()));
         awayScore.setText(getString(R.string.scores, game.getAwayTeam().getFullName(), game.getAwayScore()));
@@ -334,8 +337,8 @@ public class GameFragment extends Fragment {
         if(pendingPace > 0) {
             playerTeam.setPace(pendingPace);
         }
-        if(pendingHelp > 0) {
-            playerTeam.setDefenseTendToHelp(pendingHelp);
+        if(pendingAgro > 0) {
+            playerTeam.setAggression(pendingAgro);
         }
         if(pendingOffThrees > 0){
             playerTeam.setOffenseFavorsThrees(pendingOffThrees);
@@ -455,6 +458,8 @@ public class GameFragment extends Fragment {
 
                     if(forceSub && success){
                         forceSub = false;
+                        spinner.setSelection(0, true);
+                        changeAdapters(0);
                     }
                 }
                 else if(adapterType == 4) {
@@ -495,12 +500,12 @@ public class GameFragment extends Fragment {
 
         pendingOffThrees = playerTeam.getOffenseFavorsThrees();
         pendingDefThrees = playerTeam.getDefenseFavorsThrees();
-        pendingHelp = playerTeam.getDefenseTendToHelp();
+        pendingAgro = playerTeam.getAggression();
         pendingPace = playerTeam.getPace();
 
         offThrees.setProgress((int) (pendingOffThrees / 70.0 * 100.0 - 30));
         defThrees.setProgress((int) (pendingDefThrees / 70.0 * 100.0 - 30));
-        help.setProgress((int) (pendingHelp / 70.0 * 100.0 - 30));
+        agro.setProgress(pendingAgro + 10);
         pace.setProgress((int) ((pendingPace - 55) / 35.0 * 100.0));
 
         offThrees.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -541,11 +546,11 @@ public class GameFragment extends Fragment {
             }
         });
 
-        help.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int defHelpProgress;
+        agro.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int agroProgress;
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                defHelpProgress = i;
+                agroProgress = i;
             }
 
             @Override
@@ -555,8 +560,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                defHelpProgress = (int) (((defHelpProgress + 30) / 100.0) * 70);
-                pendingHelp = defHelpProgress;
+                pendingAgro = agroProgress - 10;
             }
         });
 
@@ -577,6 +581,17 @@ public class GameFragment extends Fragment {
                 // pace can be between 55 and 90
                 paceProgress = (int)((paceProgress / 100.0) * 35 + 55);
                 pendingPace = paceProgress;
+            }
+        });
+
+        tbIntentFoul.setChecked(false);
+        tbIntentFoul.setVisibility(View.VISIBLE);
+        tvIntentFoul.setVisibility(View.VISIBLE);
+
+        tbIntentFoul.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            game.setPlayerIntentFoul(isChecked);
             }
         });
 

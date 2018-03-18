@@ -2,6 +2,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
 import android.content.Context;
 
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
@@ -37,12 +38,11 @@ public class StandardTenTeam extends Conference {
             addTournament(new Tournament(PlayIn7v10, "7 vs 10 Play In", true));
             addTournament(new Tournament(PlayIn8v9, "8 vs 9 Play in", true));
         }
-        else if(getTournaments().size() == 2){
+        else if(getTournaments().size() == 2 && allGamesPlayed()){
             for(Tournament t: getTournaments()){
-                while(!t.isHasChampion()) {
-                    t.playNextRound();
-                }
+                t.playNextRound();
             }
+
             if(getTournaments().get(1).getChampion().equals(teams.get(7))){
                 teams.remove(8);
             }
@@ -58,9 +58,10 @@ public class StandardTenTeam extends Conference {
             }
             addTournament(new Tournament(teams, getName() + " Championship", true));
         }
-        else if(getTournaments().size() == 3){
-            Tournament t = getTournaments().get(2);
-            t.playNextRound();
+        else if(allGamesPlayed()){
+            for(Tournament t: getTournaments()){
+                t.playNextRound();
+            }
         }
         addTournamentGames();
     }

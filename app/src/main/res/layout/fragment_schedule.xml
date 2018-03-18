@@ -24,26 +24,6 @@
         android:paddingTop="16dp"
         android:text="@string/sim_game"/>
 
-    <Button
-        android:id="@+id/start_new_season"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        android:paddingTop="16dp"
-        android:text="@string/new_season"/>
-
-    <Button
-        android:id="@+id/start_tournament"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        android:paddingTop="16dp"
-        android:text="@string/start_tournament"/>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/schedule_list"
         android:scrollbars="vertical"

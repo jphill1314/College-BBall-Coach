@@ -26,13 +26,13 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView tvPos, tvName, tvRating, tvPT, tvYear;
+        public TextView tvPos, tvName, tvRating, tvPrefPos, tvYear;
         public ViewHolder(View view, final MainActivity activity){
             super(view);
             tvPos = view.findViewById(R.id.roster_position);
             tvName = view.findViewById(R.id.roster_name);
             tvRating =  view.findViewById(R.id.roster_rating);
-            tvPT = view.findViewById(R.id.roster_pt);
+            tvPrefPos = view.findViewById(R.id.roster_pref_pos);
             tvYear = view.findViewById(R.id.roster_year);
 
             view.setOnClickListener(new View.OnClickListener() {
@@ -66,11 +66,33 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
-        holder.tvPos.setText(players.get(position).getPositionAbr());
         holder.tvName.setText(players.get(position).getFullName());
         holder.tvRating.setText(getStarRating(players.get(position).getOverallRating()));
-        holder.tvPT.setText(Integer.toString(players.get(position).getMinutes()));
+        holder.tvPrefPos.setText(players.get(position).getPositionAbr());
         holder.tvYear.setText(players.get(position).getYearAsString());
+
+        String pos;
+        switch (position){
+            case 0:
+                pos = "PG";
+                break;
+            case 1:
+                pos = "SG";
+                break;
+            case 2:
+                pos = "SF";
+                break;
+            case 3:
+                pos = "PF";
+                break;
+            case 4:
+                pos = "C";
+                break;
+            default:
+                pos = "-";
+        }
+
+        holder.tvPos.setText(pos);
     }
 
     @Override

@@ -47,6 +47,8 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
                     activity.getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_frame, frag)
                             .commit();
+
+                    activity.homeButton.setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -83,12 +85,12 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
             changes = 0;
             for(int x = 0; x < standing.size() - 1; x++){
                 for(int y = x + 1; y < standing.size(); y++) {
-                    if (standing.get(x).getWins() < standing.get(y).getWins()) {
+                    if (standing.get(x).getWinPercent() < standing.get(y).getWinPercent()) {
                         Collections.swap(standing, x, y);
                         changes++;
                     }
-                    else if(standing.get(x).getWins() == standing.get(y).getWins()){
-                        if(standing.get(x).getLoses() > standing.get(y).getLoses()){
+                    else if(standing.get(x).getWinPercent() == standing.get(y).getWinPercent()){
+                        if(standing.get(x).getWins() > standing.get(y).getWins()){
                             Collections.swap(standing, x, y);
                             changes++;
                         }
