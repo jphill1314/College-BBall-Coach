@@ -27,6 +27,7 @@ import com.coaching.jphil.collegebasketballcoach.adapters.GameAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameRosterAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameSpeechAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
 import java.util.ArrayList;
@@ -162,6 +163,12 @@ public class GameFragment extends Fragment {
         super.onDestroyView();
         if(gameAsync != null){
             gameAsync.cancel(true);
+            for(Player p: game.getHomeTeam().getPlayers()){
+                p.prepareForSaving();
+            }
+            for(Player p: game.getAwayTeam().getPlayers()){
+                p.prepareForSaving();
+            }
         }
     }
 
@@ -261,6 +268,7 @@ public class GameFragment extends Fragment {
             updateUI();
             gameAsync = null;
         }
+
 
         private void updateUI(){
             homeScore.setText(getString(R.string.scores, game.getHomeTeam().getFullName(), game.getHomeScore()));

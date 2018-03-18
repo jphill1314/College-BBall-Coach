@@ -16,7 +16,7 @@ public class Player {
     private int year;
     private int overallRating;
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
-    private int gameVariability = 5;
+    private int gameVariability = 10;
     private int offensiveModifier = 0;
     private int defensiveModifier = 0;
 
@@ -71,6 +71,7 @@ public class Player {
         this.fName = fName;
         this.year = year;
         this.position = position;
+        currentPosition = position;
         generateAttributes(overallRating);
 
         gamesPlayed = 0;
@@ -88,6 +89,7 @@ public class Player {
         this.fName = fName;
         this.year = year;
         this.position = position;
+        currentPosition = position;
         this.minutes = minutes;
 
         closeRangeShot = closeShot;
@@ -154,7 +156,7 @@ public class Player {
         prepareForSave = true;
     }
 
-    public void newSeason(int maxImprovement, int games, int offenseFocus, int perimeterFocus, int skillFocus){
+    void newSeason(int maxImprovement, int games, int offenseFocus, int perimeterFocus, int skillFocus){
         year++;
         int improve = (int)Math.ceil(maxImprovement * totalMinutes / (games * 30));
         if(improve > maxImprovement){
@@ -170,7 +172,7 @@ public class Player {
         totalMinutes = 0;
     }
 
-    public void playGame(){
+    void playGame(){
         if(timePlayed > 0){
             gamesPlayed++;
             totalMinutes += timePlayed / 60;
@@ -183,7 +185,7 @@ public class Player {
         fatigue = 0;
     }
 
-    public void preGameSetup(){
+    void preGameSetup(){
         fouls = 0;
         twoPointShotAttempts = 0;
         twoPointShotMade = 0;
@@ -202,36 +204,36 @@ public class Player {
         prepareForSave = false;
     }
 
-    public void addFoul(){
+    void addFoul(){
         fouls++;
     }
 
-    public void addTwoPointShot(boolean made){
+    void addTwoPointShot(boolean made){
         twoPointShotAttempts++;
         if(made){
             twoPointShotMade++;
         }
     }
 
-    public void addThreePointShot(boolean made){
+    void addThreePointShot(boolean made){
         threePointShotAttempts++;
         if(made){
             threePointShotMade++;
         }
     }
 
-    public void addFreeThrowShot(boolean made){
+    void addFreeThrowShot(boolean made){
         freeThrowAttempts++;
         if(made){
             freeThrowMade++;
         }
     }
 
-    public void addAssist(){
+    void addAssist(){
         assists++;
     }
 
-    public void addRebound(boolean offensive){
+    void addRebound(boolean offensive){
         if(offensive){
             oRebounds++;
         }
@@ -290,7 +292,7 @@ public class Player {
         return dRebounds;
     }
 
-    public void addTimePlayed(int time, int event){
+    void addTimePlayed(int time, int event){
         // event: 0 = nothing, 1 = change of possession, -1 = timeout / on bench, 10 = halftime
         timePlayed += time;
         if(time > 0){
@@ -370,42 +372,78 @@ public class Player {
         }
     }
 
-    public void setMinutes(int minutes){
-        this.minutes = minutes;
-    }
-
     private void generateAttributes(int rating){
         Random r = new Random();
+        rating += 10;
+
+        double[] closeWeight = new double[] {.6, .7, .8, 1.0, 1.0};
+        double[] midWeight = new double[] {.8, .8, .8, .7, .7};
+        double[] longWeight = new double[] {.8, 1.0, .8, .5, .5};
+        double[] ballWeight = new double[] {1.1, .8, .8, .6, .5};
+        double[] passWeight = new double[] {1.1, .8, .8, .6, .5};
+        double[] screenWeight = new double[] {.4, .5, .6, .9, 1.0};
+        double[] offMoveWeight = new double[] {.8, 1.0, .8, .7, .7};
+
+        double[] postDefWeight = new double[] {.4, .5, .6, .9, 1.0};
+        double[] perimDefWeight = new double[] {1.0, 1.0, .9, .5, .5};
+        double[] onBallWeight = new double[] {1.0, .8, .8, .9, 1.0};
+        double[] offBallWeight = new double[] {.8, .8, .8, .7, .6};
+        double[] stealWeight = new double[] {.8, .8, .8, .5, .5};
+        double[] reboundWeight = new double[] {.4, .5, .7, 1.2, 1.2};
 
         // Offensive
-        closeRangeShot = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        midRangeShot = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        longRangeShot = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        ballHandling = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        passing = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        screening = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        offBallMovement = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
+        closeRangeShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * closeWeight[position-1]);
+        midRangeShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * midWeight[position-1]);
+        longRangeShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * longWeight[position-1]);
+        ballHandling = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * ballWeight[position-1]);
+        passing = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * passWeight[position-1]);
+        screening = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * screenWeight[position-1]);
+        offBallMovement = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * offMoveWeight[position-1]);
 
         // Defensive
-        postDefense = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        perimeterDefense = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        onBallDefense = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        offBallDefense = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        stealing = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
-        rebounding = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
+        postDefense = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * postDefWeight[position-1]);
+        perimeterDefense = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * perimDefWeight[position-1]);
+        onBallDefense = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * onBallWeight[position-1]);
+        offBallDefense = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * offBallWeight[position-1]);
+        stealing = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * stealWeight[position-1]);
+        rebounding = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * reboundWeight[position-1]);
 
         // Physical
-        stamina = rating + (2 * r.nextInt(ratingVariability)) - ratingVariability;
+        stamina = r.nextInt(40) + 40;
 
         calculateRating();
     }
 
     private void calculateRating(){
-        // Update this to take player's position into account
+        double[] closeWeight = new double[] {.6, .7, .8, 1.0, 1.0};
+        double[] midWeight = new double[] {.8, .8, .8, .7, .7};
+        double[] longWeight = new double[] {.8, 1.0, .8, .5, .5};
+        double[] ballWeight = new double[] {1.1, .8, .8, .6, .5};
+        double[] passWeight = new double[] {1.1, .8, .8, .6, .5};
+        double[] screenWeight = new double[] {.4, .5, .6, .9, 1.0};
+        double[] offMoveWeight = new double[] {.8, 1.0, .8, .7, .7};
 
-        overallRating = (int)((closeRangeShot + midRangeShot + longRangeShot + ballHandling + passing
-        + screening + offBallMovement + postDefense + perimeterDefense + onBallDefense + offBallDefense + stealing + rebounding
-        + stamina) / 14.0);
+        double[] postDefWeight = new double[] {.4, .5, .6, .9, 1.0};
+        double[] perimDefWeight = new double[] {1.0, 1.0, .9, .5, .5};
+        double[] onBallWeight = new double[] {1.0, .8, .8, .9, 1.0};
+        double[] offBallWeight = new double[] {.8, .8, .8, .7, .6};
+        double[] stealWeight = new double[] {.8, .8, .8, .5, .5};
+        double[] reboundWeight = new double[] {.4, .5, .7, 1.2, 1.2};
+
+        overallRating = (int) (closeRangeShot * closeWeight[currentPosition-1] +
+                midRangeShot * midWeight[currentPosition-1] + longRangeShot * longWeight[currentPosition-1] +
+                ballHandling * ballWeight[currentPosition-1] + passing * passWeight[currentPosition-1] +
+                screening * screenWeight[currentPosition-1] + offBallMovement * offMoveWeight[currentPosition-1] +
+                postDefense * postDefWeight[currentPosition-1] + perimeterDefense * perimDefWeight[currentPosition-1] +
+                onBallDefense * onBallWeight[currentPosition-1] + offBallDefense * offBallWeight[currentPosition-1] +
+                stealing * stealWeight[currentPosition-1] + rebounding * reboundWeight[currentPosition-1]);
+
+        if(currentPosition < 3){
+            overallRating /= 10;
+        }
+        else{
+            overallRating = (int) (overallRating / 9.7);
+        }
     }
 
     public double getOffensiveEfficiency(int favorsThrees, int pace){
@@ -529,7 +567,7 @@ public class Player {
 
     public void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
         // for coach type: 0=no effect, 1=less variability, 2=extra variability (good or bad), 3=defensive focus, 4=offensive focus
-        int maxModifier = 20;
+        int maxModifier = 25;
         double gameModifier = (Math.random() * 2 * gameVariability) - gameVariability;
         if(coachType == 1){
             gameModifier /= 2;

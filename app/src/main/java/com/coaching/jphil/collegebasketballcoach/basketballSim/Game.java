@@ -163,10 +163,6 @@ public class Game {
                     homeTeam.getCoachTalk(awayScore - homeScore);
                     awayTeam.getCoachTalk(homeScore - awayScore);
                 }
-                if(lastPlay == 3){
-
-                }
-
                 lastPlay = simPlay();
             }
         } while (startNextHalf());
@@ -478,7 +474,7 @@ public class Game {
             return 1;
         }
 
-        if(playerIntentFoul){
+        if(playerIntentFoul && !shootFreeThrows){
             if(homeTeamHasBall && !homeTeam.isPlayerControlled()){
                 intentionallyFoul(homeTeam, awayTeam);
                 plays.add(0, getFormattedTime() + " (" + shotClock + ") - " + currentPlay);
@@ -658,7 +654,7 @@ public class Game {
                     return 0;
                 }
 
-                if ((passSuccess > (25 + defense.getAggression() / 2) && !startInBackcourt)) {
+                if ((passSuccess > (20 + defense.getAggression() / 2) && !startInBackcourt)) {
                     // pass leading to a shot
                     int timeChange = (int) (8 - (offense.getPace() / 90.0) * r.nextInt(4));
                     timeRemaining -= timeChange;
@@ -678,6 +674,7 @@ public class Game {
             else {
                 deadBall = true;
                 madeShot = false;
+                alertedDeadBall = false;
 
                 int timeChange = (int) (4 - (offense.getPace() / 90.0) * r.nextInt(3));
                 timeRemaining -= timeChange;
@@ -841,7 +838,7 @@ public class Game {
 
         if (assisted) {
             // shots off of good passes go in more often!
-            shotSuccess += 20;
+            shotSuccess += 30;
         }
 
         boolean isFouled = getFoul(2);
@@ -1269,10 +1266,16 @@ public class Game {
             if(chance < -40){
                 currentPlay += " " + withBall.getFullName() + " has lost the ball out of bounds! You can credit " +
                         ballDef.getFullName() + " with causing that turnover!";
+                deadBall = true;
+                madeShot = false;
+                alertedDeadBall = false;
                 return -1;
             }
             else{
                 currentPlay += " " + ballDef.getFullName() + " has knocked the ball out of bounds!";
+                deadBall = true;
+                madeShot = false;
+                alertedDeadBall = false;
                 return 1;
             }
         }
