@@ -257,7 +257,7 @@ public class Player {
     }
 
     public void setCurrentPosition(int pos){
-        if(pos < 5) {
+        if(pos <= 5 && pos > 0) {
             currentPosition = pos;
         }
         else{
@@ -334,7 +334,7 @@ public class Player {
         }
         else if(event < 0){
             if(fatigue > 0) {
-                fatigue -= 1;
+                fatigue -= .1;
             }
         }
     }

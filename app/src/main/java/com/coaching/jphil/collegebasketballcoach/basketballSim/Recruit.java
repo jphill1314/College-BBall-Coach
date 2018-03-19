@@ -132,9 +132,23 @@ public class Recruit {
         return null;
     }
 
+    public void loseInterest(){
+        Random r = new Random();
+        interest -= r.nextInt(7) + 3;
+
+        if(interest < 0){
+            interest = 0;
+        }
+    }
+
     public void attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
         Random r = new Random();
-        interest += r.nextInt(recruitingAbility / 2) + recruitingAbility / 2;
+        if(recruitingAbility > 10) {
+            interest += r.nextInt(recruitingAbility / 10) + recruitingAbility / 10;
+        }
+        else{
+            interest += 1;
+        }
 
         if(bigWin){
             interest += r.nextInt(10);

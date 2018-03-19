@@ -400,6 +400,9 @@ public class Game {
             return true;
         }
 
+        if(savePlays){
+            plays.add("Game Over!");
+        }
         isPlayed = true;
         return false;
     }
@@ -412,7 +415,6 @@ public class Game {
          */
         if(playerFouledOut){
             if(homeTeam.isPlayerControlled() && !debug){
-                homeTeam.makeSubs();
                 awayTeam.aiMakeSubs(half, timeRemaining);
                 if(playerFouledOut(homeTeam)){
                     return 3;
@@ -423,7 +425,6 @@ public class Game {
             }
             else if(awayTeam.isPlayerControlled() && !debug){
                 homeTeam.aiMakeSubs(half, timeRemaining);
-                awayTeam.makeSubs();
                 if(playerFouledOut(awayTeam)){
                     return 3;
                 }
@@ -436,6 +437,8 @@ public class Game {
                 awayTeam.aiMakeSubs(half, timeRemaining);
                 playerFouledOut = false;
             }
+            homeTeam.makeSubs();
+            awayTeam.makeSubs();
         }
 
         playType = 0;

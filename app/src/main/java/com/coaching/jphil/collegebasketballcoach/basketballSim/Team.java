@@ -302,7 +302,7 @@ public class Team {
         for(int x = 0; x < 25 - current; x++){
             int rating = overallRating + 30 - r.nextInt(60);
             recruits.add(new Recruit(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)],
-                    r.nextInt(4) + 1, rating, this, recruits.size()));
+                    r.nextInt(5) + 1, rating, this, recruits.size()));
         }
     }
 
@@ -341,6 +341,12 @@ public class Team {
 
         players = new ArrayList<>(rosterPlayers);
         lastScoreDif = 0;
+
+        if(recruits != null){
+            for(Recruit r: recruits){
+                r.loseInterest();
+            }
+        }
     }
 
     public int getCoachTalk(int scoreDif){
