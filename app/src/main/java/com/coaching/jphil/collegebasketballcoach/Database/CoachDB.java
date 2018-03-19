@@ -34,4 +34,10 @@ public class CoachDB {
 
     public int workingWithGuards;
     public int workingWithBigs;
+
+    public int recruitingAbility;
+
+    public int tendencyToSub;
+
+    public String recruitIds;
 }

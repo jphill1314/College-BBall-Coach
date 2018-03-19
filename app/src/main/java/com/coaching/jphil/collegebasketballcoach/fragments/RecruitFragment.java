@@ -37,7 +37,7 @@ public class RecruitFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recruit_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new RecruitAdapter(activity.currentTeam.getRecruits());
+        adapter = new RecruitAdapter(activity.currentTeam.getRecruits(), activity);
         recyclerView.setAdapter(adapter);
 
         return view;

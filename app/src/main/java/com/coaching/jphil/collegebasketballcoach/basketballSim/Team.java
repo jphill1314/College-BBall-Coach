@@ -44,6 +44,20 @@ public class Team {
 
     private int lastScoreDif = 0;
 
+    private int twoPointAttempts;
+    private int twoPointMakes;
+    private int threePointAttempts;
+    private int threePointMakes;
+    private int freeThrowAttempts;
+    private int freeThrowMakes;
+    private int assists;
+    private int oBoards;
+    private int dBoards;
+    private int steals;
+    private int turnovers;
+
+    private int currentSeasonYear;
+
     private int id;
 
     public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches,
@@ -62,6 +76,8 @@ public class Team {
 
         numberOfGames = 0;
 
+        currentSeasonYear = 2017;
+
         opponents = new ArrayList<>();
 
         setEqualTrainingFocus();
@@ -70,7 +86,7 @@ public class Team {
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
                 int defenseFavorsThrees, int agression, int pace, int offenseFocus,
-                int perimeterFocus, int skillFocus, Context context){
+                int perimeterFocus, int skillFocus, int year, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.isPlayerControlled = isPlayerControlled;
@@ -102,6 +118,8 @@ public class Team {
         this.offenseFocus = offenseFocus;
         this.perimeterFocus = perimeterFocus;
         this.skillFocus = skillFocus;
+
+        currentSeasonYear = year;
     }
 
     public void addPlayers(ArrayList<Player> players){
@@ -139,6 +157,10 @@ public class Team {
         }
     }
 
+    public int getCurrentSeasonYear(){
+        return currentSeasonYear;
+    }
+
     public int getId(){
         return id;
     }
@@ -167,8 +189,32 @@ public class Team {
         return players.size();
     }
 
+    public int getNumberOfReturningPlayers(){
+        int num = 0;
+        for(Player p: players){
+            if(p.getYear() < 3){
+                num++;
+            }
+        }
+
+        for(Recruit r: recruits){
+            if(r.getIsCommitted()){
+                num++;
+            }
+        }
+        return num;
+    }
+
     public ArrayList<Coach> getCoaches(){
         return coaches;
+    }
+
+    public String[] getCoachesNamesAndAbility(){
+        String[] names = new String[coaches.size()];
+        for(int x = 0; x < coaches.size(); x++){
+            names[x] = coaches.get(x).getFullName() + "\t" + coaches.get(x).getRecruitingAbility();
+        }
+        return names;
     }
 
     public int getGamesPlayed(){
@@ -206,6 +252,15 @@ public class Team {
             }
         }
 
+        for(Recruit r: recruits){
+            Player newPlayer = r.startNewSeason();
+            if(newPlayer != null){
+                players.add(newPlayer);
+            }
+        }
+
+        generateRecruits();
+
         wins = 0;
         loses = 0;
         gamesPlayed = 0;
@@ -214,8 +269,40 @@ public class Team {
         schedule = new ArrayList<>();
         opponents = new ArrayList<>();
 
-        if(players.size() < 10){
-            generateFreshman(10 - players.size());
+        int newNum = (int) (12 + Math.random() * 4);
+        if(players.size() < newNum){
+            generateFreshman(newNum - players.size());
+        }
+
+        currentSeasonYear++;
+    }
+
+    public void firstSeason(){
+        generateRecruits();
+    }
+
+    private void generateRecruits(){
+        recruits = new ArrayList<>();
+        int[] needs = positionNeeds(false);
+
+        String[] firstNames = context.getResources().getStringArray(R.array.first_names);
+        String[] lastNames = context.getResources().getStringArray(R.array.last_names);
+
+        Random r = new Random();
+
+        for(int y = 0; y < needs.length; y++){
+            for(int x = 0; x < needs[y] * 2; x++){
+                int rating = overallRating + 20 - r.nextInt(40);
+                recruits.add(new Recruit(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)],
+                        y+1, rating, this, recruits.size()));
+            }
+        }
+
+        int current = recruits.size();
+        for(int x = 0; x < 25 - current; x++){
+            int rating = overallRating + 30 - r.nextInt(60);
+            recruits.add(new Recruit(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)],
+                    r.nextInt(4) + 1, rating, this, recruits.size()));
         }
     }
 
@@ -226,6 +313,18 @@ public class Team {
         for(Player p: players){
             p.preGameSetup();
         }
+
+        twoPointAttempts = 0;
+        twoPointMakes = 0;
+        threePointAttempts = 0;
+        threePointMakes = 0;
+        freeThrowAttempts = 0;
+        freeThrowMakes = 0;
+        assists = 0;
+        oBoards = 0;
+        dBoards = 0;
+        steals = 0;
+        turnovers = 0;
     }
 
     public void playGame(boolean wonGame){
@@ -388,10 +487,28 @@ public class Team {
         String[] lastNames = context.getResources().getStringArray(R.array.last_names);
         String[] firstNames = context.getResources().getStringArray(R.array.first_names);
 
+        int[] needs = positionNeeds(true);
+        for(int x = 1; x < 6; x++){
+            while(needs[x-1] > 0){
+                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                        x, 0, overallRating - r.nextInt(10)));
+                needs[x-1]--;
+                numPlayers--;
+            }
+        }
+
         for(int i = 0; i < numPlayers; i++){
             players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
                     r.nextInt(4) + 1, 0, overallRating - r.nextInt(10)));
         }
+    }
+
+    private int[] positionNeeds(boolean countSeniors){
+        int[] needs = new int[] {0,0,0,0,0};
+        for(int x = 1; x < 6; x++){
+            needs[x-1] = 2 - getNumberOfPlayersAtPosition(x, countSeniors);
+        }
+        return needs;
     }
 
     public boolean updateSubs(int i1, int i2){
@@ -402,7 +519,7 @@ public class Team {
         return false;
     }
 
-    public void makeSubs(){
+    void makeSubs(){
         players = new ArrayList<>(subPlayers);
         updateCurrentPositions();
     }
@@ -414,40 +531,46 @@ public class Team {
 
     private void updateCurrentPositions(){
         for(int x = 0; x < players.size(); x++){
-            players.get(x).setCurrentPosition(x);
+            if(x < 5) {
+                players.get(x).setCurrentPosition(x + 1);
+            }
+            else{
+                players.get(x).setCurrentPosition(players.get(x).getPosition());
+            }
         }
     }
 
-    public void aiMakeSubs(int half, int timeRemaining){
+    void aiMakeSubs(int half, int timeRemaining){
         int tendToSub = coaches.get(0).getTendencyToSub();
 
         Random r = new Random();
 
         for(int x = 0; x < 5; x++){
             if(subPlayers.get(x).isEligible()){
-                if(subPlayers.get(x).getFatigue() > r.nextInt(101) - tendToSub ||
+                if(subPlayers.get(x).getFatigue() > r.nextInt(15) + 60 - tendToSub ||
                         (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && r.nextInt(35) + tendToSub > 75)){
-                    int sub = findSub(half, timeRemaining);
-                    if(subPlayers.get(x).getOverallRating() / subPlayers.get(x).getFatigue() <
-                            subPlayers.get(sub).getOverallRating()/ subPlayers.get(sub).getFatigue()){
+                    int sub = findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition());
+                    if(subPlayers.get(x).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition()) / subPlayers.get(x).getFatigue() <
+                            subPlayers.get(sub).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition())/ subPlayers.get(sub).getFatigue()){
                         updateSubs(x, sub);
                     }
                 }
             }
             else{
-                updateSubs(x, findSub(half, timeRemaining));
+                updateSubs(x, findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition()));
             }
         }
     }
 
-    private int findSub(int half, int timeRemaining){
+    private int findSub(int half, int timeRemaining, int position){
         int indexOfBest = 5;
         Random r = new Random();
         Player best = subPlayers.get(5);
+
         for(int x = 6; x < subPlayers.size(); x++){
             if(subPlayers.get(x).isEligible()) {
-                if (best.getOverallRating() / best.getFatigue() <
-                        subPlayers.get(x).getOverallRating() / subPlayers.get(x).getFatigue() &&
+                if (best.calculateRatingAtPosition(position) / best.getFatigue() <
+                        subPlayers.get(x).calculateRatingAtPosition(position) / subPlayers.get(x).getFatigue() &&
                         (!subPlayers.get(x).isInFoulTrouble(half, timeRemaining) &&
                                 r.nextInt(35) + coaches.get(0).getTendencyToSub() > 75)) {
                     indexOfBest = x;
@@ -480,10 +603,6 @@ public class Team {
         return conference;
     }
 
-    public void setSchedule(ArrayList<Game> games){
-        schedule = games;
-    }
-
     public void addGameToSchedule(Game game){
         if(schedule == null){
             schedule = new ArrayList<>();
@@ -502,5 +621,91 @@ public class Team {
 
     public ArrayList<Game> getSchedule(){
         return schedule;
+    }
+
+    void addTwoPointShot(boolean made){
+        twoPointAttempts++;
+        if(made){
+            twoPointMakes++;
+        }
+    }
+
+    void addThreePointShot(boolean made){
+        threePointAttempts++;
+        if(made){
+            threePointMakes++;
+        }
+    }
+
+    void addFreeThrowShot(boolean made){
+        freeThrowAttempts++;
+        if(made){
+            freeThrowMakes++;
+        }
+    }
+
+    void addAssist(){
+        assists++;
+    }
+
+    void addRebound(boolean offensive){
+        if(offensive){
+            oBoards++;
+        }
+        else{
+            dBoards++;
+        }
+    }
+
+    void addTurnover(){
+        turnovers++;
+    }
+
+    void addSteal(){
+        steals++;
+    }
+
+    public int getTwoPointAttempts() {
+        return twoPointAttempts;
+    }
+
+    public int getTwoPointMakes() {
+        return twoPointMakes;
+    }
+
+    public int getThreePointAttempts() {
+        return threePointAttempts;
+    }
+
+    public int getThreePointMakes() {
+        return threePointMakes;
+    }
+
+    public int getFreeThrowAttempts() {
+        return freeThrowAttempts;
+    }
+
+    public int getFreeThrowMakes() {
+        return freeThrowMakes;
+    }
+
+    public int getAssists() {
+        return assists;
+    }
+
+    public int getoBoards() {
+        return oBoards;
+    }
+
+    public int getdBoards() {
+        return dBoards;
+    }
+
+    public int getSteals() {
+        return steals;
+    }
+
+    public int getTurnovers() {
+        return turnovers;
     }
 }

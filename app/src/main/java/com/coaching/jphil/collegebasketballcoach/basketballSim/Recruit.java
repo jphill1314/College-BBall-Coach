@@ -15,37 +15,41 @@ public class Recruit {
     private int rating;
     private int interest; // 0-100 with higher meaning more interest in a program
     private boolean isCommitted;
-    private boolean isRecentlyRecruited;
+    private boolean isRecruited;
 
-    public Recruit(String firstName, String lastName, int position, int rating, Team team){
+    private int id;
+
+    public Recruit(String firstName, String lastName, int position, int rating, Team team, int id){
         this.firstName = firstName;
         this.lastName = lastName;
         this.position = position;
         this.rating = rating;
+        this.id = id;
+
         isCommitted = false;
-        isRecentlyRecruited = false;
+        isRecruited = false;
 
         generateInterest(team);
     }
 
     public Recruit(String firstName, String lastName, int position, int rating, int interest,
-                   boolean isCommitted, boolean isRecentlyRecruited){
+                   boolean isCommitted, int id){
         this.firstName = firstName;
         this.lastName = lastName;
         this.position = position;
         this.rating = rating;
         this.interest = interest;
         this.isCommitted = isCommitted;
-        this.isRecentlyRecruited = isRecentlyRecruited;
+        this.id = id;
     }
 
     private void generateInterest(Team team){
         interest = 0;
         if(team.getOverallRating() > rating){
-            interest += 50 + (team.getOverallRating() - rating);
+            interest += 25 + (team.getOverallRating() - rating);
         }
         else if(team.getOverallRating() + 10 >= rating){
-            interest += 25;
+            interest += 10;
         }
 
         if(team.getNumberOfPlayersAtPosition(position, false) > 1){
@@ -53,6 +57,13 @@ public class Recruit {
         }
         else{
             interest += 25;
+        }
+
+        if(interest < 0){
+            interest = 0;
+        }
+        if(interest > 100){
+            interest = 100;
         }
     }
 
@@ -97,32 +108,20 @@ public class Recruit {
         return interest;
     }
 
+    public int getId(){
+        return id;
+    }
+
     public boolean getIsCommitted(){
         return isCommitted;
     }
 
-    public void attemptToRecruit(){
-        if(!isRecentlyRecruited && !isCommitted) {
-            if (interest >= 75) {
-                isCommitted = true;
-            } else {
-                Random r = new Random();
-                interest += r.nextInt(50) - 25;
-
-                if(interest < 0){
-                    interest = 0;
-                }
-            }
-            isRecentlyRecruited = true;
-        }
+    public void toggleIsRecruited(){
+        isRecruited = !isRecruited;
     }
 
-    public void setIsRecentlyRecruited(boolean bool){
-        isRecentlyRecruited = bool;
-    }
-
-    public boolean getIsRecentlyRecruited(){
-        return isRecentlyRecruited;
+    public boolean isRecruited(){
+        return isRecruited;
     }
 
     public Player startNewSeason(){
@@ -131,5 +130,35 @@ public class Recruit {
             return new Player(lastName, firstName, position, 0, rating + 5 - r.nextInt(10));
         }
         return null;
+    }
+
+    public void attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
+        Random r = new Random();
+        interest += r.nextInt(recruitingAbility / 2) + recruitingAbility / 2;
+
+        if(bigWin){
+            interest += r.nextInt(10);
+        }
+        else if(badLoss){
+            interest -= r.nextInt(10);
+        }
+
+        if(interest < 0){
+            interest = 0;
+        }
+        else if(interest > 100){
+            interest = 100;
+        }
+
+        if(spotsAvailable > 0) {
+            commit();
+        }
+    }
+
+    private void commit(){
+        Random r = new Random();
+        if((interest - 75 >= r.nextInt(25)) || interest == 100){
+            isCommitted = true;
+        }
     }
 }

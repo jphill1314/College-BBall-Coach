@@ -58,9 +58,9 @@ public class ScheduleFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
         TextView tvSeason = view.findViewById(R.id.schedule_season);
-        tvSeason.setText(getResources().getString(R.string.season_name, 2017, 18));
-
         mainActivity = (MainActivity) getActivity();
+
+        tvSeason.setText(getResources().getString(R.string.season_name, mainActivity.getPlayerTeam().getCurrentSeasonYear(), mainActivity.getPlayerTeam().getCurrentSeasonYear() + 1));
 
         recyclerView = view.findViewById(R.id.schedule_list);
         manager = new LinearLayoutManager(getContext());

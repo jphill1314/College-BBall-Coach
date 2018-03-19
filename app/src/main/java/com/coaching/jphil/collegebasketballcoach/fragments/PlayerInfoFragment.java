@@ -32,8 +32,6 @@ public class PlayerInfoFragment extends Fragment {
     private TextView gamesPlayed, totalMinutes;
     private TextView playerName;
 
-    private ImageView star1, star2, star3, star4, star5;
-
     private MainActivity mainActivity;
 
     @Override
@@ -70,12 +68,6 @@ public class PlayerInfoFragment extends Fragment {
         gamesPlayed = view.findViewById(R.id.games_played);
         totalMinutes = view.findViewById(R.id.total_minutes);
 
-        star1 = view.findViewById(R.id.player_star_1);
-        star2 = view.findViewById(R.id.player_star_2);
-        star3 = view.findViewById(R.id.player_star_3);
-        star4 = view.findViewById(R.id.player_star_4);
-        star5 = view.findViewById(R.id.player_star_5);
-
         setAttributes();
 
         return view;
@@ -88,15 +80,15 @@ public class PlayerInfoFragment extends Fragment {
         midShot.setText(getResources().getString(R.string.mid_shot, player.getMidRangeShot()));
         longShot.setText(getResources().getString(R.string.long_shot, player.getLongRangeShot()));
         ballHandle.setText(getResources().getString(R.string.ball_handle, player.getBallHandling()));
-        pass.setText(getResources().getString(R.string.passing, player.getLongRangeShot()));
-        screen.setText(getResources().getString(R.string.screening, player.getBallHandling()));
+        pass.setText(getResources().getString(R.string.passing, player.getPassing()));
+        screen.setText(getResources().getString(R.string.screening, player.getScreening()));
 
-        postDef.setText(getResources().getString(R.string.post_def, player.getCloseRangeShot()));
-        perimDef.setText(getResources().getString(R.string.perim_def, player.getMidRangeShot()));
-        onBall.setText(getResources().getString(R.string.on_ball, player.getLongRangeShot()));
-        offBall.setText(getResources().getString(R.string.off_ball, player.getBallHandling()));
-        steal.setText(getResources().getString(R.string.steal, player.getLongRangeShot()));
-        rebound.setText(getResources().getString(R.string.rebound, player.getBallHandling()));
+        postDef.setText(getResources().getString(R.string.post_def, player.getPostDefense()));
+        perimDef.setText(getResources().getString(R.string.perim_def, player.getPerimeterDefense()));
+        onBall.setText(getResources().getString(R.string.on_ball, player.getOnBallDefense()));
+        offBall.setText(getResources().getString(R.string.off_ball, player.getOffBallDefense()));
+        steal.setText(getResources().getString(R.string.steal, player.getStealing()));
+        rebound.setText(getResources().getString(R.string.rebound, player.getRebounding()));
 
         stamina.setText(getResources().getString(R.string.stamina, player.getStamina()));
 
@@ -104,73 +96,5 @@ public class PlayerInfoFragment extends Fragment {
 
         gamesPlayed.setText(getResources().getString(R.string.games_played, player.getGamesPlayed()));
         totalMinutes.setText(getResources().getString(R.string.total_minutes, player.getTotalMinutes()));
-
-        setStarRating(player.getOverallRating());
-    }
-
-    private void setStarRating(int rating){
-        switch (getStarRating(rating)){
-            case "0.5":
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
-                break;
-            case "1":
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                break;
-            case "1.5":
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
-                break;
-            case "2":
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                break;
-            case "2.5":
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
-                break;
-            case "3":
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                break;
-            case "3.5":
-                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
-                break;
-            case "4":
-                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                break;
-            case "4.5":
-                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star5.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_half_black_24dp));
-                break;
-            case "5":
-                star1.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star2.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star3.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star4.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                star5.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_black_24dp));
-                break;
-        }
-    }
-
-    private String getStarRating(int rating){
-        String stars;
-
-        stars = Integer.toString(rating / 20);
-        if(rating % 20 > 9){
-            stars += ".5";
-        }
-
-        return stars;
     }
 }

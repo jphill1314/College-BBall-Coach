@@ -6,13 +6,19 @@ import android.arch.persistence.room.Room;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
 import com.coaching.jphil.collegebasketballcoach.Database.CoachDB;
@@ -51,7 +57,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
+    public DrawerLayout drawerLayout;
     private RecyclerView drawerList;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager manager;
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     public NationalChampionship championship;
 
     public FloatingActionButton homeButton;
+    public ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,19 +102,36 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, new RosterFragment())
                         .commit();
+
+                actionBar.setTitle(currentTeam.getFullName());
             }
         });
 
         manager = new LinearLayoutManager(this);
         drawerList.setLayoutManager(manager);
 
-        Drawable[] drawables = new Drawable[7];
-        for(int x = 0; x < drawables.length; x++){
-            drawables[x] = getResources().getDrawable(R.drawable.ic_assignment_black_24dp);
-        }
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        adapter = new NavDrawerAdapter(getResources().getStringArray(R.array.drawer_items), drawables);
+        actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+        actionBar.setTitle(currentTeam.getFullName());
+
+        adapter = new NavDrawerAdapter(getResources().getStringArray(R.array.drawer_items));
         drawerList.setAdapter(adapter);
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -129,31 +153,61 @@ public class MainActivity extends AppCompatActivity {
         }
 
         android.support.v4.app.FragmentTransaction t = fm.beginTransaction();
+        boolean makeSwitch = false;
+        String text = "";
 
         switch(position){
             case 0:
                 t.replace(R.id.content_frame, new RosterFragment());
+                makeSwitch = true;
                 break;
             case 1:
                 t.replace(R.id.content_frame, new ScheduleFragment());
+                makeSwitch = true;
                 break;
             case 2:
                 t.replace(R.id.content_frame, new StandingsFragment());
+                makeSwitch = true;
                 break;
             case 3:
-                t.replace(R.id.content_frame, new RecruitFragment());
+                if(currentTeam.isPlayerControlled()) {
+                    t.replace(R.id.content_frame, new RecruitFragment());
+                    makeSwitch = true;
+                }
+                else{
+                    text = "You can't view another team's recruits!";
+                }
                 break;
             case 4:
-                t.replace(R.id.content_frame, new StrategyFragment());
+                if(currentTeam.isPlayerControlled()) {
+                    t.replace(R.id.content_frame, new StrategyFragment());
+                    makeSwitch = true;
+                }
+                else{
+                    text = "You can't view another team's strategy!";
+                }
                 break;
             case 5:
                 t.replace(R.id.content_frame, new StaffFragment());
+                makeSwitch = true;
                 break;
             case 6:
-                t.replace(R.id.content_frame, new TrainingFragment());
+                if(currentTeam.isPlayerControlled()) {
+                    t.replace(R.id.content_frame, new TrainingFragment());
+                    makeSwitch = true;
+                }
+                else{
+                    text = "You can't view another team's practice plans!";
+                }
                 break;
         }
-        t.commit();
+
+        if(makeSwitch) {
+            t.commit();
+        }
+        else{
+            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        }
         drawerLayout.closeDrawer(drawerList);
     }
 
@@ -162,17 +216,18 @@ public class MainActivity extends AppCompatActivity {
         Random r = new Random();
 
         for(int i = 0; i < names.length; i++){
+            int numPlayers = 12 + r.nextInt(4);
             int rating = r.nextInt(15) + minRating;
             if(i != 0) {
-                teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), false, this));
+                teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating), false, this));
             }
             else{
                 if(player) {
                     //rating = 90;
-                    teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), true, this));
+                    teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating), true, this));
                 }
                 else{
-                    teams.add(new Team(names[i], mascots[i], getPlayers(10, rating), getCoaches(4, rating), false, this));
+                    teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating), false, this));
                 }
             }
         }
@@ -216,8 +271,14 @@ public class MainActivity extends AppCompatActivity {
                     (i % 5) + 1, r.nextInt(4), teamRating));
         }
         for (int i = 5; i < numPlayers; i++) {
-            players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                    (i % 5) + 1, r.nextInt(4), teamRating - r.nextInt(10)));
+            if(i < 10) {
+                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                        (i % 5) + 1, r.nextInt(4), teamRating - r.nextInt(10)));
+            }
+            else{
+                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
+                        r.nextInt(4) + 1, r.nextInt(4), teamRating - r.nextInt(15)));
+            }
         }
         return players;
     }
@@ -355,6 +416,8 @@ public class MainActivity extends AppCompatActivity {
                         teamsDB[i].perimeterFocus = teams.get(i).getPerimeterFocus();
                         teamsDB[i].skillsFocus = teams.get(i).getSkillFocus();
 
+                        teamsDB[i].currentYear = teams.get(i).getCurrentSeasonYear();
+
                         teams.get(i).setId(i + teamIndex);
 
                         if(teams.get(i).isPlayerControlled() && teams.get(i).getRecruits() != null){
@@ -363,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
                             for (Recruit recruit : teams.get(i).getRecruits()) {
                                 recruits[rIndex] = new RecruitDB();
 
-                                recruits[rIndex].recruitID = rIndex;
+                                recruits[rIndex].recruitID = recruit.getId();
                                 recruits[rIndex].teamID = teamIndex;
 
                                 recruits[rIndex].firstName = recruit.getFirstName();
@@ -372,7 +435,6 @@ public class MainActivity extends AppCompatActivity {
                                 recruits[rIndex].interest = recruit.getInterest();
                                 recruits[rIndex].rating = recruit.getRating();
                                 recruits[rIndex].isCommitted = recruit.getIsCommitted();
-                                recruits[rIndex].isRecentlyRecruited = recruit.getIsRecentlyRecruited();
                                 rIndex++;
                             }
 
@@ -421,7 +483,6 @@ public class MainActivity extends AppCompatActivity {
 
                             players[pIndex].gamesPlayed = player.getGamesPlayed();
                             players[pIndex].totalMinutes = player.getTotalMinutes();
-
                             pIndex++;
                         }
                     }
@@ -456,6 +517,20 @@ public class MainActivity extends AppCompatActivity {
 
                             coaches[cIndex].workingWithGuards = coach.getWorkingWithGuards();
                             coaches[cIndex].workingWithBigs = coach.getWorkingWithBigs();
+
+                            coaches[cIndex].recruitingAbility = coach.getRecruitingAbility();
+
+                            coaches[cIndex].tendencyToSub = coach.getTendencyToSub();
+
+                            String recuitIds = "";
+                            if(coach.getRecruits() != null){
+                                for(Recruit r: coach.getRecruits()){
+                                    recuitIds += r.getId() + ",";
+                                }
+                            }
+
+                            coaches[cIndex].recruitIds = recuitIds;
+
                             cIndex++;
                         }
                     }
@@ -579,30 +654,42 @@ public class MainActivity extends AppCompatActivity {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                             teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
                             teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
-                            teamsDB[i].offenseFocus, teamsDB[i].perimeterFocus, teamsDB[i].skillsFocus, getApplicationContext()));
+                            teamsDB[i].offenseFocus, teamsDB[i].perimeterFocus, teamsDB[i].skillsFocus, teamsDB[i].currentYear,
+                            getApplicationContext()));
                 }
 
                 for (PlayerDB player : players) {
                     teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.pos,
                             player.year, player.minutes, player.closeRangeShot, player.midRangeShot,
-                            player.longRangeShot, player.ballHandling, player.screening, player.offBallMovement, player.postDefense,
+                            player.longRangeShot, player.ballHandling, player.passing, player.screening, player.offBallMovement, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
                             player.stealing, player.rebounding, player.stamina, player.gamesPlayed,
                             player.totalMinutes));
+                }
+
+                for (RecruitDB recruit : recruits) {
+                    teams.get(recruit.teamID).addRecruit(new Recruit(recruit.firstName, recruit.lastName,
+                            recruit.pos, recruit.rating, recruit.interest, recruit.isCommitted,
+                            recruit.recruitID));
                 }
 
                 for (CoachDB coach : coaches) {
                     teams.get(coach.teamID).addCoach(new Coach(coach.firstName, coach.lastName, coach.pos,
                             coach.shotTeaching, coach.ballControlTeaching, coach.screenTeaching, coach.defPositionTeaching,
                             coach.defOnBallTeaching, coach.defOffBallTeaching, coach.reboundTeaching, coach.stealTeaching,
-                            coach.conditioningTeaching, coach.workingWithGuards, coach.workingWithBigs));
+                            coach.conditioningTeaching, coach.workingWithGuards, coach.workingWithBigs, coach.recruitingAbility,
+                            coach.tendencyToSub));
+
+                    if(coach.recruitIds.length() > 0) {
+                        for (String s : Arrays.asList(coach.recruitIds.split(","))) {
+                            int i = Integer.parseInt(s);
+                            teams.get(coach.teamID).getCoaches().get(teams.get(coach.teamID).getCoaches().size()-1)
+                                    .addRecruit(teams.get(coach.teamID).getRecruits().get(i));
+                        }
+                    }
                 }
 
-                for (RecruitDB recruit : recruits) {
-                    teams.get(recruit.teamID).addRecruit(new Recruit(recruit.firstName, recruit.lastName,
-                            recruit.pos, recruit.rating, recruit.interest, recruit.isCommitted,
-                            recruit.isRecentlyRecruited));
-                }
+
 
                 for(int x = 0; x < teams.size(); x++){
                     conferences.get(teamsDB[x].conferenceID).addTeam(teams.get(x));

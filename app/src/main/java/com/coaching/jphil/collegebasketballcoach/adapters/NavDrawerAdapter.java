@@ -18,7 +18,6 @@ import com.coaching.jphil.collegebasketballcoach.R;
 public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.ViewHolder> {
 
     private String[] drawerItems;
-    private Drawable[] drawerImages;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView tvNav;
@@ -36,9 +35,8 @@ public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.View
         }
     }
 
-    public NavDrawerAdapter(String[] items, Drawable[] images){
+    public NavDrawerAdapter(String[] items){
         drawerItems = items;
-        drawerImages = images;
     }
 
     @Override
@@ -50,7 +48,6 @@ public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.tvNav.setText(drawerItems[position]);
-        holder.tvNav.setCompoundDrawables(drawerImages[position], null, null, null);
     }
 
     @Override

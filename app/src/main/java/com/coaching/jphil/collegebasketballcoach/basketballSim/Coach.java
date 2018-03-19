@@ -1,5 +1,6 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -27,18 +28,25 @@ public class Coach {
     private int workingWithGuards;
     private int workingWithBigs;
 
-    private int tendencyToSub = 50;
+    private int tendencyToSub;
+
+    private int recruitingAbility;
+    private ArrayList<Recruit> recruits;
 
     public Coach(String firstName, String lastName, int position, int ability){
         this.firstName = firstName;
         this.lastName = lastName;
         this.position = position;
+
+        recruits = new ArrayList<>();
+
         generateAttributes(ability);
     }
 
     public Coach(String firstName, String lastName, int position, int shotTeaching, int ballControlTeaching,
                  int screenTeaching, int defPositionTeaching, int defOnBallTeaching, int defOffBallTeaching,
-                 int reboundTeaching, int stealTeaching, int conditioningTeaching, int workingWithGuards, int workingWithBigs){
+                 int reboundTeaching, int stealTeaching, int conditioningTeaching, int workingWithGuards, int workingWithBigs,
+                 int recruitingAbility, int tendencyToSub){
         this.firstName = firstName;
         this.lastName = lastName;
         this.position = position;
@@ -58,6 +66,10 @@ public class Coach {
         this.workingWithBigs = workingWithBigs;
         this.workingWithGuards = workingWithGuards;
 
+        this.recruitingAbility = recruitingAbility;
+
+        this.tendencyToSub = tendencyToSub;
+
         calculateOverallRating();
     }
 
@@ -75,6 +87,30 @@ public class Coach {
 
     public int getPosition(){
         return position;
+    }
+
+    public ArrayList<Recruit> getRecruits(){
+        return recruits;
+    }
+
+    public boolean addRecruit(Recruit recruit){
+        if(recruits == null){
+            recruits = new ArrayList<>();
+        }
+
+        if(recruits.size() < 2) {
+            recruits.add(recruit);
+            recruit.toggleIsRecruited();
+            return true;
+        }
+        return false;
+    }
+
+    public void removeRecruit(Recruit recruit){
+        if(recruits != null){
+            recruits.remove(recruit);
+            recruit.toggleIsRecruited();
+        }
     }
 
     public String getPositionAsString(){
@@ -139,6 +175,10 @@ public class Coach {
         return tendencyToSub;
     }
 
+    public int getRecruitingAbility(){
+        return recruitingAbility;
+    }
+
     private void generateAttributes(int ability){
         int abilityVariability = 10;
         Random r = new Random();
@@ -158,6 +198,10 @@ public class Coach {
         workingWithGuards = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
         workingWithBigs = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
 
+        recruitingAbility = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
+
+        tendencyToSub = 25 + r.nextInt(50);
+
         calculateOverallRating();
     }
 
@@ -166,4 +210,5 @@ public class Coach {
         + defOnBallTeaching + defOffBallTeaching + reboundTeaching + stealTeaching + conditioningTeaching
         + workingWithBigs + workingWithGuards) / 11;
     }
+
 }

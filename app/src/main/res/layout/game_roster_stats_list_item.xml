@@ -3,19 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
+    android:paddingBottom="8dp"
     android:paddingTop="8dp">
-
-    <TextView
-        android:id="@+id/player_position"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
-        android:gravity="center"
-        android:textSize="16sp"/>
 
     <TextView
         android:id="@+id/player_name"
@@ -23,10 +12,11 @@
         android:layout_weight="2"
         android:layout_height="wrap_content"
         android:paddingEnd="8dp"
+        android:paddingStart="8dp"
         android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/player_pref"
+        android:id="@+id/stat_1"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -35,7 +25,7 @@
         android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/player_condition"
+        android:id="@+id/stat_2"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -44,7 +34,7 @@
         android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/player_rating"
+        android:id="@+id/stat_3"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -53,7 +43,7 @@
         android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/player_fouls"
+        android:id="@+id/stat_4"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"

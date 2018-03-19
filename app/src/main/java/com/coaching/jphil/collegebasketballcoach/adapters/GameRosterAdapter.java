@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
+import com.coaching.jphil.collegebasketballcoach.fragments.GameFragment;
 
 import java.util.ArrayList;
 
@@ -21,26 +22,58 @@ import java.util.ArrayList;
 public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.ViewHolder> {
 
     private ArrayList<Player> players;
+    private GameFragment gameFragment;
     private boolean[] pendingSub;
+    private boolean isPlayerTeam;
     private int index1, index2;
+    private int type;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        TextView pos, name, stats;
+        TextView pos, name, prefPos, condition, rating, fouls;
+        TextView stat1, stat2, stat3, stat4;
         View view;
 
-        public ViewHolder(View view){
+        public ViewHolder(View view, int type){
             super(view);
 
-            pos = view.findViewById(R.id.player_position);
-            name = view.findViewById(R.id.player_name);
-            stats = view.findViewById(R.id.player_stats);
+            if(type == 0) {
+                pos = view.findViewById(R.id.player_position);
+                prefPos = view.findViewById(R.id.player_pref);
+                condition = view.findViewById(R.id.player_condition);
+                rating = view.findViewById(R.id.player_rating);
+                fouls = view.findViewById(R.id.player_fouls);
+            }
+            else{
+                stat1 = view.findViewById(R.id.stat_1);
+                stat2 = view.findViewById(R.id.stat_2);
+                stat3 = view.findViewById(R.id.stat_3);
+                stat4 = view.findViewById(R.id.stat_4);
+            }
 
+            name = view.findViewById(R.id.player_name);
             this.view = view;
         }
     }
 
-    public GameRosterAdapter(ArrayList<Player> players){
+    public GameRosterAdapter(ArrayList<Player> players, int type, GameFragment gameFragment){
         this.players = players;
+        this.type = type;
+        this.gameFragment = gameFragment;
+        isPlayerTeam = true;
+
+        index1 = -1;
+        index2 = -1;
+        pendingSub = new boolean[players.size()];
+        for(int x = 0; x < players.size(); x++){
+            pendingSub[x] = false;
+        }
+    }
+
+    public GameRosterAdapter(ArrayList<Player> players, int type){
+        this.players = players;
+        this.type = type;
+        isPlayerTeam = false;
+
         index1 = -1;
         index2 = -1;
         pendingSub = new boolean[players.size()];
@@ -59,60 +92,98 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
         }
         index1 = -1;
         index2 = -1;
+
         notifyDataSetChanged();
         return values;
     }
 
-    public void clearPending(){
-        for(int x = 0; x < pendingSub.length; x++){
-            pendingSub[x] = false;
-        }
-        notifyDataSetChanged();
-    }
-
     @Override
     public GameRosterAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.game_roster_list_item, parent, false);
-        return new ViewHolder(view);
+        View view;
+        if(type == 0) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.game_roster_list_item, parent, false);
+        }
+        else{
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.game_roster_stats_list_item, parent, false);
+        }
+        return new ViewHolder(view, type);
     }
 
-    @Override
-    public void onBindViewHolder(GameRosterAdapter.ViewHolder holder, int position){
+    private void bindType0(GameRosterAdapter.ViewHolder holder, int position){
         String ps;
-        switch (position){
-            case 0:
+        switch (position+1){
+            case 1:
                 ps = "PG";
                 break;
-            case 1:
+            case 2:
                 ps = "SG";
                 break;
-            case 2:
+            case 3:
                 ps = "SF";
                 break;
-            case 3:
+            case 4:
                 ps = "PF";
                 break;
-            case 4:
+            case 5:
                 ps = "C";
                 break;
             default:
                 ps = "-";
         }
         holder.pos.setText(ps);
-        holder.name.setText(players.get(position).getFullName());
-        holder.stats.setText(players.get(position).getGameStatsAsString());
+        holder.prefPos.setText(players.get(position).getPositionAbr());
+
+        int condition = 100 - players.get(position).getFatigue();
+        holder.condition.setText("" + condition);
+
+        if(position < 5){
+            holder.rating.setText(players.get(position).calculateRatingAtPosition(position+1) + "");
+        }
+        else{
+            holder.rating.setText(players.get(position).getOverallRating() + "");
+        }
+        holder.fouls.setText(""+players.get(position).getFouls());
 
         holder.view.setBackgroundColor(Color.rgb(250, 250,250));
 
         if(players.get(position).getFatigue() > 60){
-            holder.name.setBackgroundColor(Color.rgb(255, 0, 0));
+            holder.condition.setTextColor(Color.rgb(255, 0, 0));
         }
         else if(players.get(position).getFatigue() > 40){
-            holder.name.setBackgroundColor(Color.rgb(255, 255, 0));
+            holder.condition.setTextColor(Color.rgb(255, 255, 0));
         }
         else {
-            holder.name.setBackgroundColor(Color.rgb(0, 255, 0));
+            holder.condition.setTextColor(Color.rgb(0, 255, 0));
         }
+    }
+
+    private void bindType1(GameRosterAdapter.ViewHolder holder, int position){
+        holder.stat1.setText(players.get(position).getTwoPointShotMade() + "/" + players.get(position).getTwoPointShotAttempts());
+        holder.stat2.setText(players.get(position).getThreePointShotMade() + "/" + players.get(position).getThreePointShotAttempts());
+        holder.stat3.setText(players.get(position).getFreeThrowMade() + "/" + players.get(position).getFreeThrowAttempts());
+        holder.stat4.setText(players.get(position).getAssists()+"");
+    }
+
+    private void bindType2(GameRosterAdapter.ViewHolder holder, int position){
+        holder.stat1.setText(players.get(position).getoRebounds()+"");
+        holder.stat2.setText(players.get(position).getdRebounds()+"");
+        holder.stat3.setText(players.get(position).getSteals()+"");
+        holder.stat4.setText(players.get(position).getTurnovers()+"");
+    }
+
+    @Override
+    public void onBindViewHolder(GameRosterAdapter.ViewHolder holder, int position){
+        if(type == 0){
+            bindType0(holder, position);
+        }
+        else if(type == 1){
+            bindType1(holder, position);
+        }
+        else if(type == 2){
+            bindType2(holder, position);
+        }
+
+        holder.name.setText(players.get(position).getFullName());
 
         if(position == index1 || position == index2){
             holder.view.setBackgroundColor(Color.LTGRAY);
@@ -126,23 +197,24 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
             holder.view.setBackgroundColor(Color.BLACK);
         }
 
-        final int pos = position;
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(index1 == -1 && !pendingSub[pos]){
-                    index1 = pos;
+        if(isPlayerTeam) {
+            final int pos = position;
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (index1 == -1 && !pendingSub[pos]) {
+                        index1 = pos;
+                    } else if (pos != index1 && !pendingSub[pos]) {
+                        index2 = pos;
+                        gameFragment.fab.setVisibility(View.VISIBLE);
+                    } else {
+                        index1 = -1;
+                        index2 = -1;
+                    }
+                    notifyDataSetChanged();
                 }
-                else if(pos != index1 && !pendingSub[pos]){
-                    index2 = pos;
-                }
-                else{
-                    index1 = -1;
-                    index2 = -1;
-                }
-                notifyDataSetChanged();
-            }
-        });
+            });
+        }
     }
 
     @Override

@@ -24,5 +24,4 @@ public class RecruitDB {
     public int interest;
 
     public boolean isCommitted;
-    public boolean isRecentlyRecruited;
 }

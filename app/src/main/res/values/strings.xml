@@ -11,7 +11,8 @@
         <item>Training</item>
     </string-array>
 
-    <string name="toast_minutes">Your team must have exactly 200 minutes of playing time set!</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_closed">closed</string>
 
     <!-- Roster Fragment-->
     <string name="position">Pos.</string>
@@ -107,8 +108,13 @@
 
     <!-- Recruiting Fragment -->
     <string name="recruit_interest">Interest</string>
-    <string name="button_recruit">Recruit this player</string>
-    <string name="button_commit">Get commitment</string>
+    <string name="recruit">Tap to recruit this player</string>
+    <string name="stop_recruit">Being recruited by %s</string>
+    <string name="alert_title">Select a coach to recruit this player</string>
+    <string name="warn_unrecruit">Stop recruiting this player?</string>
+    <string name="committed">This player has committed to your team!</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <!-- Game Fragment -->
     <string name="timeout">Call timeout</string>
@@ -127,6 +133,21 @@
     <string name="timeout_instruction">A timeout has been called.\nMake any desired changes before speaking to your players.</string>
     <string name="pre_game_instruction">Address your players before starting the half.</string>
 
+    <string name="floor_pos">Floor</string>
+    <string name="pref_pos">Pref.</string>
+    <string name="condition">Cond.</string>
+    <string name="fouls">Fouls</string>
+
+    <string name="two_point">2FG</string>
+    <string name="three_point">3FG</string>
+    <string name="free_throw">FT</string>
+    <string name="assists">Assists</string>
+
+    <string name="o_board">OB</string>
+    <string name="d_board">DB</string>
+    <string name="steals">Steals</string>
+    <string name="to">TO</string>
+
     <string-array name="timeout_array">
         <item>Skip speech</item>
         <item>Good work guys! Keep it up!</item>
@@ -141,6 +162,12 @@
         <item>We\'re going to have to work extra hard if we expect to pull this one off.</item>
         <item>If you play hard on the defensive end, we\'ll get the result we\'re after.</item>
         <item>You will have to make some shots to win this one.</item>
+    </string-array>
+
+    <string-array name="game_roster_spinner">
+        <item>Selection Information</item>
+        <item>Offensive Stats</item>
+        <item>Defensive Stats</item>
     </string-array>
 
     <string name="list_score">%s: %d - %s: %d</string>

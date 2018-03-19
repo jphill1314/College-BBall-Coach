@@ -17,15 +17,16 @@ List of improvements to add (for version 1.0):
 * Standings
 - [x] Sort by win % first and # of wins second
 - [ ] Show rankings and RPI (or something like strength of schedule)
+- [x] Show the correct season years
 
 * Recruiting
-- [ ] Assign a coach to recruit a certain player instead of pressing a button after every game
-- [ ] Recruits that are not recruited will gradually lose interest
-- [ ] Recruits that are recruited will gain interest based on the coach's ability and the team's results
+- [x] Assign a coach to recruit a certain player instead of pressing a button after every game
+- [x] Recruits that are not recruited will gradually lose interest
+- [x] Recruits that are recruited will gain interest based on the coach's ability and the team's results
 - [ ] Each recruit has a scouting report that is gradually revealed the longer they are recruited (probably best and worst abilities and work ethic)
-- [ ] Once a recruit reaches a certain level of interest, he will have a chance to commit after every game
+- [x] Once a recruit reaches a certain level of interest, he will have a chance to commit after every game
 - [ ] When a recruit commits, all other recruits' interest is effected based on the position of the commit and the number of spots left on the team
-- [ ] The recruits should be generated based on the team's expected needs and their current ability, but there should be a couple of hard to get players that are much better
+- [x] The recruits should be generated based on the team's expected needs and their current ability, but there should be a couple of hard to get players that are much better
 
 * Strategy
 - [ ] Add ability to press with varring intensity (to slow the pace or to steal the ball) and frequency (never, sometimes, always)
@@ -33,7 +34,7 @@ List of improvements to add (for version 1.0):
 - [x] Add ability to set overal aggression level (lower means fewer fouls, but not as good defense)
 
 * Staff
-- [ ] Add recruiting ability
+- [x] Add recruiting ability
 - [ ] Hire and fire staff
 
 * Training
@@ -42,14 +43,14 @@ List of improvements to add (for version 1.0):
 - [ ] A player's improvement depends on playing time, practice intensity, work ethic, and the coaches' abilities
 
 * Game Viewer
-- [ ] Add empty list items so that the FAB doesn't always block bottom item in lists
+- [x] Add empty list items so that the FAB doesn't always block bottom item in lists
 - [ ] Indicate which team has the ball in the Play-by-Play screen
 - [ ] Add more varriety to team talks
-- [ ] Give better indication of a player's rating, prefered position, condition, and if they are a pending sub on roster page
-- [ ] Add additional screen on roster page to get a better view of stats
-- [ ] Add team stats
+- [x] Give better indication of a player's rating, prefered position, condition, and if they are a pending sub on roster page
+- [x] Add additional screen on roster page to get a better view of stats
+- [x] Add team stats
 - [ ] (maybe 1.0) Add ability to 'run a play' out of a timeout in close and late situations
-- [ ] Prevent the user from accessing other parts of the game while in the game view
+- [x] Prevent the user from accessing other parts of the game while in the game view
 - [ ] If the user quits while in game, reopening the app should place the user back into the game
 - [ ] Add ability to pause the sim
 
@@ -59,12 +60,12 @@ List of improvements to add (for version 1.0):
 - [ ] Find better balance between which plays occur
 - [ ] Improve balance of gaining fatigue vs losing fatigue
 - [ ] Have the AI modify strategy based on the situation
-- [ ] Track more stats like steals and turnovers
+- [x] Track more stats like steals and turnovers
 
 * Players
 - [ ] Save game stats
-- [ ] Generate initial abilities based on position
-- [ ] Calculate overall rating based on position 
+- [x] Generate initial abilities based on position
+- [x] Calculate overall rating based on position 
 - [ ] A player can be set to train as a different position, but will improve slower than if they trained as their best position
 
 * Offseason (Pushed to after 1.0)
@@ -75,7 +76,7 @@ List of improvements to add (for version 1.0):
 * General UI
 - [ ] Add a team overview screen
 - [x] Add a button that will take the user to the overview screen from anywhere in the game (except while in game)[This is effectively added)
-- [ ] Indicate which team is being viewed
+- [x] Indicate which team is being viewed
 - [ ] Add a start screen from which the user can load a save or start a new one (there can only ever be one saved game [for now])
 - [ ] Add a team creation page for starting a new game
 - [ ] Add loading indicators whenever an AsyncTask is running

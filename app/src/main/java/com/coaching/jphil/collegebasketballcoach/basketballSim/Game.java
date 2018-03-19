@@ -631,17 +631,26 @@ public class Game {
 
         if (passSuccess >= defense.getAggression()) {
             // successful pass
-            currentPlay += passer.getFullName() + " passes the ball to " + target.getFullName() + ".";
-            int ob = getBallOutOfBounds(target, targetDef);
+            currentPlay += passer.getFullName() + " passes the ball to " + target.getFullName();
+            int ob = 0;
+            if(location != -1){
+                currentPlay += ".";
+                ob = getBallOutOfBounds(target, targetDef);
+            }
+
             if(ob == 0) {
                 boolean startInBackcourt = false;
                 if (location < 1) {
                     startInBackcourt = true;
                     location = 1;
+
+                    currentPlay += " and he brings the ball into the front court.";
+
                     int timeChange = (int) (8 - (offense.getPace() / 90.0) * r.nextInt(6));
                     timeRemaining -= timeChange;
                     shotClock -= timeChange;
                 }
+
                 lastPlayerWithBall = playerWithBall;
                 playerWithBall = target.getCurrentPosition();
 
@@ -676,24 +685,32 @@ public class Game {
                 madeShot = false;
                 alertedDeadBall = false;
 
+                if(ob == -1){
+                    passer.addTurnover();
+                    offense.addTurnover();
+                    changePossession();
+                }
+
                 int timeChange = (int) (4 - (offense.getPace() / 90.0) * r.nextInt(3));
                 timeRemaining -= timeChange;
                 shotClock -= timeChange;
-
-                if(ob == -1){
-                    changePossession();
-                }
             }
         } else if (stealSuccess > (75 - defense.getAggression())) {
             // unsuccessful pass -> turnover
             currentPlay += passer.getFullName() + " turns the ball over! ";
+            passer.addTurnover();
+            offense.addTurnover();
             if (r.nextBoolean()) {
                 // ball is stolen by off ball defender
                 currentPlay += targetDef.getFullName() + " has stolen the ball!";
                 playerWithBall = target.getCurrentPosition();
+                targetDef.addSteal();
+                defense.addSteal();
             }
             else{
                 currentPlay += passDef.getFullName() + " has stolen the ball!";
+                passDef.addSteal();
+                defense.addSteal();
             }
 
             changePossession();
@@ -709,6 +726,8 @@ public class Game {
                 deadBall = true;
                 alertedDeadBall = false;
                 madeShot = false;
+                passer.addTurnover();
+                offense.addTurnover();
                 changePossession();
             }
             else if(getFoul(0)){
@@ -802,13 +821,13 @@ public class Game {
             currentPlay += "\n";
         }
         if (shotClose > shotMid && shotClose > shotLong) {
-            currentPlay += shooter.getFullName() + " shoots from up close and ";
+            currentPlay += shooter.getFullName() + " shoots from up close";
             shotLocation = 1;
         } else if (shotMid > shotClose && shotMid > shotLong) {
-            currentPlay += shooter.getFullName() + " shoots from mid-range and ";
+            currentPlay += shooter.getFullName() + " shoots from mid-range";
             shotLocation = 2;
         } else {
-            currentPlay += shooter.getFullName() + " shoots from 3 and ";
+            currentPlay += shooter.getFullName() + " shoots from 3";
             shotLocation = 3;
         }
 
@@ -843,7 +862,7 @@ public class Game {
 
         boolean isFouled = getFoul(2);
         if(isFouled){
-            currentPlay += "is fouled ";
+            currentPlay += ", is fouled";
             shotSuccess -= 30;
         }
 
@@ -855,34 +874,43 @@ public class Game {
             deadBall = true;
 
             if(isFouled){
-                currentPlay += "and makes the shot anyways!" + foulString;
+                currentPlay += " and makes the shot anyways!" + foulString;
                 madeShot = false; // this is so media timeouts can be called on and-1s
                 alertedDeadBall = false;
             }
             else {
-                currentPlay += "makes it!";
+                currentPlay += " and makes it!";
                 madeShot = true;
             }
 
             if(assisted){
                 offense.getPlayers().get(lastPlayerWithBall-1).addAssist();
+                offense.addAssist();
             }
 
-            changePossession();
+
             if (shotLocation == 1 || shotLocation == 2) {
                 shooter.addTwoPointShot(true);
+                offense.addTwoPointShot(true);
                 if(isFouled){
                     freeThrowShooter = shooter;
                     freeThrows = 1;
                     shootFreeThrows = true;
                 }
+                else{
+                    changePossession();
+                }
                 return 2;
             } else {
                 shooter.addThreePointShot(true);
+                offense.addThreePointShot(true);
                 if(isFouled){
                     freeThrowShooter = shooter;
                     freeThrows = 1;
                     shootFreeThrows = true;
+                }
+                else{
+                    changePossession();
                 }
                 return 3;
             }
@@ -893,10 +921,10 @@ public class Game {
         shotClock -= timeChange;
 
         if(isFouled){
-            currentPlay += "and misses the shot." + foulString;
+            currentPlay += ", but misses the shot." + foulString;
         }
         else {
-            currentPlay += "misses it!";
+            currentPlay += ", but misses it!";
         }
         if(shotLocation == 1 || shotLocation == 2){
             if(isFouled){
@@ -909,6 +937,7 @@ public class Game {
                 return 0;
             }
             shooter.addTwoPointShot(false);
+            offense.addTwoPointShot(false);
         }
         else{
             if(isFouled){
@@ -921,6 +950,7 @@ public class Game {
                 return 0;
             }
             shooter.addThreePointShot(false);
+            offense.addThreePointShot(false);
         }
 
         getRebound(offense, defense);
@@ -969,11 +999,26 @@ public class Game {
                 if (player.getFreeThrowShot() > r.nextInt(100)) {
                     made++;
                     player.addFreeThrowShot(true);
+                    if(homeTeamHasBall){
+                        homeTeam.addFreeThrowShot(true);
+                    }
+                    else{
+                        awayTeam.addFreeThrowShot(true);
+                    }
+
                     if (x == attempts - 1) {
                         madeLast = true;
                     }
                 } else {
                     player.addFreeThrowShot(false);
+                    if(homeTeamHasBall){
+                        homeTeam.addFreeThrowShot(false);
+                    }
+                    else{
+                        awayTeam.addFreeThrowShot(false);
+                    }
+
+
                     if (x == attempts - 1) {
                         madeLast = false;
                     }
@@ -985,18 +1030,47 @@ public class Game {
             if(player.getFreeThrowShot() > r.nextInt(100)){
                 made++;
                 player.addFreeThrowShot(true);
+                if(homeTeamHasBall){
+                    homeTeam.addFreeThrowShot(true);
+                }
+                else{
+                    awayTeam.addFreeThrowShot(true);
+                }
+
                 if(player.getFreeThrowShot() > r.nextInt(100)){
                     made++;
                     player.addFreeThrowShot(true);
+                    if(homeTeamHasBall){
+                        homeTeam.addFreeThrowShot(true);
+                    }
+                    else{
+                        awayTeam.addFreeThrowShot(true);
+                    }
+
+
                     madeLast = true;
                 }
                 else{
                     player.addFreeThrowShot(false);
+                    if(homeTeamHasBall){
+                        homeTeam.addFreeThrowShot(false);
+                    }
+                    else{
+                        awayTeam.addFreeThrowShot(false);
+                    }
+
                     madeLast = false;
                 }
             }
             else{
                 player.addFreeThrowShot(false);
+                if(homeTeamHasBall){
+                    homeTeam.addFreeThrowShot(false);
+                }
+                else{
+                    awayTeam.addFreeThrowShot(false);
+                }
+
                 madeLast = false;
             }
         }
@@ -1025,6 +1099,7 @@ public class Game {
                 currentPlay += player.getFullName() + " makes " + made + " of " + attempts + " free throws.";
             }
         }
+
         if(!madeLast){
             if(homeTeamHasBall) {
                 getRebound(homeTeam, awayTeam);
@@ -1063,10 +1138,11 @@ public class Game {
             }
         }
 
-        if (offChance[offHigh] - 5 > defChance[defHigh]) {
+        if (offChance[offHigh] - 15 > defChance[defHigh]) {
             playerWithBall = offHigh + 1;
             currentPlay += "\n" + offense.getPlayers().get(playerWithBall-1).getFullName() + " grabs the offensive rebound.";
             offense.getPlayers().get(playerWithBall-1).addRebound(true);
+            offense.addRebound(true);
             if(timeRemaining >= 30) {
                 shotClock = 30;
             }
@@ -1077,6 +1153,7 @@ public class Game {
             playerWithBall = defHigh + 1;
             currentPlay += "\n" + defense.getPlayers().get(playerWithBall-1).getFullName() + " grabs the defensive rebound.";
             defense.getPlayers().get(playerWithBall-1).addRebound(false);
+            defense.addRebound(false);
             changePossession();
         }
     }
@@ -1096,8 +1173,6 @@ public class Game {
         situation: -1 = charging situation, -2 = off-ball situation
          */
 
-
-        // TODO: make the player's ability affect the probability of the foul
         int foulFactor = 100 - team.getAggression(); //higher number == fewer fouls
         if(situation == 0 && r.nextInt(foulFactor) < 2){
             player.addFoul();
@@ -1117,12 +1192,16 @@ public class Game {
         else if(situation == -1 && r.nextInt(foulFactor) < 10){
             player.addFoul();
             foulString = "\n" + player.getFullName() + " has been called for a charge.";
+            player.addTurnover();
+            team.addTurnover();
             changePossession();
             return true;
         }
         else if(situation == -2 && r.nextInt(foulFactor) < 5){
             player.addFoul();
             foulString = "\n" + player.getFullName() + " has been called for an off-ball foul.";
+            player.addTurnover();
+            team.addTurnover();
             changePossession();
             return true;
         }
@@ -1291,7 +1370,7 @@ public class Game {
         }
 
         // TODO: add a chance for fouls here
-        if(postChance > 30){
+        if(postChance > 40){
             int timeChange;
             if(homeTeamHasBall) {
                 timeChange = (int) (8 - (homeTeam.getPace() / 90.0) * r.nextInt(4));
@@ -1304,9 +1383,15 @@ public class Game {
             lastShotClock = shotClock;
 
             currentPlay += " " + withBall.getFullName() + " goes to work in the post";
-            if(r.nextDouble() > .5 || postChance > 50){
+            if(r.nextDouble() > .5 || postChance > 60){
                 currentPlay += " and scores!";
                 withBall.addTwoPointShot(true);
+                if(homeTeamHasBall){
+                    homeTeam.addTwoPointShot(true);
+                }
+                else{
+                    awayTeam.addTwoPointShot(true);
+                }
 
                 deadBall= true;
                 madeShot = true;
@@ -1316,6 +1401,12 @@ public class Game {
             else{
                 currentPlay += ", but cannot get his shot to fall.";
                 withBall.addTwoPointShot(false);
+                if(homeTeamHasBall){
+                    homeTeam.addTwoPointShot(false);
+                }
+                else{
+                    awayTeam.addTwoPointShot(false);
+                }
 
                 if(homeTeamHasBall) {
                     getRebound(homeTeam, awayTeam);

@@ -59,6 +59,8 @@ public class Player {
     private int assists;
     private int oRebounds;
     private int dRebounds;
+    private int steals;
+    private int turnovers;
 
     private double fatigue;
     private int timePlayed; // time in seconds
@@ -83,7 +85,7 @@ public class Player {
     }
 
     public Player(String lName, String fName, int position, int year, int minutes, int closeShot, int midShot,
-                  int longShot, int ballHandle, int screen, int offBallMove, int postDef, int perDef, int onBall,
+                  int longShot, int ballHandle, int pass, int screen, int offBallMove, int postDef, int perDef, int onBall,
                   int offBall, int steal, int rebound, int stamina, int gamesPlayed, int totalMinutes){
         this.lName = lName;
         this.fName = fName;
@@ -96,6 +98,7 @@ public class Player {
         midRangeShot = midShot;
         longRangeShot = longShot;
         ballHandling = ballHandle;
+        passing = pass;
         screening = screen;
         offBallMovement = offBallMove;
 
@@ -111,6 +114,7 @@ public class Player {
         this.gamesPlayed = gamesPlayed;
         this.totalMinutes = totalMinutes;
 
+        prepareForSaving();
         prepareForSave = false;
 
         calculateRating();
@@ -196,6 +200,8 @@ public class Player {
         assists = 0;
         oRebounds = 0;
         dRebounds = 0;
+        steals = 0;
+        turnovers = 0;
         timePlayed = 0;
         fatigue = 0;
 
@@ -242,9 +248,20 @@ public class Player {
         }
     }
 
+    void addTurnover(){
+        turnovers++;
+    }
+
+    void addSteal(){
+        steals++;
+    }
+
     public void setCurrentPosition(int pos){
-        if(pos < 4) {
-            currentPosition = pos + 1;
+        if(pos < 5) {
+            currentPosition = pos;
+        }
+        else{
+            currentPosition = position;
         }
     }
 
@@ -292,6 +309,14 @@ public class Player {
         return dRebounds;
     }
 
+    public int getSteals(){
+        return steals;
+    }
+
+    public int getTurnovers(){
+        return turnovers;
+    }
+
     void addTimePlayed(int time, int event){
         // event: 0 = nothing, 1 = change of possession, -1 = timeout / on bench, 10 = halftime
         timePlayed += time;
@@ -308,7 +333,9 @@ public class Player {
             fatigue *= .5;
         }
         else if(event < 0){
-            fatigue -= 1;
+            if(fatigue > 0) {
+                fatigue -= 1;
+            }
         }
     }
 
@@ -438,7 +465,7 @@ public class Player {
                 onBallDefense * onBallWeight[currentPosition-1] + offBallDefense * offBallWeight[currentPosition-1] +
                 stealing * stealWeight[currentPosition-1] + rebounding * reboundWeight[currentPosition-1]);
 
-        if(currentPosition < 3){
+        if(currentPosition < 4){
             overallRating /= 10;
         }
         else{
@@ -446,37 +473,36 @@ public class Player {
         }
     }
 
-    public double getOffensiveEfficiency(int favorsThrees, int pace){
-        double efficiency = 0.0;
+    public int calculateRatingAtPosition(int position){
+        double[] closeWeight = new double[] {.6, .7, .8, 1.0, 1.0};
+        double[] midWeight = new double[] {.8, .8, .8, .7, .7};
+        double[] longWeight = new double[] {.8, 1.0, .8, .5, .5};
+        double[] ballWeight = new double[] {1.1, .8, .8, .6, .5};
+        double[] passWeight = new double[] {1.1, .8, .8, .6, .5};
+        double[] screenWeight = new double[] {.4, .5, .6, .9, 1.0};
+        double[] offMoveWeight = new double[] {.8, 1.0, .8, .7, .7};
 
-        efficiency += (1 - favorsThrees / 100.0) * closeRangeShot;
-        efficiency += .5 * midRangeShot;
-        efficiency += (favorsThrees / 100.0) * longRangeShot;
+        double[] postDefWeight = new double[] {.4, .5, .6, .9, 1.0};
+        double[] perimDefWeight = new double[] {1.0, 1.0, .9, .5, .5};
+        double[] onBallWeight = new double[] {1.0, .8, .8, .9, 1.0};
+        double[] offBallWeight = new double[] {.8, .8, .8, .7, .6};
+        double[] stealWeight = new double[] {.8, .8, .8, .5, .5};
+        double[] reboundWeight = new double[] {.4, .5, .7, 1.2, 1.2};
 
-        efficiency += (50.0 / pace) * (ballHandling + passing + screening); // slower pace favors good ball handlers, passers, and screeners
-        efficiency += (pace / 80.0) * stamina; // slower pace helps players with low stamina
+        int rating = (int) (closeRangeShot * closeWeight[position-1] +
+                midRangeShot * midWeight[position-1] + longRangeShot * longWeight[position-1] +
+                ballHandling * ballWeight[position-1] + passing * passWeight[position-1] +
+                screening * screenWeight[position-1] + offBallMovement * offMoveWeight[position-1] +
+                postDefense * postDefWeight[position-1] + perimeterDefense * perimDefWeight[position-1] +
+                onBallDefense * onBallWeight[position-1] + offBallDefense * offBallWeight[position-1] +
+                stealing * stealWeight[position-1] + rebounding * reboundWeight[position-1]);
 
-        efficiency = efficiency / 5.5; //should give perfect player an efficiency of 100
-
-        return efficiency;
-    }
-
-    public double getDefensiveEfficiency(int tendToHelp, int favorsThrees, int pace){
-        double efficiency = 0.0;
-
-        efficiency += (1 - tendToHelp / 100.0) * onBallDefense;
-        efficiency += (tendToHelp / 100.0) * offBallDefense;
-
-        efficiency += (1 - favorsThrees / 100.0) * postDefense;
-        efficiency += (favorsThrees / 100.0) * perimeterDefense;
-
-        efficiency += stealing + rebounding;
-
-        efficiency += (pace / 80.0) * stamina;
-
-        efficiency = efficiency / 5.0;
-
-        return efficiency;
+        if(position < 4){
+            return rating / 10;
+        }
+        else{
+            return  (int) (rating/ 9.7);
+        }
     }
 
     public int getCloseRangeShot() {
@@ -650,9 +676,4 @@ public class Player {
         return freeThrowMade + "/" + freeThrowAttempts;
     }
 
-    public String getGameStatsAsString(){
-        return "mins:" + getMinutesPlayed() + " - 2s:" + getTwoPointStats() + " - 3s:" + getThreePointStats() + " - FT:" +
-                getFreeThrowStats() + "\nast:" + getAssists() + " - OB:" +getoRebounds() +
-                " - DB:" + getdRebounds() + " - F:" + getFouls();
-    }
 }

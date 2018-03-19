@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20sp"
-            android:padding="15dp" />
+            android:padding="8dp" />
 
         <TextView
             android:id="@+id/away_score"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20sp"
-            android:padding="15dp" />
+            android:padding="8dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -109,11 +109,12 @@
 
     <Spinner
         android:id="@+id/game_spinner"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
+        android:layout_centerHorizontal="true"
         android:layout_below="@id/time_layout"/>
 
     <SeekBar
@@ -122,13 +123,13 @@
         android:layout_height="wrap_content"
         android:paddingBottom="16dp"
         android:layout_alignParentBottom="true"
-        android:max="25"/>
+        android:max="10"/>
 
     <TextView
         android:id="@+id/alert_dead_ball"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
@@ -143,7 +144,7 @@
         android:id="@+id/speed_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:layout_above="@id/game_speed_bar"

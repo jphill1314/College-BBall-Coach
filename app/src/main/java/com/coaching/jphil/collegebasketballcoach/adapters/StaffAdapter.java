@@ -64,7 +64,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvPos.setText(coaches.get(position).getPositionAsString());
         holder.tvName.setText(coaches.get(position).getFullName());
-        holder.tvRating.setText(getStarRating(coaches.get(position).getOverallRating()));
+        holder.tvRating.setText(coaches.get(position).getOverallRating() + "");
     }
 
     @Override
@@ -72,14 +72,5 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.ViewHolder> 
         return coaches.size();
     }
 
-    private String getStarRating(int rating){
-        String stars;
-
-        stars = Integer.toString(rating / 20);
-        if(rating % 20 > 9){
-            stars += ".5";
-        }
-        return stars;
-    }
 
 }

@@ -40,7 +40,7 @@ public abstract class Conference {
         for(Team t: teams){
             t.setConference(this);
             if(t.isPlayerControlled()){
-                t.setRecruits(getRecruits(t.getOverallRating(), t));
+                t.firstSeason();
             }
         }
         tournaments = null;
@@ -84,27 +84,10 @@ public abstract class Conference {
     public void startNewSeason(){
         tournaments = null;
         for(Team t: teams) {
-            if (t.isPlayerControlled()) {
-                t.setRecruits(getRecruits(t.getOverallRating(), t));
-            }
             t.newSeason();
         }
         generateMasterSchedule();
 
-    }
-
-    private ArrayList<Recruit> getRecruits(int teamRating, Team team){
-        ArrayList<Recruit> recruits = new ArrayList<>();
-        String[] lastNames = context.getResources().getStringArray(R.array.last_names);
-        String[] firstNames = context.getResources().getStringArray(R.array.first_names);
-
-        Random r = new Random();
-        for(int x = 0; x < 15; x++){
-            recruits.add(new Recruit(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)],
-                    (x % 5) + 1, teamRating + 5 - r.nextInt(20), team));
-        }
-
-        return recruits;
     }
 
     private void generateMasterSchedule(){
@@ -168,19 +151,6 @@ public abstract class Conference {
 
     public ArrayList<Game> getMasterSchedule(){
         return masterSchedule;
-    }
-
-    public ArrayList<Game> getTeamSchedule(Team team){
-        if(teams.contains(team)){
-            ArrayList<Game> schedule = new ArrayList<>();
-            for(Game g: masterSchedule){
-                if(g.getHomeTeam().equals(team) || g.getAwayTeam().equals(team)){
-                    schedule.add(g);
-                }
-            }
-            return schedule;
-        }
-        return null;
     }
 
     public String getName() {

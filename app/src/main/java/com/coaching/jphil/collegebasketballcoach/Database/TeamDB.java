@@ -21,6 +21,8 @@ public class TeamDB {
     public String schoolName;
     public String schoolMascot;
 
+    public int currentYear;
+
     public int wins;
     public int loses;
 

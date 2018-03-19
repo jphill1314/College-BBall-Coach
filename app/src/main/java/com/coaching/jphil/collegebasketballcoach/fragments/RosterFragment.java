@@ -46,6 +46,7 @@ public class RosterFragment extends Fragment {
         Bundle args = getArguments();
         if(args != null){
             mainActivity.currentTeam = generateStandings(mainActivity.currentConference.getTeams()).get(args.getInt("team"));
+            mainActivity.actionBar.setTitle(mainActivity.currentTeam.getFullName());
         }
         pendingSubs = new ArrayList<>(mainActivity.currentTeam.getPlayers());
 
@@ -94,6 +95,7 @@ public class RosterFragment extends Fragment {
 
         return view;
     }
+
 
     private ArrayList<Team> generateStandings(ArrayList<Team> standing){
         int changes = 0;
