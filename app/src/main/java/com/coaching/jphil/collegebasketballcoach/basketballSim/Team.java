@@ -37,10 +37,10 @@ public class Team {
     private int numberOfGames;
 
     // Strategy
-    private int offenseFavorsThrees = 50;
-    private int defenseFavorsThrees = 50;
-    private int aggression = 0;
-    private int pace = 70;
+    private int offenseFavorsThrees;
+    private int defenseFavorsThrees;
+    private int aggression;
+    private int pace;
 
     private int lastScoreDif = 0;
 
@@ -82,6 +82,7 @@ public class Team {
 
         setEqualTrainingFocus();
         setOverallRating();
+        generateStrategy();
     }
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
@@ -713,5 +714,70 @@ public class Team {
 
     public int getTurnovers() {
         return turnovers;
+    }
+
+    private void generateStrategy(){
+        pace = (int)((getAverageStamina() / 100.0) * 35 + 55);
+        aggression = 0;
+
+        offenseFavorsThrees = (int)((getAverageThreePointShot() * 1.0 / getAverageCloseShot()) * 25 + 25);
+        defenseFavorsThrees = (int)((getAveragePerimDef() * 1.0 / getAveragePostDef()) * 25 + 25);
+
+        if(offenseFavorsThrees > 75){
+            offenseFavorsThrees = 75;
+        }
+        else if(offenseFavorsThrees < 25){
+            offenseFavorsThrees = 25;
+        }
+
+        if(defenseFavorsThrees > 75){
+            defenseFavorsThrees = 75;
+        }
+        else if(defenseFavorsThrees < 25){
+            defenseFavorsThrees = 25;
+        }
+
+
+    }
+
+    private int getAverageStamina(){
+        int total = 0;
+        for(Player p: players){
+            total += p.getStamina();
+        }
+
+        return total / players.size();
+    }
+
+    private int getAverageThreePointShot(){
+        int total = 0;
+        for(Player p: players){
+            total += p.getLongRangeShot();
+        }
+        return total / players.size();
+    }
+
+    private int getAverageCloseShot(){
+        int total = 0;
+        for(Player p: players){
+            total += p.getCloseRangeShot();
+        }
+        return total / players.size();
+    }
+
+    private int getAveragePostDef(){
+        int total = 0;
+        for(Player p: players){
+            total += p.getPostDefense();
+        }
+        return total / players.size();
+    }
+
+    private int getAveragePerimDef(){
+        int total = 0;
+        for(Player p: players){
+            total += p.getPerimeterDefense();
+        }
+        return total / players.size();
     }
 }

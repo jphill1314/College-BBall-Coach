@@ -1,6 +1,21 @@
 <resources>
     <string name="app_name">College Basketball Coach</string>
 
+
+    <!-- Start Screen-->
+    <string name="new_game_button">New Game</string>
+    <string name="load_game_button">Load Game</string>
+
+    <!-- Team Creator -->
+    <string name="team_creator">Create your team!</string>
+    <string name="school_name_prompt">School name</string>
+    <string name="mascot_name">Mascot</string>
+    <string name="coach_name">Coach name</string>
+    <string name="team_rating">Team rating: %d</string>
+    <string name="conference">Team\'s conference</string>
+    <string name="conference_rating">Conference ratings</string>
+
+
     <string-array name="drawer_items">
         <item>Roster</item>
         <item>Schedule</item>
@@ -76,7 +91,7 @@
 
     <string name="more_agro">More aggressive</string>
     <string name="less_agro">Less aggressive</string>
-    
+
     <string name="intentional_foul">Intentionally Foul</string>
 
     <!-- Training Fragment -->

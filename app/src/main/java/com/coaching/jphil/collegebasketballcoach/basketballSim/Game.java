@@ -1,6 +1,8 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -185,6 +187,7 @@ public class Game {
     private boolean playerFouledOut = false;
     private boolean alertedDeadBall = true;
     private boolean shootFreeThrows = false;
+    private boolean isInProgress = false;
     private int freeThrows;
     private Player freeThrowShooter;
     private Random r;
@@ -217,6 +220,7 @@ public class Game {
         mediaTimeouts = new boolean[]{false, false, false, false, false, false, false, false, false, false};
         playerWantsTO = false;
         recentTO = false;
+        isInProgress = true;
         homeTimeouts = 4;
         awayTimeouts = 4;
 
@@ -404,6 +408,7 @@ public class Game {
             plays.add("Game Over!");
         }
         isPlayed = true;
+        isInProgress = false;
         return false;
     }
 
@@ -1523,4 +1528,9 @@ public class Game {
     public void setPlayerIntentFoul(boolean wantFoul){
         playerIntentFoul = wantFoul;
     }
+
+    public boolean getIsInProgress(){
+        return isInProgress;
+    }
+
 }

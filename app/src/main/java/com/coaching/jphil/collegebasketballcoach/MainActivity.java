@@ -1,15 +1,11 @@
 package com.coaching.jphil.collegebasketballcoach;
 
-
-import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Room;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -51,8 +47,6 @@ import com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -80,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(db == null){
+        if(db == null && conferences == null){
             db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
             dataAsync = new DataAsync();
             dataAsync.execute("load");
@@ -138,9 +132,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
 
+        Log.d("onPause", "onPause has been called");
+
         if(dataAsync != null) {
             dataAsync.cancel(true);
-            dataAsync = new DataAsync();
         }
         dataAsync = new DataAsync();
         dataAsync.execute("save");
@@ -457,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
                             players[pIndex] = new PlayerDB();
                             player.prepareForSaving();
                             players[pIndex].playerId = pIndex + playerIndex;
+                            player.setPlayerId(pIndex + playerIndex);
                             players[pIndex].teamID = i + teamIndex;
                             players[pIndex].lastName = player.getlName();
                             players[pIndex].firstName = player.getfName();
@@ -620,7 +616,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 db.appDAO().insertGames(games);
 
-
                 db.close();
             }
 
@@ -659,8 +654,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for (PlayerDB player : players) {
-                    teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.pos,
-                            player.year, player.minutes, player.closeRangeShot, player.midRangeShot,
+                    teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.playerId,
+                            player.pos, player.year, player.minutes, player.closeRangeShot, player.midRangeShot,
                             player.longRangeShot, player.ballHandling, player.passing, player.screening, player.offBallMovement, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
                             player.stealing, player.rebounding, player.stamina, player.gamesPlayed,
@@ -759,6 +754,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+            Log.d("load", "finished loading");
         }
 
         private void clearData(){

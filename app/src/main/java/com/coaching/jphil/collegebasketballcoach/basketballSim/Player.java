@@ -62,6 +62,8 @@ public class Player {
     private int steals;
     private int turnovers;
 
+    private int playerId;
+
     private double fatigue;
     private int timePlayed; // time in seconds
 
@@ -84,11 +86,12 @@ public class Player {
         prepareForSave = false;
     }
 
-    public Player(String lName, String fName, int position, int year, int minutes, int closeShot, int midShot,
+    public Player(String lName, String fName, int id, int position, int year, int minutes, int closeShot, int midShot,
                   int longShot, int ballHandle, int pass, int screen, int offBallMove, int postDef, int perDef, int onBall,
                   int offBall, int steal, int rebound, int stamina, int gamesPlayed, int totalMinutes){
         this.lName = lName;
         this.fName = fName;
+        this.playerId = id;
         this.year = year;
         this.position = position;
         currentPosition = position;
@@ -134,6 +137,14 @@ public class Player {
 
     public int getYear(){
         return year;
+    }
+
+    public int getId(){
+        return playerId;
+    }
+
+    public void setPlayerId(int id){
+        playerId = id;
     }
 
     public String getYearAsString(){

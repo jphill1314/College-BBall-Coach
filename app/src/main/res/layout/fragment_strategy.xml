@@ -63,7 +63,7 @@
             android:id="@+id/seek_offense_three"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="70"/>
+            android:max="50"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -138,7 +138,7 @@
             android:id="@+id/seek_defense_three"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="70"/>
+            android:max="50"/>
 
         <LinearLayout
             android:layout_width="match_parent"

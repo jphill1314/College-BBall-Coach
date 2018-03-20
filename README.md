@@ -77,12 +77,12 @@ List of improvements to add (for version 1.0):
 - [ ] Add a team overview screen
 - [x] Add a button that will take the user to the overview screen from anywhere in the game (except while in game)[This is effectively added)
 - [x] Indicate which team is being viewed
-- [ ] Add a start screen from which the user can load a save or start a new one (there can only ever be one saved game [for now])
-- [ ] Add a team creation page for starting a new game
+- [x] Add a start screen from which the user can load a save or start a new one (there can only ever be one saved game [for now])
+- [x] Add a team creation page for starting a new game
 - [ ] Add loading indicators whenever an AsyncTask is running
 
 * Team Creation
-- [ ] User can name the school, the mascot, the conference, and the head coach's name
+- [x] User can name the school, the mascot, the conference, and the head coach's name
 - [ ] User can choose the average rating of the other schools in the conference and their own team's overall rating
 - [ ] There should be a couple of pre-made options
 

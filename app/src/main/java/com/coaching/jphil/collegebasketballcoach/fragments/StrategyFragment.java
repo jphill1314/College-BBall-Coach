@@ -40,8 +40,8 @@ public class StrategyFragment extends Fragment {
         agro = view.findViewById(R.id.seek_agro);
         pace = view.findViewById(R.id.seek_pace);
 
-        offThree.setProgress((int) (team.getOffenseFavorsThrees() / 70.0 * 100.0 - 30));
-        defThree.setProgress((int) (team.getDefenseFavorsThrees() / 70.0 * 100.0 - 30));
+        offThree.setProgress(team.getOffenseFavorsThrees() - 25);
+        defThree.setProgress(team.getDefenseFavorsThrees() - 25);
         agro.setProgress(team.getAggression() + 10);
         pace.setProgress((int) ((team.getPace() - 55) / 35.0 * 100.0));
 
@@ -60,7 +60,7 @@ public class StrategyFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                offThreeProgress = (int) (((offThreeProgress + 30) / 100.0) * 70);
+                offThreeProgress = offThreeProgress + 25;
                 team.setOffenseFavorsThrees(offThreeProgress);
             }
         });
@@ -79,7 +79,7 @@ public class StrategyFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                defThreeProgress = (int) (((defThreeProgress + 30) / 100.0) * 70);
+                defThreeProgress = defThreeProgress + 25;
                 team.setDefenseFavorsThrees(defThreeProgress);
             }
         });

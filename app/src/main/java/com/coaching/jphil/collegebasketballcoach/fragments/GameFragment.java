@@ -188,7 +188,7 @@ public class GameFragment extends Fragment {
     @Override
     public void onDestroyView(){
         super.onDestroyView();
-        if(gameAsync != null){
+        if(gameAsync != null) {
             gameAsync.cancel(true);
         }
 
@@ -223,8 +223,13 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
-            game.setSavePlays(true);
-            game.preGameSetUp();
+            if(!game.getIsInProgress()) {
+                game.setSavePlays(true);
+                game.preGameSetUp();
+            }
+            else{
+                changeAdapters(0);
+            }
         }
 
         @Override

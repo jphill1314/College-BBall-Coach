@@ -145,7 +145,6 @@ public class ScheduleFragment extends Fragment {
 
                 mainActivity.getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, frag)
-                        .addToBackStack("games")
                         .commit();
             }
             else if(results == -2){
