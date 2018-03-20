@@ -26,7 +26,7 @@ public class CoachInfoFragment extends Fragment {
 
     private int coachIndex;
     private TextView tvShot, tvBallControl, tvScreen, tvPositioning, tvOnBall, tvOffBall;
-    private TextView tvRebound, tvSteal, tvCondition, tvGuard, tvBig, tvName;
+    private TextView tvRebound, tvSteal, tvCondition, tvRecruit, tvOffMove, tvName;
 
     private MainActivity activity;
 
@@ -51,8 +51,8 @@ public class CoachInfoFragment extends Fragment {
         tvRebound = view.findViewById(R.id.staff_rebound);
         tvSteal = view.findViewById(R.id.staff_steal);
         tvCondition = view.findViewById(R.id.staff_condition);
-        tvGuard = view.findViewById(R.id.staff_guards);
-        tvBig = view.findViewById(R.id.staff_bigs);
+        tvRecruit = view.findViewById(R.id.staff_recruit);
+        tvOffMove = view.findViewById(R.id.staff_off_move);
         tvName = view.findViewById(R.id.staff_name);
 
         setAttributes();
@@ -72,8 +72,8 @@ public class CoachInfoFragment extends Fragment {
         tvRebound.setText(getResources().getString(R.string.rebound_teach, coach.getReboundTeaching()));
         tvSteal.setText(getResources().getString(R.string.steal_teach, coach.getStealTeaching()));
         tvCondition.setText(getResources().getString(R.string.condition_teaching, coach.getConditioningTeaching()));
-        tvGuard.setText(getResources().getString(R.string.work_guards, coach.getWorkingWithGuards()));
-        tvBig.setText(getResources().getString(R.string.work_bigs, coach.getWorkingWithBigs()));
+        tvRecruit.setText(getResources().getString(R.string.recruit_ability, coach.getRecruitingAbility()));
+        tvOffMove.setText(getResources().getString(R.string.off_move, coach.getOffPositionTeaching()));
         tvName.setText(getResources().getString(R.string.coach_name_pos, coach.getFullName(), coach.getPositionAsString()));
     }
 }

@@ -1,7 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.coaching.jphil.collegebasketballcoach.fragments.PlayerInfoFragment">
 
     <TextView
@@ -11,161 +12,37 @@
         android:textSize="25sp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:gravity="center"
-        android:layout_alignParentTop="true" />
+        android:gravity="center" />
 
-    <ScrollView
-        android:id="@+id/attributes_scroll"
+    <TextView
+        android:id="@+id/rating_at_pos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:layout_below="@id/player_name">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textSize="20sp"
+        android:gravity="center"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:orientation="vertical">
+    <TextView
+        android:id="@+id/training_as"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textSize="20sp"
+        android:gravity="center"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:text="@string/stats"/>
+    <Spinner
+        android:id="@+id/player_spinner"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/games_played"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/player_list"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-            <TextView
-                android:id="@+id/total_minutes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:paddingTop="24dp"
-                android:text="@string/off_attributes"/>
-
-            <TextView
-                android:id="@+id/close_shot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/mid_shot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/long_shot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/ball_handle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/passing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/screen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:paddingTop="24dp"
-                android:text="@string/def_attributes"/>
-
-            <TextView
-                android:id="@+id/post_def"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/perim_def"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/on_ball"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/off_ball"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/stealing"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/rebound"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:paddingTop="24dp"
-                android:text="@string/phys_attributes"/>
-
-            <TextView
-                android:id="@+id/stamina"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-</RelativeLayout>
+</LinearLayout>

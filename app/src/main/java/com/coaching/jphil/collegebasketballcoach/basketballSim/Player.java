@@ -2,6 +2,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -15,21 +16,33 @@ public class Player {
     private int currentPosition;
     private int year;
     private int overallRating;
+    private int trainingAs;
+
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
     private int gameVariability = 10;
     private int offensiveModifier = 0;
     private int defensiveModifier = 0;
 
-    private int minutes;
-
     // Offensive attributes
     private int closeRangeShot;
     private int midRangeShot;
     private int longRangeShot;
+    private int freeThrowShot;
+    private int postMove;
     private int ballHandling;
     private int passing;
     private int screening;
     private int offBallMovement;
+
+    private int closeRangeShotProgress;
+    private int midRangeShotProgress;
+    private int longRangeShotProgress;
+    private int freeThrowShotProgress;
+    private int postMoveProgress;
+    private int ballHandlingProgress;
+    private int passingProgress;
+    private int screeningProgress;
+    private int offBallMovementProgress;
 
     // Defensive attributes
     private int postDefense;
@@ -39,11 +52,19 @@ public class Player {
     private int stealing;
     private int rebounding;
 
-    // Mental attributes
-    // add these later, maybe
+    private int postDefenseProgress;
+    private int perimeterDefenseProgress;
+    private int onBallDefenseProgress;
+    private int offBallDefenseProgress;
+    private int stealingProgress;
+    private int reboundingProgress;
 
-    // Physical attributes
+    // Other Attributes
     private int stamina;
+    private int aggressiveness;
+    private int workEthic;
+
+    private int staminaProgress;
 
     // Tracked Stats
     private int gamesPlayed;
@@ -81,25 +102,25 @@ public class Player {
         gamesPlayed = 0;
         totalMinutes = 0;
 
-        minutes = 20;
-
         prepareForSave = false;
     }
 
-    public Player(String lName, String fName, int id, int position, int year, int minutes, int closeShot, int midShot,
-                  int longShot, int ballHandle, int pass, int screen, int offBallMove, int postDef, int perDef, int onBall,
-                  int offBall, int steal, int rebound, int stamina, int gamesPlayed, int totalMinutes){
+    public Player(String lName, String fName, int id, int position, int year, int train, int closeShot, int midShot,
+                  int longShot, int freeThrow, int postOff, int ballHandle, int pass, int screen, int offBallMove, int postDef, int perDef, int onBall,
+                  int offBall, int steal, int rebound, int stamina, int aggressive, int work, int gamesPlayed, int totalMinutes){
         this.lName = lName;
         this.fName = fName;
         this.playerId = id;
         this.year = year;
         this.position = position;
+        trainingAs = train;
         currentPosition = position;
-        this.minutes = minutes;
 
         closeRangeShot = closeShot;
         midRangeShot = midShot;
         longRangeShot = longShot;
+        freeThrowShot = freeThrow;
+        postMove = postOff;
         ballHandling = ballHandle;
         passing = pass;
         screening = screen;
@@ -113,6 +134,8 @@ public class Player {
         rebounding = rebound;
 
         this.stamina = stamina;
+        aggressiveness = aggressive;
+        workEthic = work;
 
         this.gamesPlayed = gamesPlayed;
         this.totalMinutes = totalMinutes;
@@ -121,6 +144,29 @@ public class Player {
         prepareForSave = false;
 
         calculateRating();
+    }
+
+    public void setProgress(int closeShot, int midShot, int longShot, int freeThrow, int postOff,
+                            int ballHandle, int pass, int screen, int offBallMove, int postDef,
+                            int perDef, int onBall, int offBall, int steal, int rebound, int stamina){
+        closeRangeShotProgress = closeShot;
+        midRangeShotProgress = midShot;
+        longRangeShotProgress = longShot;
+        freeThrowShotProgress = freeThrow;
+        postMoveProgress = postOff;
+        ballHandlingProgress = ballHandle;
+        passingProgress = pass;
+        screeningProgress = screen;
+        offBallMovementProgress = offBallMove;
+
+        postDefenseProgress = postDef;
+        perimeterDefenseProgress = perDef;
+        onBallDefenseProgress = onBall;
+        offBallDefenseProgress = offBall;
+        stealingProgress = steal;
+        reboundingProgress = rebound;
+
+        staminaProgress = stamina;
     }
 
     public String getlName() {
@@ -171,23 +217,16 @@ public class Player {
         prepareForSave = true;
     }
 
-    void newSeason(int maxImprovement, int games, int offenseFocus, int perimeterFocus, int skillFocus){
+    void newSeason(ArrayList<Coach> coaches){
         year++;
-        int improve = (int)Math.ceil(maxImprovement * totalMinutes / (games * 30));
-        if(improve > maxImprovement){
-            improve = maxImprovement;
-        }
-        if(improve < 1){
-            improve = 1;
-        }
 
-        improveAttributes(improve, offenseFocus, perimeterFocus, skillFocus);
+        practice(coaches, 5);
 
         gamesPlayed = 0;
         totalMinutes = 0;
     }
 
-    void playGame(){
+    void playGame(ArrayList<Coach> coaches){
         if(timePlayed > 0){
             gamesPlayed++;
             totalMinutes += timePlayed / 60;
@@ -198,6 +237,8 @@ public class Player {
         offensiveModifier = 0;
         defensiveModifier = 0;
         fatigue = 0;
+
+        practice(coaches, 1);
     }
 
     void preGameSetup(){
@@ -350,25 +391,352 @@ public class Player {
         }
     }
 
-    private void improveAttributes(int maxImprovement, int offenseFocus, int perimeterFocus, int skillFocus){
+    private void practice(ArrayList<Coach> coaches, int time){
+        Random r = new Random();
+        /*
+        Values of Training as:
+        0 = guard
+        1 = big
+        2 = pg
+        3 = sg
+        4 = sf
+        5 = pf
+        6 = c
+        7 = 3-point specialist
+        8 = rebound specialist
+        9 = defensive specialist
+        10 = energy guy
+         */
+
+        int shooting = 0;
+        int screenTeach = 0;
+        int offPos = 0;
+        int defPos = 0;
+        int ballHandle = 0;
+        int onBall = 0;
+        int offBall = 0;
+        int rebound = 0;
+        int steal = 0;
+        int condition = 0;
+
+        for(Coach c: coaches){
+            shooting += c.getShotTeaching();
+            ballHandle += c.getBallControlTeaching();
+            offPos += c.getOffPositionTeaching();
+            screenTeach += c.getScreenTeaching();
+            defPos += c.getDefPositionTeaching();
+            onBall += c.getDefOnBallTeaching();
+            offBall += c.getDefOffBallTeaching();
+            rebound += c.getReboundTeaching();
+            steal += c.getStealTeaching();
+            condition += c.getConditioningTeaching();
+        }
+
+        shooting = (int)(shooting * (workEthic / 100.0));
+        ballHandle = (int) (ballHandle * (workEthic / 100.0));
+        offPos = (int) (ballHandle * (workEthic / 100.0));
+        screenTeach = (int) (screenTeach * (workEthic / 100.0));
+        defPos = (int) (defPos * (workEthic / 100.0));
+        onBall = (int) (onBall * (workEthic / 100.0));
+        offBall = (int) (offBall * (workEthic / 100.0));
+        rebound = (int) (rebound * (workEthic / 100.0));
+        steal = (int) (steal  * (workEthic / 100.0));
+        condition = (int) (condition  * (workEthic / 100.0));
+
+        if(shooting < 1){
+            shooting = 1;
+        }
+        if(ballHandle < 1){
+            ballHandle = 1;
+        }
+        if(offPos < 1){
+            offPos = 1;
+        }
+        if(screenTeach < 1){
+            screenTeach = 1;
+        }
+        if(defPos < 1){
+            defPos = 1;
+        }
+        if(onBall < 1){
+            onBall = 1;
+        }
+        if(offBall < 1){
+            offBall = 1;
+        }
+        if(rebound < 1){
+            rebound = 1;
+        }
+        if(steal < 1){
+            steal = 1;
+        }
+        if(condition < 1){
+            condition = 1;
+        }
+
+        switch (trainingAs){
+            case 0:
+                // guard
+                midRangeShotProgress += r.nextInt(shooting) + 2;
+                longRangeShotProgress += r.nextInt(shooting) + 2;
+                freeThrowShotProgress += r.nextInt(shooting) + 2;
+                ballHandlingProgress += r.nextInt(ballHandle) + 2;
+                passingProgress += r.nextInt(ballHandle) + 2;
+                offBallMovementProgress += r.nextInt(offPos) + 2;
+
+                perimeterDefenseProgress += r.nextInt(defPos) + 2;
+                onBallDefenseProgress += r.nextInt(onBall) + 2;
+                offBallDefenseProgress += r.nextInt(offBall) + 2;
+                stealingProgress += r.nextInt(steal) + 2;
+                break;
+            case 1:
+                // big
+                closeRangeShotProgress += r.nextInt(shooting) + 2;
+                midRangeShotProgress += r.nextInt(shooting) + 2;
+                postMoveProgress += r.nextInt(shooting) + 2;
+                screeningProgress += r.nextInt(screenTeach) + 2;
+                freeThrowShotProgress += r.nextInt(shooting) + 2;
+
+                postDefenseProgress += r.nextInt(defPos) + 2;
+                onBallDefenseProgress += r.nextInt(onBall) + 2;
+                offBallDefenseProgress += r.nextInt(offBall) + 2;
+                reboundingProgress += r.nextInt(rebound) + 4;
+                break;
+            case 2:
+                // pg
+                midRangeShotProgress += r.nextInt(shooting) + 1;
+                longRangeShotProgress += r.nextInt(shooting) + 2;
+                freeThrowShotProgress += r.nextInt(shooting) + 1;
+                ballHandlingProgress += r.nextInt(ballHandle) + 4;
+                passingProgress += r.nextInt(ballHandle) + 4;
+                offBallMovementProgress += r.nextInt(offPos) + 2;
+
+                perimeterDefenseProgress += r.nextInt(defPos) + 2;
+                onBallDefenseProgress += r.nextInt(onBall) + 2;
+                offBallDefenseProgress += r.nextInt(offBall) + 1;
+                stealingProgress += r.nextInt(steal) + 1;
+                break;
+            case 3:
+                // sg
+                midRangeShotProgress += r.nextInt(shooting) + 3;
+                longRangeShotProgress += r.nextInt(shooting) + 4;
+                freeThrowShotProgress += r.nextInt(shooting) + 4;
+                ballHandlingProgress += r.nextInt(ballHandle) + 1;
+                passingProgress += r.nextInt(ballHandle) + 1;
+                offBallMovementProgress += r.nextInt(offPos) + 4;
+
+                perimeterDefenseProgress += r.nextInt(defPos) + 2;
+                onBallDefenseProgress += r.nextInt(onBall) + 1;
+                offBallDefenseProgress += r.nextInt(offBall) + 1;
+                stealingProgress += r.nextInt(steal) + 1;
+                break;
+            case 4:
+                // sf
+                closeRangeShotProgress += r.nextInt(shooting) + 1;
+                midRangeShotProgress += r.nextInt(shooting) + 1;
+                longRangeShotProgress += r.nextInt(shooting) + 1;
+                freeThrowShotProgress += r.nextInt(shooting) + 1;
+                ballHandlingProgress += r.nextInt(ballHandle) + 1;
+                passingProgress += r.nextInt(ballHandle) + 1;
+                offBallMovementProgress += r.nextInt(offPos) + 1;
+
+                perimeterDefenseProgress += r.nextInt(defPos) + 1;
+                onBallDefenseProgress += r.nextInt(onBall) + 1;
+                offBallDefenseProgress += r.nextInt(offBall) + 1;
+                stealingProgress += r.nextInt(steal) + 1;
+                reboundingProgress += r.nextInt(rebound) + 1;
+                break;
+            case 5:
+                // pf
+                closeRangeShotProgress += r.nextInt(shooting) + 2;
+                midRangeShotProgress += r.nextInt(shooting) + 2;
+                postMoveProgress += r.nextInt(shooting) + 2;
+                screeningProgress += r.nextInt(screenTeach) + 1;
+                freeThrowShotProgress += r.nextInt(shooting) + 2;
+
+                postDefenseProgress += r.nextInt(defPos) + 2;
+                onBallDefenseProgress += r.nextInt(onBall) + 2;
+                offBallDefenseProgress += r.nextInt(offBall) + 2;
+                reboundingProgress += r.nextInt(rebound) + 4;
+                break;
+            case 6:
+                // c
+                closeRangeShotProgress += r.nextInt(shooting) + 2;
+                midRangeShotProgress += r.nextInt(shooting) + 1;
+                postMoveProgress += r.nextInt(shooting) + 2;
+                screeningProgress += r.nextInt(screenTeach) + 2;
+                freeThrowShotProgress += r.nextInt(shooting) + 2;
+
+                postDefenseProgress += r.nextInt(defPos) + 2;
+                onBallDefenseProgress += r.nextInt(onBall) + 2;
+                offBallDefenseProgress += r.nextInt(offBall) + 1;
+                reboundingProgress += r.nextInt(rebound) + 4;
+                break;
+            case 7:
+                // 3-point specialist
+                longRangeShotProgress += r.nextInt(2 * shooting) + 3;
+                freeThrowShotProgress += r.nextInt(2 * shooting) + 3;
+                offBallMovementProgress += r.nextInt(2 * offPos) + 3;
+                break;
+            case 8:
+                // Rebound specialist
+                reboundingProgress += r.nextInt(2 * rebound) + 3;
+                postDefenseProgress += r.nextInt(2 * defPos) + 3;
+                break;
+            case 9:
+                // Defensive specialist
+                postDefenseProgress += r.nextInt(2 * defPos);
+                perimeterDefenseProgress += r.nextInt(2 * defPos);
+                onBallDefenseProgress += r.nextInt(2 * onBall);
+                offBallDefenseProgress += r.nextInt(2 * offBall);
+                break;
+            case 10:
+                // Energy guy
+                staminaProgress += r.nextInt(2 * condition);
+                stealingProgress += r.nextInt(2 * steal);
+                reboundingProgress += r.nextInt(2 * rebound);
+                onBallDefenseProgress += r.nextInt(2 * onBall);
+                break;
+        }
+
+        if(time == 1 && totalMinutes > 10 * gamesPlayed) {
+            closeRangeShotProgress += r.nextInt(2 * time);
+            midRangeShotProgress += r.nextInt(2 * time);
+            longRangeShotProgress += r.nextInt(2 * time);
+            freeThrowShotProgress += r.nextInt(2 * time);
+            postMoveProgress = r.nextInt(2 * time);
+            ballHandlingProgress += r.nextInt(2 * time);
+            passingProgress += r.nextInt(2 * time);
+            screeningProgress += r.nextInt(2 * time);
+            offBallMovementProgress += r.nextInt(2 * time);
+
+            postDefenseProgress += r.nextInt(2 * time);
+            perimeterDefenseProgress += r.nextInt(2 * time);
+            onBallDefenseProgress += r.nextInt(2 * time);
+            offBallDefenseProgress += r.nextInt(2 * time);
+            stealingProgress += r.nextInt(2 * time);
+            reboundingProgress += r.nextInt(2 * time);
+
+            staminaProgress += r.nextInt(2 * time);
+        }
+        improveAttributes(time);
+    }
+
+    private void improveAttributes(int time){
+        // time == 1 after each game
+        // time == 5 after each season
+
+        int modifier = 500;
+
+        closeRangeShot += closeRangeShotProgress / modifier;
+        if(closeRangeShot > 100){
+            closeRangeShot = 100;
+        }
+        closeRangeShotProgress = closeRangeShotProgress % modifier;
+
+        midRangeShot += midRangeShotProgress / modifier;
+        if(midRangeShot > 100){
+            midRangeShot = 100;
+        }
+        midRangeShotProgress = midRangeShotProgress % modifier;
+
+        longRangeShot += longRangeShotProgress / modifier;
+        if(longRangeShot > 100){
+            longRangeShot = 100;
+        }
+        longRangeShotProgress = longRangeShotProgress % modifier;
+
+        freeThrowShot += freeThrowShotProgress / modifier;
+        if(freeThrowShot > 100){
+            freeThrowShot = 100;
+        }
+        freeThrowShotProgress = freeThrowShotProgress % modifier;
+
+        postMove += postMoveProgress / modifier;
+        if(postMove > 100){
+            postMove = 100;
+        }
+        postMoveProgress = postMoveProgress % modifier;
+
+        ballHandling += ballHandlingProgress / modifier;
+        if(ballHandling > 100){
+            ballHandling = 100;
+        }
+        ballHandlingProgress = ballHandlingProgress % modifier;
+
+        passing += passingProgress / modifier;
+        if(passing > 100){
+            passing = 100;
+        }
+        passingProgress = passingProgress % modifier;
+
+        screening += screeningProgress / modifier;
+        if(screening > 100){
+            screening = 100;
+        }
+        screeningProgress = screeningProgress % modifier;
+
+        postDefense += postDefenseProgress / modifier;
+        if(postDefense > 100){
+            postDefense = 100;
+        }
+        postDefenseProgress = postDefenseProgress % modifier;
+
+        perimeterDefense += perimeterDefenseProgress / modifier;
+        if(perimeterDefense > 100){
+            perimeterDefense = 100;
+        }
+        perimeterDefenseProgress = perimeterDefenseProgress % modifier;
+
+        onBallDefense += onBallDefenseProgress / modifier;
+        if(onBallDefense > 100){
+            onBallDefense = 100;
+        }
+        onBallDefenseProgress = onBallDefenseProgress % modifier;
+
+        offBallDefense += offBallDefenseProgress / modifier;
+        if(offBallDefense > 100){
+            offBallDefense = 100;
+        }
+        offBallDefenseProgress = offBallDefenseProgress % modifier;
+
+        stealing += stealingProgress / modifier;
+        if(stealing > 100){
+            stealing = 100;
+        }
+        stealingProgress = stealingProgress % modifier;
+
+        rebounding += reboundingProgress / modifier;
+        if(rebounding > 100){
+            rebounding = 100;
+        }
+        reboundingProgress = reboundingProgress % modifier;
+
+        stamina += staminaProgress / modifier;
+        if(stamina > 100){
+            stamina = 100;
+        }
+        staminaProgress = staminaProgress % modifier;
+
         Random r = new Random();
 
-        closeRangeShot += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
-        midRangeShot += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
-        longRangeShot += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
-        ballHandling += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (perimeterFocus) + skillFocus) / 100.0));
-        passing += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + 50 + skillFocus) / 100.0));
-        screening += r.nextInt((int)Math.ceil(maxImprovement * (offenseFocus + (100-perimeterFocus) + skillFocus) / 100.0));
+        if(time > 1) {
+            aggressiveness += r.nextInt(time * 2) - time;
+            if(aggressiveness > 100){
+                aggressiveness = 100;
+            }
+            else if(aggressiveness < 0){
+                aggressiveness = 0;
+            }
 
-        postDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
-        perimeterDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
-        onBallDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
-        offBallDefense += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + 50 + skillFocus) / 100.0));
-        stealing += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (perimeterFocus) + skillFocus) / 100.0));
-        rebounding += r.nextInt((int)Math.ceil(maxImprovement * ((100-offenseFocus) + (100-perimeterFocus) + skillFocus) / 100.0));
-
-        stamina += r.nextInt((int)Math.ceil(maxImprovement * (1 - skillFocus/100.0)));
-
+            workEthic += r.nextInt(time * 2) - time;
+            if(workEthic > 100){
+                workEthic = 100;
+            }
+            else if(workEthic < 0){
+                workEthic = 0;
+            }
+        }
         calculateRating();
     }
 
@@ -417,6 +785,8 @@ public class Player {
         double[] closeWeight = new double[] {.6, .7, .8, 1.0, 1.0};
         double[] midWeight = new double[] {.8, .8, .8, .7, .7};
         double[] longWeight = new double[] {.8, 1.0, .8, .5, .5};
+        double[] ftWeight = new double[] {.8, .8, .8, .6, .6};
+        double[] postOffWeight = new double[]{.2, .2, .5, 1.3, 1.3};
         double[] ballWeight = new double[] {1.1, .8, .8, .6, .5};
         double[] passWeight = new double[] {1.1, .8, .8, .6, .5};
         double[] screenWeight = new double[] {.4, .5, .6, .9, 1.0};
@@ -433,6 +803,8 @@ public class Player {
         closeRangeShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * closeWeight[position-1]);
         midRangeShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * midWeight[position-1]);
         longRangeShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * longWeight[position-1]);
+        freeThrowShot = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * ftWeight[position-1]);
+        postMove = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * postOffWeight[position-1]);
         ballHandling = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * ballWeight[position-1]);
         passing = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * passWeight[position-1]);
         screening = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * screenWeight[position-1]);
@@ -447,7 +819,17 @@ public class Player {
         rebounding = (int) ((rating + (2 * r.nextInt(ratingVariability)) - ratingVariability) * reboundWeight[position-1]);
 
         // Physical
-        stamina = r.nextInt(40) + 40;
+        stamina = r.nextInt(60) + 40;
+        aggressiveness = r.nextInt(100);
+        workEthic = r.nextInt(100);
+
+        if(position < 4){
+            trainingAs = 0;
+        }
+        else{
+            trainingAs = 1;
+        }
+
 
         calculateRating();
     }
@@ -456,6 +838,8 @@ public class Player {
         double[] closeWeight = new double[] {.6, .7, .8, 1.0, 1.0};
         double[] midWeight = new double[] {.8, .8, .8, .7, .7};
         double[] longWeight = new double[] {.8, 1.0, .8, .5, .5};
+        double[] ftWeight = new double[] {.8, .8, .8, .6, .6};
+        double[] postOffWeight = new double[]{.2, .2, .5, 1.3, 1.3};
         double[] ballWeight = new double[] {1.1, .8, .8, .6, .5};
         double[] passWeight = new double[] {1.1, .8, .8, .6, .5};
         double[] screenWeight = new double[] {.4, .5, .6, .9, 1.0};
@@ -470,24 +854,28 @@ public class Player {
 
         overallRating = (int) (closeRangeShot * closeWeight[currentPosition-1] +
                 midRangeShot * midWeight[currentPosition-1] + longRangeShot * longWeight[currentPosition-1] +
+                freeThrowShot * ftWeight[currentPosition-1] + postMove * postOffWeight[currentPosition-1] +
                 ballHandling * ballWeight[currentPosition-1] + passing * passWeight[currentPosition-1] +
                 screening * screenWeight[currentPosition-1] + offBallMovement * offMoveWeight[currentPosition-1] +
                 postDefense * postDefWeight[currentPosition-1] + perimeterDefense * perimDefWeight[currentPosition-1] +
                 onBallDefense * onBallWeight[currentPosition-1] + offBallDefense * offBallWeight[currentPosition-1] +
                 stealing * stealWeight[currentPosition-1] + rebounding * reboundWeight[currentPosition-1]);
 
-        if(currentPosition < 4){
-            overallRating /= 10;
-        }
-        else{
-            overallRating = (int) (overallRating / 9.7);
-        }
+        double div = closeWeight[currentPosition-1] + midWeight[currentPosition-1] + longWeight[currentPosition-1] +
+                ftWeight[currentPosition-1] + postOffWeight[currentPosition-1] + ballWeight[currentPosition-1] +
+                passWeight[currentPosition-1] + screenWeight[currentPosition-1] + offMoveWeight[currentPosition-1] +
+                postDefWeight[currentPosition-1] + perimDefWeight[currentPosition-1] + onBallWeight[currentPosition-1] +
+                offBallWeight[currentPosition-1] + stealWeight[currentPosition-1] + reboundWeight[currentPosition-1];
+
+        overallRating = (int) (overallRating / div);
     }
 
     public int calculateRatingAtPosition(int position){
         double[] closeWeight = new double[] {.6, .7, .8, 1.0, 1.0};
         double[] midWeight = new double[] {.8, .8, .8, .7, .7};
         double[] longWeight = new double[] {.8, 1.0, .8, .5, .5};
+        double[] ftWeight = new double[] {.8, .8, .8, .6, .6};
+        double[] postOffWeight = new double[]{.2, .2, .5, 1.3, 1.3};
         double[] ballWeight = new double[] {1.1, .8, .8, .6, .5};
         double[] passWeight = new double[] {1.1, .8, .8, .6, .5};
         double[] screenWeight = new double[] {.4, .5, .6, .9, 1.0};
@@ -502,18 +890,20 @@ public class Player {
 
         int rating = (int) (closeRangeShot * closeWeight[position-1] +
                 midRangeShot * midWeight[position-1] + longRangeShot * longWeight[position-1] +
+                freeThrowShot * ftWeight[position-1] + postMove * postOffWeight[position-1] +
                 ballHandling * ballWeight[position-1] + passing * passWeight[position-1] +
                 screening * screenWeight[position-1] + offBallMovement * offMoveWeight[position-1] +
                 postDefense * postDefWeight[position-1] + perimeterDefense * perimDefWeight[position-1] +
                 onBallDefense * onBallWeight[position-1] + offBallDefense * offBallWeight[position-1] +
                 stealing * stealWeight[position-1] + rebounding * reboundWeight[position-1]);
 
-        if(position < 4){
-            return rating / 10;
-        }
-        else{
-            return  (int) (rating/ 9.7);
-        }
+        double div = closeWeight[position-1] + midWeight[position-1] + longWeight[position-1] +
+                ftWeight[position-1] + postOffWeight[position-1] + ballWeight[position-1] +
+                passWeight[position-1] + screenWeight[position-1] + offMoveWeight[position-1] +
+                postDefWeight[position-1] + perimDefWeight[position-1] + onBallWeight[position-1] +
+                offBallWeight[position-1] + stealWeight[position-1] + reboundWeight[position-1];
+
+        return  (int) (rating / div);
     }
 
     public int getCloseRangeShot() {
@@ -529,7 +919,11 @@ public class Player {
     }
 
     public int getFreeThrowShot(){
-        return (int)(((getCloseRangeShot() + getMidRangeShot() + getLongRangeShot()) / 3.0) * getFatigueFactor());
+        return (int)((freeThrowShot + offensiveModifier) * getFatigueFactor());
+    }
+
+    public int getPostMove(){
+        return (int)((postMove + offensiveModifier) * getFatigueFactor());
     }
 
     public int getBallHandling() {
@@ -583,6 +977,18 @@ public class Player {
         return (int) fatigue;
     }
 
+    public int getAggressiveness(){
+        return aggressiveness;
+    }
+
+    public int getWorkEthic(){
+        return workEthic;
+    }
+
+    public int getTrainingAs(){
+        return trainingAs;
+    }
+
     public int getGamesPlayed() {
         return gamesPlayed;
     }
@@ -593,6 +999,70 @@ public class Player {
 
     public int getMinutesPlayed(){
         return timePlayed / 60;
+    }
+
+    public int getCloseRangeShotProgress() {
+        return closeRangeShotProgress;
+    }
+
+    public int getMidRangeShotProgress() {
+        return midRangeShotProgress;
+    }
+
+    public int getLongRangeShotProgress() {
+        return longRangeShotProgress;
+    }
+
+    public int getFreeThrowShotProgress() {
+        return freeThrowShotProgress;
+    }
+
+    public int getPostMoveProgress() {
+        return postMoveProgress;
+    }
+
+    public int getBallHandlingProgress() {
+        return ballHandlingProgress;
+    }
+
+    public int getPassingProgress() {
+        return passingProgress;
+    }
+
+    public int getScreeningProgress() {
+        return screeningProgress;
+    }
+
+    public int getOffBallMovementProgress() {
+        return offBallMovementProgress;
+    }
+
+    public int getPostDefenseProgress() {
+        return postDefenseProgress;
+    }
+
+    public int getPerimeterDefenseProgress() {
+        return perimeterDefenseProgress;
+    }
+
+    public int getOnBallDefenseProgress() {
+        return onBallDefenseProgress;
+    }
+
+    public int getOffBallDefenseProgress() {
+        return offBallDefenseProgress;
+    }
+
+    public int getStealingProgress() {
+        return stealingProgress;
+    }
+
+    public int getReboundingProgress() {
+        return reboundingProgress;
+    }
+
+    public int getStaminaProgress() {
+        return staminaProgress;
     }
 
     private double getFatigueFactor(){
@@ -687,4 +1157,19 @@ public class Player {
         return freeThrowMade + "/" + freeThrowAttempts;
     }
 
+    public void setTraining(int type){
+        trainingAs = type;
+    }
+
+    public int[] getOffensiveAttributes(){
+        return new int[]{closeRangeShot, midRangeShot, longRangeShot, freeThrowShot, postMove, ballHandling, passing, screening, offBallMovement};
+    }
+
+    public int[] getDefensiveAttributes(){
+        return new int[]{postDefense, perimeterDefense, onBallDefense, offBallDefense, stealing, rebounding};
+    }
+
+    public int[] getOtherAttributes(){
+        return new int[]{stamina, aggressiveness, workEthic};
+    }
 }

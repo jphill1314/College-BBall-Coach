@@ -3,16 +3,23 @@ package com.coaching.jphil.collegebasketballcoach.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
+import com.coaching.jphil.collegebasketballcoach.adapters.PlayerInfoAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 
 /**
@@ -26,13 +33,16 @@ public class PlayerInfoFragment extends Fragment {
     }
 
     private int playerIndex;
-    private TextView closeShot, midShot, longShot, ballHandle, pass, screen;
-    private TextView postDef, perimDef, onBall, offBall, steal, rebound;
-    private TextView stamina;
-    private TextView gamesPlayed, totalMinutes;
-    private TextView playerName;
+    TextView name, rating, training;
+    Spinner spinner;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager manager;
 
     private MainActivity mainActivity;
+
+    private Player player;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,56 +55,49 @@ public class PlayerInfoFragment extends Fragment {
         if(args != null){
             playerIndex = args.getInt("player");
         }
+        player = mainActivity.currentTeam.getPlayers().get(playerIndex);
 
-        closeShot = view.findViewById(R.id.close_shot);
-        midShot = view.findViewById(R.id.mid_shot);
-        longShot = view.findViewById(R.id.long_shot);
-        ballHandle = view.findViewById(R.id.ball_handle);
-        pass = view.findViewById(R.id.passing);
-        screen = view.findViewById(R.id.screen);
+        name = view.findViewById(R.id.player_name);
+        name.setText(getString(R.string.player_name_pos, player.getFullName(), player.getPositionAbr()));
 
-        postDef = view.findViewById(R.id.post_def);
-        perimDef = view.findViewById(R.id.perim_def);
-        onBall = view.findViewById(R.id.on_ball);
-        offBall = view.findViewById(R.id.off_ball);
-        steal = view.findViewById(R.id.stealing);
-        rebound = view.findViewById(R.id.rebound);
+        rating = view.findViewById(R.id.rating_at_pos);
+        rating.setText(getString(R.string.rating_at_pos, player.calculateRatingAtPosition(1), player.calculateRatingAtPosition(2),
+                player.calculateRatingAtPosition(3), player.calculateRatingAtPosition(4), player.calculateRatingAtPosition(5)));
+        training = view.findViewById(R.id.training_as);
+        training.setText(getString(R.string.training_desc, getResources().getStringArray(R.array.training_types)[player.getTrainingAs()]));
 
-        stamina = view.findViewById(R.id.stamina);
+        spinner = view.findViewById(R.id.player_spinner);
+        SpinnerAdapter spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.player_info_spinner));
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(0, false);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                changeAdapter(i);
+            }
 
-        playerName = view.findViewById(R.id.player_name);
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
 
-        gamesPlayed = view.findViewById(R.id.games_played);
-        totalMinutes = view.findViewById(R.id.total_minutes);
+        recyclerView = view.findViewById(R.id.player_list);
+        manager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(manager);
 
-        setAttributes();
+        adapter = new PlayerInfoAdapter(player, 0, getContext());
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
         return view;
     }
 
-    private void setAttributes(){
-        Player player = mainActivity.currentTeam.getPlayers().get(playerIndex);
-
-        closeShot.setText(getResources().getString(R.string.close_shot, player.getCloseRangeShot()));
-        midShot.setText(getResources().getString(R.string.mid_shot, player.getMidRangeShot()));
-        longShot.setText(getResources().getString(R.string.long_shot, player.getLongRangeShot()));
-        ballHandle.setText(getResources().getString(R.string.ball_handle, player.getBallHandling()));
-        pass.setText(getResources().getString(R.string.passing, player.getPassing()));
-        screen.setText(getResources().getString(R.string.screening, player.getScreening()));
-
-        postDef.setText(getResources().getString(R.string.post_def, player.getPostDefense()));
-        perimDef.setText(getResources().getString(R.string.perim_def, player.getPerimeterDefense()));
-        onBall.setText(getResources().getString(R.string.on_ball, player.getOnBallDefense()));
-        offBall.setText(getResources().getString(R.string.off_ball, player.getOffBallDefense()));
-        steal.setText(getResources().getString(R.string.steal, player.getStealing()));
-        rebound.setText(getResources().getString(R.string.rebound, player.getRebounding()));
-
-        stamina.setText(getResources().getString(R.string.stamina, player.getStamina()));
-
-        playerName.setText(getResources().getString(R.string.player_name_pos, player.getFullName(), player.getYearAsString(), player.getPositionAbr()));
-
-        gamesPlayed.setText(getResources().getString(R.string.games_played, player.getGamesPlayed()));
-        totalMinutes.setText(getResources().getString(R.string.total_minutes, player.getTotalMinutes()));
+    private void changeAdapter(int type){
+        adapter = new PlayerInfoAdapter(player, type, getContext());
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
+
 }

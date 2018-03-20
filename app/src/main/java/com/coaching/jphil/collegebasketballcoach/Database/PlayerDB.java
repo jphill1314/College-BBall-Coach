@@ -21,17 +21,28 @@ public class PlayerDB {
     public String firstName;
     public int pos;
     public int year;
-
-    public int minutes;
+    public int trainingAs;
 
     // Offensive attributes
     public int closeRangeShot;
     public int midRangeShot;
     public int longRangeShot;
+    public int freeThrowShot;
+    public int postMove;
     public int ballHandling;
     public int passing;
     public int screening;
     public int offBallMovement;
+
+    public int closeRangeShotProgress;
+    public int midRangeShotProgress;
+    public int longRangeShotProgress;
+    public int freeThrowShotProgress;
+    public int postMoveProgress;
+    public int ballHandlingProgress;
+    public int passingProgress;
+    public int screeningProgress;
+    public int offballMovementProgress;
 
     // Defensive attributes
     public int postDefense;
@@ -41,11 +52,19 @@ public class PlayerDB {
     public int stealing;
     public int rebounding;
 
-    // Mental attributes
-    // add these later, maybe
+    public int postDefenseProgress;
+    public int perimeterDefenseProgress;
+    public int onBallDefenseProgress;
+    public int offBallDefenseProgress;
+    public int stealingProgress;
+    public int reboundingProgress;
 
-    // Physical attributes
+    // Other attributes
     public int stamina;
+    public int aggressiveness;
+    public int workEthic;
+
+    public int staminaProgress;
 
     // Tracked Stats
     public int gamesPlayed;

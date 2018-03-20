@@ -1,107 +1,23 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment"
-    android:padding="16dp">
+    android:orientation="vertical"
+    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment">
 
     <TextView
-        android:id="@+id/tv_practice"
+        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_alignParentTop="true"
-        android:textSize="25sp"
+        android:padding="16dp"
+        android:textSize="26sp"
         android:textStyle="bold"
-        android:text="@string/practice" />
+        android:text="@string/practice"/>
 
-    <TextView
-        android:id="@+id/p_offense"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_practice"
-        android:paddingTop="16dp"
-        android:textSize="20sp"/>
-
-    <SeekBar
-        android:id="@+id/s_offense"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/player_list"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/p_offense"
-        android:max="100"/>
+        android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/defense_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/s_offense"
-        android:text="@string/defense_focus"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/s_offense"
-        android:layout_alignParentEnd="true"
-        android:text="@string/offense_focus"/>
-
-    <TextView
-        android:id="@+id/p_perimeter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/defense_label"
-        android:paddingTop="16dp"
-        android:textSize="20sp"/>
-
-    <SeekBar
-        android:id="@+id/s_perimeter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/p_perimeter"
-        android:max="100"/>
-
-    <TextView
-        android:id="@+id/post_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/s_perimeter"
-        android:text="@string/post_focus"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/s_perimeter"
-        android:layout_alignParentEnd="true"
-        android:text="@string/perimeter_focus"/>
-
-    <TextView
-        android:id="@+id/p_skills"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/post_label"
-        android:paddingTop="16dp"
-        android:textSize="20sp"/>
-
-    <SeekBar
-        android:id="@+id/s_skills"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/p_skills"
-        android:max="100"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/s_skills"
-        android:text="@string/physical_focus"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/s_skills"
-        android:layout_alignParentEnd="true"
-        android:text="@string/skill_focus"/>
-
-</RelativeLayout>
+</LinearLayout>

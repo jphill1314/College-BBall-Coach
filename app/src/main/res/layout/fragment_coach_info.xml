@@ -38,6 +38,13 @@
                 android:text="@string/coach_attributes"/>
 
             <TextView
+                android:id="@+id/staff_recruit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
                 android:id="@+id/staff_shoot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,6 +60,13 @@
 
             <TextView
                 android:id="@+id/staff_screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/staff_off_move"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"
@@ -95,20 +109,6 @@
 
             <TextView
                 android:id="@+id/staff_condition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/staff_guards"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:textSize="20sp"/>
-
-            <TextView
-                android:id="@+id/staff_bigs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"

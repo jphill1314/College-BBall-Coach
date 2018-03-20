@@ -23,6 +23,7 @@ public class CoachDB {
     public int shotTeaching;
     public int ballControlTeaching;
     public int screenTeaching;
+    public int offPositionTeaching;
 
     public int defPositionTeaching;
     public int defOnBallTeaching;
@@ -31,9 +32,6 @@ public class CoachDB {
     public int stealTeaching;
 
     public int conditioningTeaching;
-
-    public int workingWithGuards;
-    public int workingWithBigs;
 
     public int recruitingAbility;
 

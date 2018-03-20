@@ -43,32 +43,46 @@
     <string name="loses">Loses</string>
 
     <!-- Player Info Fragment -->
-    <string name="off_attributes">Offensive Attributes</string>
-    <string name="close_shot">Close Range Shot: %d</string>
-    <string name="mid_shot">Mid Range Shot: %d</string>
-    <string name="long_shot">Long Range Shot: %d</string>
-    <string name="ball_handle">Ball Handling: %d</string>
-    <string name="passing">Passing: %d</string>
-    <string name="screening">Screening: %d</string>
+    <string-array name="off_attributes">
+        <item>Close Range Shot: </item>
+        <item>Mid Range Shot: </item>
+        <item>Long Range Shot: </item>
+        <item>Free Throws: </item>
+        <item>Post Moves: </item>
+        <item>Ball Handling: </item>
+        <item>Passing: </item>
+        <item>Screening: </item>
+        <item>Off Ball Movement: </item>
+    </string-array>
 
-    <string name="def_attributes">Defensive Attributes</string>
-    <string name="post_def">Post Defense: %d</string>
-    <string name="perim_def">Perimeter Defense: %d</string>
-    <string name="on_ball">On Ball Defense: %d</string>
-    <string name="off_ball">Off Ball Defense: %d</string>
-    <string name="steal">Stealing: %d</string>
-    <string name="rebound">Rebounding: %d</string>
+    <string-array name="def_attributes">
+        <item>Post Defense: </item>
+        <item>Perimeter Defense: </item>
+        <item>On Ball Defense: </item>
+        <item>Off Ball Defense: </item>
+        <item>Stealing: </item>
+        <item>Rebounding: </item>
+    </string-array>
 
-    <string name="phys_attributes">Physical Attributes</string>
-    <string name="stamina">Stamina: %d</string>
+    <string-array name="other_attributes">
+        <item>Stamina: </item>
+        <item>Aggressiveness: </item>
+        <item>Work Ethic: </item>
+    </string-array>
 
     <string name="stats">Statistics</string>
     <string name="games_played">Games played: %d</string>
     <string name="total_minutes">Minutes played: %d</string>
 
-    <string name="player_name_pos">%s - %s - %s</string>
-    <string name="team_minutes">Unassigned Minutes: %d</string>
-    <string name="player_minutes">Playing Time: %d</string>
+    <string name="rating_at_pos">PG: %d SG: %d SF: %d PF: %d C: %d</string>
+
+    <string name="player_name_pos">%s - %s</string>
+    <string-array name="player_info_spinner">
+        <item>Offensive Attributes</item>
+        <item>Defensive Attributes</item>
+        <item>Other Attributes</item>
+        <item>Game Stats</item>
+    </string-array>
 
     <!-- Schedule Fragment -->
     <string name="season_name">%d-%d Season</string>
@@ -95,31 +109,37 @@
     <string name="intentional_foul">Intentionally Foul</string>
 
     <!-- Training Fragment -->
-    <string name="practice">Practice Plan</string>
-    <string name="offense_focus">More Offense</string>
-    <string name="defense_focus">More Defense</string>
-    <string name="perimeter_focus">More Perimeter</string>
-    <string name="post_focus">More Post</string>
-    <string name="skill_focus">More Skills</string>
-    <string name="physical_focus">More Conditioning</string>
+    <string name="practice">Training Plan</string>
+    <string name="training_desc">Currently training as: %s</string>
+    <string name="training">Currently training as:</string>
+    <string-array name="training_types">
+        <item>Guard</item>
+        <item>Big</item>
+        <item>Point Guard</item>
+        <item>Shooting Guard</item>
+        <item>Small Forward</item>
+        <item>Power Forward</item>
+        <item>Center</item>
+        <item>3-point specialist</item>
+        <item>Rebound specialist</item>
+        <item>Defensive specialist</item>
+        <item>Energy guy</item>
+    </string-array>
 
     <!-- Coach Info Fragment-->
     <string name="coach_name_pos">%s - %s</string>
     <string name="coach_attributes">Coaching Attributes</string>
+    <string name="recruit_ability">Recruiting Ability: %d</string>
     <string name="shot_teach">Shooting: %d</string>
-    <string name="control_teach">Ball Control: %d</string>
     <string name="screen_teach">Screening: %d</string>
-
+    <string name="ball_handle">Ball Handling: %d</string>
+    <string name="off_move">Off Ball Movement: %d</string>
     <string name="positioning">Defensive Positioning: %d</string>
     <string name="on_ball_teach">On Ball Defense: %d</string>
     <string name="off_ball_teach">Off Ball Defense: %d</string>
     <string name="rebound_teach">Rebounding: %d</string>
     <string name="steal_teach">Stealing: %d</string>
-
     <string name="condition_teaching">Conditioning: %d</string>
-
-    <string name="work_guards">Working with Guards: %d</string>
-    <string name="work_bigs">Workign with Bigs: %d</string>
 
     <!-- Recruiting Fragment -->
     <string name="recruit_interest">Interest</string>

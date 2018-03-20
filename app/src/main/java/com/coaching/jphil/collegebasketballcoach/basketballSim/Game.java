@@ -637,7 +637,7 @@ public class Game {
         int passSuccess = (passer.getPassing() + target.getOffBallMovement()) / (r.nextInt(randomBoundValue) + 1);
         int stealSuccess = (passDef.getOnBallDefense() + targetDef.getOffBallDefense()) / (r.nextInt(randomBoundValue) + 1);
 
-        if (passSuccess >= defense.getAggression()) {
+        if (passSuccess >= (defense.getAggression() + (passDef.getAggressiveness() + targetDef.getAggressiveness()) / 20) - 5) {
             // successful pass
             currentPlay += passer.getFullName() + " passes the ball to " + target.getFullName();
             int ob = 0;
@@ -703,7 +703,7 @@ public class Game {
                 timeRemaining -= timeChange;
                 shotClock -= timeChange;
             }
-        } else if (stealSuccess > (75 - defense.getAggression())) {
+        } else if (stealSuccess > (80 - defense.getAggression() - ((passDef.getAggressiveness() + targetDef.getAggressiveness()) / 2))) {
             // unsuccessful pass -> turnover
             currentPlay += passer.getFullName() + " turns the ball over! ";
             passer.addTurnover();
@@ -817,13 +817,6 @@ public class Game {
 
         int shotLong = (int) (shooter.getLongRangeShot() * (offense.getOffenseFavorsThrees() / 100.0) *
                 (defense.getDefenseFavorsThrees() / 100.0) + r.nextInt(randomBoundValue));
-
-        if (shooter.getCurrentPosition() == 1 || shooter.getCurrentPosition() == 2) {
-            // preference for guards to favor 3s
-            shotLong += 20;
-        } else {
-            shotClose += 20;
-        }
 
         if(currentPlay.length() != 0){
             currentPlay += "\n";
@@ -1170,7 +1163,7 @@ public class Game {
         int[] values = new int[5];
 
         for (int x = 0; x < 5; x++) {
-            values[x] = team.getPlayers().get(x).getRebounding() + r.nextInt(randomBoundValue);
+            values[x] = team.getPlayers().get(x).getRebounding() + (team.getPlayers().get(x).getAggressiveness() / 10) + r.nextInt(randomBoundValue);
         }
         return values;
     }
@@ -1181,7 +1174,7 @@ public class Game {
         situation: -1 = charging situation, -2 = off-ball situation
          */
 
-        int foulFactor = 100 - team.getAggression(); //higher number == fewer fouls
+        int foulFactor = 100 - team.getAggression() + (player.getAggressiveness() / 10); //higher number == fewer fouls
         if(situation == 0 && r.nextInt(foulFactor) < 2){
             player.addFoul();
             foulString = "\n" + player.getFullName() + " has been called for a defensive foul on the floor.";
@@ -1349,8 +1342,8 @@ public class Game {
         int chance = withBall.getBallHandling() + r.nextInt(randomBoundValue) -
                 (ballDef.getStealing() + ballDef.getOnBallDefense() + r.nextInt(randomBoundValue)) / 2;
 
-        if(chance < -20){
-            if(chance < -40){
+        if(chance < -20 - ballDef.getAggressiveness() / 10){
+            if(chance < -40 - ballDef.getAggressiveness() / 10){
                 currentPlay += " " + withBall.getFullName() + " has lost the ball out of bounds! You can credit " +
                         ballDef.getFullName() + " with causing that turnover!";
                 deadBall = true;
@@ -1372,10 +1365,7 @@ public class Game {
     }
 
     private int getPostMove(Player withBall, Player ballDef) {
-        int postChance = withBall.getCloseRangeShot() - ballDef.getPostDefense() + r.nextInt(randomBoundValue);
-        if(withBall.getCurrentPosition() == 4 || withBall.getCurrentPosition() == 5){
-            postChance += r.nextInt(randomBoundValue);
-        }
+        int postChance = withBall.getPostMove() - ballDef.getPostDefense() + r.nextInt(randomBoundValue);
 
         // TODO: add a chance for fouls here
         if(postChance > 40){

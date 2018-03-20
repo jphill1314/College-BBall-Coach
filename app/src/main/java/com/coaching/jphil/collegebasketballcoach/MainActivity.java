@@ -206,39 +206,6 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.closeDrawer(drawerList);
     }
 
-    private void generateConference(String[] names, String[] mascots, String confName, int minRating, int type, boolean player){
-        ArrayList<Team> teams = new ArrayList<>();
-        Random r = new Random();
-
-        for(int i = 0; i < names.length; i++){
-            int numPlayers = 12 + r.nextInt(4);
-            int rating = r.nextInt(15) + minRating;
-            if(i != 0) {
-                teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating), false, this));
-            }
-            else{
-                if(player) {
-                    //rating = 90;
-                    teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating), true, this));
-                }
-                else{
-                    teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating), false, this));
-                }
-            }
-        }
-
-        if(conferences == null){
-            conferences = new ArrayList<>();
-        }
-
-        if(type == 0){
-            conferences.add(new StandardTenTeam(confName, teams, this));
-        }
-        else if(type == 1) {
-            conferences.add(new StaggeredTenTeam(confName, teams, this));
-        }
-    }
-
     public void startNewSeason(){
         championship = null;
         masterSchedule = new ArrayList<>();
@@ -255,41 +222,70 @@ public class MainActivity extends AppCompatActivity {
         dataAsync.execute("new season");
     }
 
-    private ArrayList<Player> getPlayers(int numPlayers, int teamRating){
-        ArrayList<Player> players = new ArrayList<Player>();
-        String[] lastNames = getResources().getStringArray(R.array.last_names);
-        String[] firstNames = getResources().getStringArray(R.array.first_names);
-        Random r = new Random();
-
-        for (int i = 0; i < 5; i++) {
-            players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                    (i % 5) + 1, r.nextInt(4), teamRating));
-        }
-        for (int i = 5; i < numPlayers; i++) {
-            if(i < 10) {
-                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                        (i % 5) + 1, r.nextInt(4), teamRating - r.nextInt(10)));
-            }
-            else{
-                players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                        r.nextInt(4) + 1, r.nextInt(4), teamRating - r.nextInt(15)));
+    public Team getPlayerTeam(){
+        for(Conference c: conferences){
+            for(Team t: c.getTeams()){
+                if(t.isPlayerControlled()){
+                    return t;
+                }
             }
         }
-        return players;
+        return null;
     }
 
-    private ArrayList<Coach> getCoaches(int numCoaches, int teamRating){
-        ArrayList<Coach> coaches = new ArrayList<Coach>();
-        String[] lastNames = getResources().getStringArray(R.array.last_names);
-        String[] firstNames = getResources().getStringArray(R.array.first_names);
-        Random r = new Random();
-
-        coaches.add(new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 1, teamRating + 5));
-        for(int i = 1; i < numCoaches; i++){
-            coaches.add(new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 2, teamRating - 5));
+    public Conference getPlayerConference(){
+        for(Conference c: conferences){
+            for(Team t: c.getTeams()){
+                if(t.isPlayerControlled()){
+                    return c;
+                }
+            }
         }
-        return coaches;
+        return null;
     }
+
+    private void generateNonConferenceGames(){
+        ArrayList<Game> nonCon = new ScheduleGenerator().generateSchedule(conferences);
+        ArrayList<Game> con = new ArrayList<>();
+        for(Conference c: conferences){
+            con.addAll(c.getMasterSchedule());
+        }
+        Collections.shuffle(con);
+        Collections.shuffle(nonCon);
+
+        masterSchedule = new ArrayList<>();
+        masterSchedule.addAll(nonCon);
+        masterSchedule.addAll(con);
+
+        for(int x = 0; x < masterSchedule.size(); x++){
+            masterSchedule.get(x).getHomeTeam().addGameToSchedule(masterSchedule.get(x));
+            masterSchedule.get(x).getAwayTeam().addGameToSchedule(masterSchedule.get(x));
+            masterSchedule.get(x).setId(x);
+        }
+
+        for(Conference c: conferences){
+            for(Team t: c.getTeams()){
+                Log.d("game", t.getFullName() + " has " + t.getNumberOfGames() + " games scheduled");
+            }
+        }
+    }
+
+    public void generateNationalChampionship(){
+        ArrayList<Team> champs = new ArrayList<>();
+        for(Conference c: conferences){
+            champs.add(c.getChampion());
+        }
+
+        championship = new NationalChampionship(champs);
+    }
+
+    public void addGameToMasterSchedule(Game game){
+        if(!masterSchedule.contains(game)){
+            game.setId(masterSchedule.size());
+            masterSchedule.add(game);
+        }
+    }
+
 
     private class DataAsync extends AsyncTask<String, String, String>{
         int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
@@ -311,11 +307,6 @@ public class MainActivity extends AppCompatActivity {
                 generateNonConferenceGames();
                 return "new season";
             }
-            else if(strings[0].equals("new game")){
-                clearData();
-                newGameSetup();
-                return "new game";
-            }
             else if(strings[0].equals("delete all")){
                 clearData();
                 return "data cleared";
@@ -328,22 +319,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result){
             if(result != null) {
                 if (result.equals("loaded") || result.equals("new season")) {
-                    if(conferences.size() == 0){
-                        Log.d("new game", "new game");
-                        newGame();
-                    }
-                    else {
-                        currentTeam = getPlayerTeam();
-                        currentConference = getPlayerConference();
+                    currentTeam = getPlayerTeam();
+                    currentConference = getPlayerConference();
 
-                        initUI();
-
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.content_frame, new RosterFragment())
-                                .commit();
-                    }
-                } else if (result.equals("data cleared")) {
-                    newGameSetup();
+                    initUI();
 
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_frame, new RosterFragment())
@@ -407,10 +386,6 @@ public class MainActivity extends AppCompatActivity {
                         teamsDB[i].aggression = teams.get(i).getAggression();
                         teamsDB[i].pace = teams.get(i).getPace();
 
-                        teamsDB[i].offenseFocus = teams.get(i).getOffenseFocus();
-                        teamsDB[i].perimeterFocus = teams.get(i).getPerimeterFocus();
-                        teamsDB[i].skillsFocus = teams.get(i).getSkillFocus();
-
                         teamsDB[i].currentYear = teams.get(i).getCurrentSeasonYear();
 
                         teams.get(i).setId(i + teamIndex);
@@ -458,11 +433,13 @@ public class MainActivity extends AppCompatActivity {
                             players[pIndex].firstName = player.getfName();
                             players[pIndex].year = player.getYear();
                             players[pIndex].pos = player.getPosition();
-                            players[pIndex].minutes = player.getMinutes();
+                            players[pIndex].trainingAs = player.getTrainingAs();
 
                             players[pIndex].closeRangeShot = player.getCloseRangeShot();
                             players[pIndex].midRangeShot = player.getMidRangeShot();
                             players[pIndex].longRangeShot = player.getLongRangeShot();
+                            players[pIndex].freeThrowShot = player.getFreeThrowShot();
+                            players[pIndex].postMove = player.getPostMove();
                             players[pIndex].ballHandling = player.getBallHandling();
                             players[pIndex].passing = player.getPassing();
                             players[pIndex].screening = player.getScreening();
@@ -476,9 +453,32 @@ public class MainActivity extends AppCompatActivity {
                             players[pIndex].rebounding = player.getRebounding();
 
                             players[pIndex].stamina = player.getStamina();
+                            players[pIndex].aggressiveness = player.getAggressiveness();
+                            players[pIndex].workEthic = player.getWorkEthic();
 
                             players[pIndex].gamesPlayed = player.getGamesPlayed();
                             players[pIndex].totalMinutes = player.getTotalMinutes();
+
+                            players[pIndex].closeRangeShotProgress = player.getCloseRangeShotProgress();
+                            players[pIndex].midRangeShotProgress = player.getMidRangeShotProgress();
+                            players[pIndex].longRangeShotProgress = player.getLongRangeShotProgress();
+                            players[pIndex].freeThrowShotProgress = player.getFreeThrowShotProgress();
+                            players[pIndex].postMoveProgress = player.getPostMoveProgress();
+                            players[pIndex].ballHandlingProgress = player.getBallHandlingProgress();
+                            players[pIndex].passingProgress = player.getPassingProgress();
+                            players[pIndex].screeningProgress = player.getScreeningProgress();
+                            players[pIndex].offballMovementProgress = player.getOffBallMovementProgress();
+
+                            players[pIndex].postDefenseProgress = player.getPostDefenseProgress();
+                            players[pIndex].perimeterDefenseProgress = player.getPerimeterDefenseProgress();
+                            players[pIndex].onBallDefenseProgress = player.getOnBallDefenseProgress();
+                            players[pIndex].offBallDefenseProgress = player.getOffBallDefenseProgress();
+                            players[pIndex].stealingProgress = player.getStealingProgress();
+                            players[pIndex].reboundingProgress = player.getReboundingProgress();
+
+                            players[pIndex].staminaProgress = player.getStaminaProgress();
+
+
                             pIndex++;
                         }
                     }
@@ -502,6 +502,7 @@ public class MainActivity extends AppCompatActivity {
                             coaches[cIndex].shotTeaching = coach.getShotTeaching();
                             coaches[cIndex].ballControlTeaching = coach.getBallControlTeaching();
                             coaches[cIndex].screenTeaching = coach.getScreenTeaching();
+                            coaches[cIndex].offPositionTeaching = coach.getOffPositionTeaching();
 
                             coaches[cIndex].defPositionTeaching = coach.getDefPositionTeaching();
                             coaches[cIndex].defOnBallTeaching = coach.getDefOnBallTeaching();
@@ -510,9 +511,6 @@ public class MainActivity extends AppCompatActivity {
                             coaches[cIndex].stealTeaching = coach.getStealTeaching();
 
                             coaches[cIndex].conditioningTeaching = coach.getConditioningTeaching();
-
-                            coaches[cIndex].workingWithGuards = coach.getWorkingWithGuards();
-                            coaches[cIndex].workingWithBigs = coach.getWorkingWithBigs();
 
                             coaches[cIndex].recruitingAbility = coach.getRecruitingAbility();
 
@@ -584,7 +582,7 @@ public class MainActivity extends AppCompatActivity {
                                 games[z].homeTeamID = t;
                             }
                             else if(championship.getTournament().getTeams().get(t).getId() == championship.getGames().get(z).getAwayTeam().getId())
-                            games[z].awayTeamID = t;
+                                games[z].awayTeamID = t;
                         }
 
                         games[z].homeScore = championship.getGames().get(z).getHomeScore();
@@ -649,17 +647,27 @@ public class MainActivity extends AppCompatActivity {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                             teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
                             teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
-                            teamsDB[i].offenseFocus, teamsDB[i].perimeterFocus, teamsDB[i].skillsFocus, teamsDB[i].currentYear,
-                            getApplicationContext()));
+                            teamsDB[i].currentYear, getApplicationContext()));
                 }
 
                 for (PlayerDB player : players) {
                     teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.playerId,
-                            player.pos, player.year, player.minutes, player.closeRangeShot, player.midRangeShot,
-                            player.longRangeShot, player.ballHandling, player.passing, player.screening, player.offBallMovement, player.postDefense,
+                            player.pos, player.year, player.trainingAs, player.closeRangeShot, player.midRangeShot,
+                            player.longRangeShot, player.freeThrowShot, player.postMove, player.ballHandling,
+                            player.passing, player.screening, player.offBallMovement, player.postDefense,
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
-                            player.stealing, player.rebounding, player.stamina, player.gamesPlayed,
-                            player.totalMinutes));
+                            player.stealing, player.rebounding, player.stamina, player.aggressiveness,
+                            player.workEthic, player.gamesPlayed, player.totalMinutes));
+
+                    teams.get(player.teamID).getPlayers().get(teams.get(player.teamID).getPlayers().size()-1)
+                            .setProgress(player.closeRangeShotProgress, player.midRangeShotProgress,
+                                    player.longRangeShotProgress, player.freeThrowShotProgress,
+                                    player.postMoveProgress, player.ballHandlingProgress,
+                                    player.passingProgress, player.screeningProgress, player.offballMovementProgress,
+                                    player.postDefenseProgress, player.perimeterDefenseProgress,
+                                    player.onBallDefenseProgress, player.offBallDefenseProgress,
+                                    player.stealingProgress, player.reboundingProgress,
+                                    player.staminaProgress);
                 }
 
                 for (RecruitDB recruit : recruits) {
@@ -670,10 +678,10 @@ public class MainActivity extends AppCompatActivity {
 
                 for (CoachDB coach : coaches) {
                     teams.get(coach.teamID).addCoach(new Coach(coach.firstName, coach.lastName, coach.pos,
-                            coach.shotTeaching, coach.ballControlTeaching, coach.screenTeaching, coach.defPositionTeaching,
-                            coach.defOnBallTeaching, coach.defOffBallTeaching, coach.reboundTeaching, coach.stealTeaching,
-                            coach.conditioningTeaching, coach.workingWithGuards, coach.workingWithBigs, coach.recruitingAbility,
-                            coach.tendencyToSub));
+                            coach.shotTeaching, coach.ballControlTeaching, coach.screenTeaching, coach.offPositionTeaching,
+                            coach.defPositionTeaching, coach.defOnBallTeaching, coach.defOffBallTeaching,
+                            coach.reboundTeaching, coach.stealTeaching, coach.conditioningTeaching,
+                            coach.recruitingAbility, coach.tendencyToSub));
 
                     if(coach.recruitIds.length() > 0) {
                         for (String s : Arrays.asList(coach.recruitIds.split(","))) {
@@ -767,98 +775,6 @@ public class MainActivity extends AppCompatActivity {
                 db.appDAO().deleteTeamDB();
                 db.appDAO().deleteConferences();
             }
-        }
-    }
-
-    public Team getPlayerTeam(){
-        for(Conference c: conferences){
-            for(Team t: c.getTeams()){
-                if(t.isPlayerControlled()){
-                    return t;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Conference getPlayerConference(){
-        for(Conference c: conferences){
-            for(Team t: c.getTeams()){
-                if(t.isPlayerControlled()){
-                    return c;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void newGameSetup(){
-        String[] names = {"Wofford", "UNCG", "ETSU", "Furman", "Mercer", "Western Carolina", "Samford", "The Citadel", "Chattanooga", "VMI"};
-        String[] mascots = {"Terriers", "Spartans", "Bucs", "Paladins", "Bears", "Catamounts", "Bulldogs", "Bulldogs", "Mocs", "Keydets"};
-
-        generateConference(names, mascots, "Southern Conference", 50, 0, true);
-
-        names = new String[]{"Boston", "New York", "Rhode Island", "Philadelphia", "Michigan", "Ohio", "Chicago", "Indianapolis", "Vermont", "NY State"};
-        generateConference(names, mascots, "Northern Conference", 60, 0, false);
-
-        names = new String[]{"San Francisco", "Los Angles", "San Diego", "Seattle", "Portland", "Arizona", "Utah", "Los Vegas", "New Mexico", "Texas"};
-        generateConference(names, mascots, "Western Conference", 40, 1, false);
-
-        names = new String[]{"North Dakota", "South Dakota", "Montana", "Oklahoma", "Iowa", "Denver", "Kansas City", "St. Louis", "Colorado", "St. Paul"};
-        generateConference(names, mascots, "Central Conference", 55, 0, false);
-
-        championship = null;
-
-        generateNonConferenceGames();
-    }
-
-    private void newGame(){
-        if(dataAsync != null){
-            dataAsync.cancel(true);
-        }
-        dataAsync = new DataAsync();
-        dataAsync.execute("new game");
-    }
-
-    private void generateNonConferenceGames(){
-        ArrayList<Game> nonCon = new ScheduleGenerator().generateSchedule(conferences);
-        ArrayList<Game> con = new ArrayList<>();
-        for(Conference c: conferences){
-            con.addAll(c.getMasterSchedule());
-        }
-        Collections.shuffle(con);
-        Collections.shuffle(nonCon);
-
-        masterSchedule = new ArrayList<>();
-        masterSchedule.addAll(nonCon);
-        masterSchedule.addAll(con);
-
-        for(int x = 0; x < masterSchedule.size(); x++){
-            masterSchedule.get(x).getHomeTeam().addGameToSchedule(masterSchedule.get(x));
-            masterSchedule.get(x).getAwayTeam().addGameToSchedule(masterSchedule.get(x));
-            masterSchedule.get(x).setId(x);
-        }
-
-        for(Conference c: conferences){
-            for(Team t: c.getTeams()){
-                Log.d("game", t.getFullName() + " has " + t.getNumberOfGames() + " games scheduled");
-            }
-        }
-    }
-
-    public void generateNationalChampionship(){
-        ArrayList<Team> champs = new ArrayList<>();
-        for(Conference c: conferences){
-            champs.add(c.getChampion());
-        }
-
-        championship = new NationalChampionship(champs);
-    }
-
-    public void addGameToMasterSchedule(Game game){
-        if(!masterSchedule.contains(game)){
-            game.setId(masterSchedule.size());
-            masterSchedule.add(game);
         }
     }
 

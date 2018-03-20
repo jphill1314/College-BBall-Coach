@@ -16,6 +16,7 @@ public class Coach {
     private int shotTeaching;
     private int ballControlTeaching;
     private int screenTeaching;
+    private int offPositionTeaching;
 
     private int defPositionTeaching;
     private int defOnBallTeaching;
@@ -24,9 +25,6 @@ public class Coach {
     private int stealTeaching;
 
     private int conditioningTeaching;
-
-    private int workingWithGuards;
-    private int workingWithBigs;
 
     private int tendencyToSub;
 
@@ -44,8 +42,8 @@ public class Coach {
     }
 
     public Coach(String firstName, String lastName, int position, int shotTeaching, int ballControlTeaching,
-                 int screenTeaching, int defPositionTeaching, int defOnBallTeaching, int defOffBallTeaching,
-                 int reboundTeaching, int stealTeaching, int conditioningTeaching, int workingWithGuards, int workingWithBigs,
+                 int screenTeaching, int offPositionTeaching, int defPositionTeaching, int defOnBallTeaching,
+                 int defOffBallTeaching, int reboundTeaching, int stealTeaching, int conditioningTeaching,
                  int recruitingAbility, int tendencyToSub){
         this.firstName = firstName;
         this.lastName = lastName;
@@ -54,6 +52,7 @@ public class Coach {
         this.shotTeaching = shotTeaching;
         this.screenTeaching = screenTeaching;
         this.ballControlTeaching = ballControlTeaching;
+        this.offPositionTeaching = offPositionTeaching;
 
         this.defPositionTeaching = defPositionTeaching;
         this.defOnBallTeaching = defOnBallTeaching;
@@ -62,10 +61,6 @@ public class Coach {
         this.stealTeaching = stealTeaching;
 
         this.conditioningTeaching = conditioningTeaching;
-
-        this.workingWithBigs = workingWithBigs;
-        this.workingWithGuards = workingWithGuards;
-
         this.recruitingAbility = recruitingAbility;
 
         this.tendencyToSub = tendencyToSub;
@@ -163,20 +158,16 @@ public class Coach {
         return conditioningTeaching;
     }
 
-    public int getWorkingWithGuards() {
-        return workingWithGuards;
-    }
-
-    public int getWorkingWithBigs() {
-        return workingWithBigs;
-    }
-
     public int getTendencyToSub(){
         return tendencyToSub;
     }
 
     public int getRecruitingAbility(){
         return recruitingAbility;
+    }
+
+    public int getOffPositionTeaching() {
+        return offPositionTeaching;
     }
 
     private void generateAttributes(int ability){
@@ -186,6 +177,7 @@ public class Coach {
         shotTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
         ballControlTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
         screenTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
+        offPositionTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
 
         defPositionTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
         defOnBallTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
@@ -194,9 +186,6 @@ public class Coach {
         stealTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
 
         conditioningTeaching = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
-
-        workingWithGuards = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
-        workingWithBigs = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
 
         recruitingAbility = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
 
@@ -208,7 +197,7 @@ public class Coach {
     private void calculateOverallRating(){
         overallRating = (shotTeaching + ballControlTeaching + screenTeaching + defPositionTeaching
         + defOnBallTeaching + defOffBallTeaching + reboundTeaching + stealTeaching + conditioningTeaching
-        + workingWithBigs + workingWithGuards) / 11;
+        + offPositionTeaching + recruitingAbility) / 11;
     }
 
 }

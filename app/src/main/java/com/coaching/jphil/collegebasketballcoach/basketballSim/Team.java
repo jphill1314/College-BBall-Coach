@@ -32,8 +32,6 @@ public class Team {
 
     private String schoolName, mascot;
 
-    private int offenseFocus, perimeterFocus, skillFocus;
-
     private int numberOfGames;
 
     // Strategy
@@ -80,14 +78,12 @@ public class Team {
 
         opponents = new ArrayList<>();
 
-        setEqualTrainingFocus();
         setOverallRating();
         generateStrategy();
     }
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
-                int defenseFavorsThrees, int agression, int pace, int offenseFocus,
-                int perimeterFocus, int skillFocus, int year, Context context){
+                int defenseFavorsThrees, int agression, int pace, int year, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.isPlayerControlled = isPlayerControlled;
@@ -115,11 +111,6 @@ public class Team {
         if(this.pace < 55){
             this.pace = 70;
         }
-
-        this.offenseFocus = offenseFocus;
-        this.perimeterFocus = perimeterFocus;
-        this.skillFocus = skillFocus;
-
         currentSeasonYear = year;
     }
 
@@ -238,16 +229,10 @@ public class Team {
     }
 
     public void newSeason(){
-        int improve = 0;
-        for(Coach c: coaches){
-            improve+= c.getOverallRating();
-        }
-        improve = (improve / coaches.size()) / 10;
-
         Iterator<Player> itr = players.iterator();
         while(itr.hasNext()){
             Player p = itr.next();
-            p.newSeason(improve, gamesPlayed, offenseFocus, perimeterFocus, skillFocus);
+            p.newSeason(coaches);
             if(p.getYear() > 3){
                 itr.remove();
             }
@@ -276,6 +261,7 @@ public class Team {
         }
 
         currentSeasonYear++;
+        setOverallRating();
     }
 
     public void firstSeason(){
@@ -336,8 +322,9 @@ public class Team {
         else{
             loses++;
         }
+
         for(Player p: players){
-            p.playGame();
+            p.playGame(coaches);
         }
 
         players = new ArrayList<>(rosterPlayers);
@@ -348,6 +335,7 @@ public class Team {
                 r.loseInterest();
             }
         }
+        setOverallRating();
     }
 
     public int getCoachTalk(int scoreDif){
@@ -445,36 +433,6 @@ public class Team {
         }
 
         overallRating = overallRating / players.size();
-    }
-
-    private void setEqualTrainingFocus(){
-        offenseFocus = 50;
-        perimeterFocus = 50;
-        skillFocus = 50;
-    }
-
-    public int getOffenseFocus() {
-        return offenseFocus;
-    }
-
-    public void setOffenseFocus(int offenseFocus) {
-        this.offenseFocus = offenseFocus;
-    }
-
-    public int getPerimeterFocus() {
-        return perimeterFocus;
-    }
-
-    public void setPerimeterFocus(int perimeterFocus) {
-        this.perimeterFocus = perimeterFocus;
-    }
-
-    public int getSkillFocus() {
-        return skillFocus;
-    }
-
-    public void setSkillFocus(int skillFocus) {
-        this.skillFocus = skillFocus;
     }
 
     public int getNumberOfPlayersAtPosition(int position, boolean countSeniors){

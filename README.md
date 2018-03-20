@@ -39,8 +39,8 @@ List of improvements to add (for version 1.0):
 
 * Training
 - [ ] Add intensity slider which affects how much the players improve and how quickly they recover from games (after 1.0)
-- [ ] Train each position differently
-- [ ] A player's improvement depends on playing time, practice intensity, work ethic, and the coaches' abilities
+- [x] Train each position differently
+- [x] A player's improvement depends on playing time, practice intensity, work ethic, and the coaches' abilities
 
 * Game Viewer
 - [x] Add empty list items so that the FAB doesn't always block bottom item in lists
@@ -66,7 +66,7 @@ List of improvements to add (for version 1.0):
 - [ ] Save game stats
 - [x] Generate initial abilities based on position
 - [x] Calculate overall rating based on position 
-- [ ] A player can be set to train as a different position, but will improve slower than if they trained as their best position
+- [x] A player can be set to train as a different position, but will improve slower than if they trained as their best position
 
 * Offseason (Pushed to after 1.0)
 - [ ] Team has a maximum and minimum size. The user can cut players if they have too many and can add walk-ons to reach the minimum

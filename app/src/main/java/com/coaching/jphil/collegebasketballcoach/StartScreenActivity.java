@@ -40,7 +40,7 @@ public class StartScreenActivity extends AppCompatActivity {
                 newGame.setVisibility(GONE);
                 loadGame.setVisibility(GONE);
                 title.setVisibility(GONE);
-                
+
                 android.support.v4.app.FragmentTransaction t = getSupportFragmentManager().beginTransaction();
                 t.replace(R.id.frame_layout, new TeamCreatorFragment()).commit();
             }

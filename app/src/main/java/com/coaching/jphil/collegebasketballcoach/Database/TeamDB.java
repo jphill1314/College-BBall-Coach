@@ -30,8 +30,4 @@ public class TeamDB {
     public int defFavorsThrees;
     public int aggression;
     public int pace;
-
-    public int offenseFocus;
-    public int perimeterFocus;
-    public int skillsFocus;
 }

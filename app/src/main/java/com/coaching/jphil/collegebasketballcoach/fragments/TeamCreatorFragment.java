@@ -215,6 +215,9 @@ public class TeamCreatorFragment extends Fragment {
             Log.d("save", "Saving data...");
 
             if(db != null){
+                if(!db.isOpen()) {
+                    db = Room.databaseBuilder(getContext(), AppDatabase.class, "basketballdb").build();
+                }
                 for(int q = 0; q < conferences.size(); q++) {
                     ConferenceDB conferenceDB = new ConferenceDB();
                     conferenceDB.conferenceID = q;
@@ -245,10 +248,6 @@ public class TeamCreatorFragment extends Fragment {
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
                         teamsDB[i].aggression = teams.get(i).getAggression();
                         teamsDB[i].pace = teams.get(i).getPace();
-
-                        teamsDB[i].offenseFocus = teams.get(i).getOffenseFocus();
-                        teamsDB[i].perimeterFocus = teams.get(i).getPerimeterFocus();
-                        teamsDB[i].skillsFocus = teams.get(i).getSkillFocus();
 
                         teamsDB[i].currentYear = teams.get(i).getCurrentSeasonYear();
 
@@ -297,11 +296,13 @@ public class TeamCreatorFragment extends Fragment {
                             players[pIndex].firstName = player.getfName();
                             players[pIndex].year = player.getYear();
                             players[pIndex].pos = player.getPosition();
-                            players[pIndex].minutes = player.getMinutes();
+                            players[pIndex].trainingAs = player.getTrainingAs();
 
                             players[pIndex].closeRangeShot = player.getCloseRangeShot();
                             players[pIndex].midRangeShot = player.getMidRangeShot();
                             players[pIndex].longRangeShot = player.getLongRangeShot();
+                            players[pIndex].freeThrowShot = player.getFreeThrowShot();
+                            players[pIndex].postMove = player.getPostMove();
                             players[pIndex].ballHandling = player.getBallHandling();
                             players[pIndex].passing = player.getPassing();
                             players[pIndex].screening = player.getScreening();
@@ -315,9 +316,32 @@ public class TeamCreatorFragment extends Fragment {
                             players[pIndex].rebounding = player.getRebounding();
 
                             players[pIndex].stamina = player.getStamina();
+                            players[pIndex].aggressiveness = player.getAggressiveness();
+                            players[pIndex].workEthic = player.getWorkEthic();
 
                             players[pIndex].gamesPlayed = player.getGamesPlayed();
                             players[pIndex].totalMinutes = player.getTotalMinutes();
+
+                            players[pIndex].closeRangeShotProgress = player.getCloseRangeShotProgress();
+                            players[pIndex].midRangeShotProgress = player.getMidRangeShotProgress();
+                            players[pIndex].longRangeShotProgress = player.getLongRangeShotProgress();
+                            players[pIndex].freeThrowShotProgress = player.getFreeThrowShotProgress();
+                            players[pIndex].postMoveProgress = player.getPostMoveProgress();
+                            players[pIndex].ballHandlingProgress = player.getBallHandlingProgress();
+                            players[pIndex].passingProgress = player.getPassingProgress();
+                            players[pIndex].screeningProgress = player.getScreeningProgress();
+                            players[pIndex].offballMovementProgress = player.getOffBallMovementProgress();
+
+                            players[pIndex].postDefenseProgress = player.getPostDefenseProgress();
+                            players[pIndex].perimeterDefenseProgress = player.getPerimeterDefenseProgress();
+                            players[pIndex].onBallDefenseProgress = player.getOnBallDefenseProgress();
+                            players[pIndex].offBallDefenseProgress = player.getOffBallDefenseProgress();
+                            players[pIndex].stealingProgress = player.getStealingProgress();
+                            players[pIndex].reboundingProgress = player.getReboundingProgress();
+
+                            players[pIndex].staminaProgress = player.getStaminaProgress();
+
+
                             pIndex++;
                         }
                     }
@@ -341,6 +365,7 @@ public class TeamCreatorFragment extends Fragment {
                             coaches[cIndex].shotTeaching = coach.getShotTeaching();
                             coaches[cIndex].ballControlTeaching = coach.getBallControlTeaching();
                             coaches[cIndex].screenTeaching = coach.getScreenTeaching();
+                            coaches[cIndex].offPositionTeaching = coach.getOffPositionTeaching();
 
                             coaches[cIndex].defPositionTeaching = coach.getDefPositionTeaching();
                             coaches[cIndex].defOnBallTeaching = coach.getDefOnBallTeaching();
@@ -349,9 +374,6 @@ public class TeamCreatorFragment extends Fragment {
                             coaches[cIndex].stealTeaching = coach.getStealTeaching();
 
                             coaches[cIndex].conditioningTeaching = coach.getConditioningTeaching();
-
-                            coaches[cIndex].workingWithGuards = coach.getWorkingWithGuards();
-                            coaches[cIndex].workingWithBigs = coach.getWorkingWithBigs();
 
                             coaches[cIndex].recruitingAbility = coach.getRecruitingAbility();
 
@@ -372,34 +394,8 @@ public class TeamCreatorFragment extends Fragment {
                     coachIndex += numCoaches;
                     db.appDAO().insertCoaches(coaches);
 
-                    if(conferences.get(q).getTournaments() != null) {
-                        TournamentDB[] tournaments = new TournamentDB[conferences.get(q).getTournaments().size()];
-                        for(int x = 0; x < tournaments.length; x++){
-                            tournaments[x] = new TournamentDB();
-                            tournaments[x].tournamentID = x + tournamentIndex;
-                            tournaments[x].name = conferences.get(q).getTournaments().get(x).getName();
-                            tournaments[x].hasChampion = conferences.get(q).getTournaments().get(x).isHasChampion();
-                            tournaments[x].playAtNeutralCourt = conferences.get(q).getTournaments().get(x).isPlayAtNeutralCourt();
-
-
-                            tournaments[x].teamIDs = "";
-                            tournaments[x].gameIDs = "";
-                            for(int z = 0; z < conferences.get(q).getTournaments().get(x).getGames().size(); z++){
-                                tournaments[x].gameIDs += conferences.get(q).getTournaments().get(x).getGames().get(z).getId() + ",";
-                            }
-
-                            for(int z = 0; z < conferences.get(q).getTournaments().get(x).getTeams().size(); z++){
-                                tournaments[x].teamIDs += (conferences.get(q).getTournaments().get(x).getTeams().get(z).getId() - teamIndex) + ",";
-                            }
-
-                            tournaments[x].conferenceId = q;
-                        }
-                        tournamentIndex += tournaments.length;
-                        db.appDAO().insertTournaments(tournaments);
-                    }
                     teamIndex += teams.size();
                 }
-
             }
 
             GameDB[] games = new GameDB[masterSchedule.size()];
@@ -450,7 +446,7 @@ public class TeamCreatorFragment extends Fragment {
                 }
                 else{
                     if(player) {
-                        rating = teamRatingValue;
+                        rating = teamRatingValue + 10;
                         teams.add(new Team(schoolName.getText().toString(), mascot.getText().toString(), getPlayers(numPlayers, rating), getCoaches(4, rating, true), true, getActivity()));
                     }
                     else{
@@ -506,6 +502,10 @@ public class TeamCreatorFragment extends Fragment {
                     for(int x = 2; x < name.length; x++){
                         name[1] += " " + name[x];
                     }
+                }
+                else if(name.length == 1){
+                    String temp = name[0];
+                    name = new String[]{"" , temp};
                 }
                 coaches.add(new Coach(name[0], name[1], 1, teamRating + 5));
             }
