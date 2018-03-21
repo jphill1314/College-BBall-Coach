@@ -30,4 +30,6 @@ public class TeamDB {
     public int defFavorsThrees;
     public int aggression;
     public int pace;
+
+    public boolean isSeasonOver;
 }

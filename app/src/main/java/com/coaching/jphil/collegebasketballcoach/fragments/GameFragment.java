@@ -194,23 +194,19 @@ public class GameFragment extends Fragment {
 
         if(game.isPlayed()){
             boolean bigWin, badLoss;
-
             if(game.getHomeTeam().isPlayerControlled()){
                 bigWin = (game.getHomeTeam().getOverallRating() + 10 <= game.getAwayTeam().getOverallRating()) && game.homeTeamWin();
                 badLoss = (game.getHomeTeam().getOverallRating() - 10 >= game.getAwayTeam().getOverallRating()) && !game.homeTeamWin();
                 for(Coach c: game.getHomeTeam().getCoaches()){
-                    for(Recruit r: c.getRecruits()){
-                        r.attemptToRecruit(c.getRecruitingAbility(), bigWin, badLoss, game.getHomeTeam().getNumberOfReturningPlayers());
-                    }
+                    c.recruitRecruits(bigWin, badLoss, game.getHomeTeam().getNumberOfReturningPlayers());
+
                 }
             }
             else{
                 bigWin = (game.getAwayTeam().getOverallRating() + 10 <= game.getHomeTeam().getOverallRating()) && !game.homeTeamWin();
                 badLoss = (game.getAwayTeam().getOverallRating() - 10 >= game.getHomeTeam().getOverallRating()) && game.homeTeamWin();
                 for(Coach c: game.getAwayTeam().getCoaches()){
-                    for(Recruit r: c.getRecruits()){
-                        r.attemptToRecruit(c.getRecruitingAbility(), bigWin, badLoss, game.getAwayTeam().getNumberOfReturningPlayers());
-                    }
+                    c.recruitRecruits(bigWin, badLoss, game.getAwayTeam().getNumberOfReturningPlayers());
                 }
             }
         }

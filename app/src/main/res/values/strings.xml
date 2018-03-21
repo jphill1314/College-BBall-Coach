@@ -39,6 +39,11 @@
     <!-- Standings Fragment -->
     <string name="standing">%s Standings</string>
     <string name="school_name">School</string>
+    <string name="conf_record">Conf.\nW-L</string>
+    <string name="overall_record">Overall\nW-L</string>
+    <string name="rpi">RPI</string>
+    <string name="record_string">%d-%d</string>
+
     <string name="wins">Wins</string>
     <string name="loses">Loses</string>
 

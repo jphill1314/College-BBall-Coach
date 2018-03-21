@@ -31,7 +31,7 @@ public class ScheduleGenerator {
         for(int x = 0; x < allTeams.size() - conferences.get(conferences.size()-1).getTeams().size(); x++){
             Team t = allTeams.get(x);
 
-            while(t.getOpponents().size() < numberOfGames){
+            while(t.getNumberOfGames() < numberOfGames){
                 Team opponent = allTeams.get(r.nextInt(allTeams.size()-x) + x);
                 int repeats = 0;
                 while(t.getOpponents().contains(opponent) || opponent.getNumberOfGames() >= numberOfGames || t.equals(opponent)){

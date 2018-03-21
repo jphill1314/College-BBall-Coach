@@ -173,6 +173,24 @@ public class Game {
         homeTeam.playGame(homeTeamWin());
         awayTeam.playGame(!homeTeamWin());
 
+        boolean bigWin, badLoss;
+
+        if(getHomeTeam().isPlayerControlled()){
+            bigWin = (getHomeTeam().getOverallRating() + 10 <= getAwayTeam().getOverallRating()) && homeTeamWin();
+            badLoss = (getHomeTeam().getOverallRating() - 10 >= getAwayTeam().getOverallRating()) && !homeTeamWin();
+            for(Coach c: getHomeTeam().getCoaches()){
+                c.recruitRecruits(bigWin, badLoss, getHomeTeam().getNumberOfReturningPlayers());
+
+            }
+        }
+        else if(awayTeam.isPlayerControlled()){
+            bigWin = (getAwayTeam().getOverallRating() + 10 <= getHomeTeam().getOverallRating()) && !homeTeamWin();
+            badLoss = (getAwayTeam().getOverallRating() - 10 >= getHomeTeam().getOverallRating()) && homeTeamWin();
+            for(Coach c: getAwayTeam().getCoaches()){
+                c.recruitRecruits(bigWin, badLoss, getAwayTeam().getNumberOfReturningPlayers());
+            }
+        }
+
     }
 
     //TODO: save game stats to DB and continue to balance for realism

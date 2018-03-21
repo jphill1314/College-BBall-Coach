@@ -110,16 +110,20 @@ public class Tournament {
             Team hTeam, aTeam;
             if(games.get(gameOne).homeTeamWin()){
                 hTeam = games.get(gameOne).getHomeTeam();
+                games.get(gameOne).getAwayTeam().toggleSeasonOver();
             }
             else{
                 hTeam = games.get(gameOne).getAwayTeam();
+                games.get(gameOne).getHomeTeam().toggleSeasonOver();
             }
 
             if(games.get(gameTwo).homeTeamWin()){
                 aTeam = games.get(gameTwo).getHomeTeam();
+                games.get(gameTwo).getAwayTeam().toggleSeasonOver();
             }
             else{
                 aTeam = games.get(gameTwo).getAwayTeam();
+                games.get(gameTwo).getHomeTeam().toggleSeasonOver();
             }
             games.add(new Game(hTeam, aTeam, true));
         }
@@ -131,16 +135,20 @@ public class Tournament {
                 Team hTeam, aTeam;
                 if(games.get(2*x).homeTeamWin()){
                     hTeam = games.get(2*x + gameMod).getHomeTeam();
+                    games.get(2*x + gameMod).getAwayTeam().toggleSeasonOver();
                 }
                 else{
                     hTeam = games.get(2*x + gameMod).getAwayTeam();
+                    games.get(2*x + gameMod).getHomeTeam().toggleSeasonOver();
                 }
 
                 if(games.get(1).homeTeamWin()){
                     aTeam = games.get(2*x + 1 + gameMod).getHomeTeam();
+                    games.get(2*x + 1 + gameMod).getAwayTeam().toggleSeasonOver();
                 }
                 else{
                     aTeam = games.get(2*x + 1 + gameMod).getAwayTeam();
+                    games.get(2*x + 1 + gameMod).getHomeTeam().toggleSeasonOver();
                 }
                 games.add(new Game(hTeam, aTeam, true));
             }
@@ -150,16 +158,20 @@ public class Tournament {
                 Team hTeam, aTeam;
                 if(games.get(2*x).homeTeamWin()){
                     hTeam = games.get(2*x).getHomeTeam();
+                    games.get(2*x).getAwayTeam().toggleSeasonOver();
                 }
                 else{
                     hTeam = games.get(2*x).getAwayTeam();
+                    games.get(2*x).getHomeTeam().toggleSeasonOver();
                 }
 
                 if(games.get(1).homeTeamWin()){
                     aTeam = games.get(2*x + 1).getHomeTeam();
+                    games.get(2*x + 1).getAwayTeam().toggleSeasonOver();
                 }
                 else{
                     aTeam = games.get(2*x + 1).getAwayTeam();
+                    games.get(2*x + 1).getHomeTeam().toggleSeasonOver();
                 }
                 games.add(new Game(hTeam, aTeam, true));
             }

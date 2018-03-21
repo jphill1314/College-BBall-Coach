@@ -37,12 +37,13 @@
             android:text="@string/school_name"/>
 
         <TextView
+            android:id="@+id/conf_wl"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="20sp"
             android:gravity="center"
-            android:text="@string/wins"/>
+            android:text="@string/conf_record"/>
 
         <TextView
             android:layout_width="0dp"
@@ -50,7 +51,7 @@
             android:layout_weight="1"
             android:textSize="20sp"
             android:gravity="center"
-            android:text="@string/loses"/>
+            android:text="@string/overall_record"/>
 
     </LinearLayout>
 

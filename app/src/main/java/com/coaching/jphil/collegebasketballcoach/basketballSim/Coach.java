@@ -170,6 +170,12 @@ public class Coach {
         return offPositionTeaching;
     }
 
+    public void recruitRecruits(boolean bigWin, boolean badLoss, int spots){
+        for(Recruit r: recruits){
+            r.attemptToRecruit(recruitingAbility, bigWin, badLoss, spots);
+        }
+    }
+
     private void generateAttributes(int ability){
         int abilityVariability = 10;
         Random r = new Random();

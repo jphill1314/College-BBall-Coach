@@ -45,6 +45,7 @@ public class RosterFragment extends Fragment {
 
         Bundle args = getArguments();
         if(args != null){
+            mainActivity.currentConference = mainActivity.conferences.get(args.getInt("conf"));
             mainActivity.currentTeam = generateStandings(mainActivity.currentConference.getTeams()).get(args.getInt("team"));
             mainActivity.actionBar.setTitle(mainActivity.currentTeam.getFullName());
         }

@@ -3,6 +3,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim;
 import android.content.Context;
 import android.util.Log;
 
+import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 
@@ -56,6 +57,8 @@ public class Team {
 
     private int currentSeasonYear;
 
+    private boolean seasonOver;
+
     private int id;
 
     public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches,
@@ -78,12 +81,14 @@ public class Team {
 
         opponents = new ArrayList<>();
 
+        seasonOver = false;
+
         setOverallRating();
         generateStrategy();
     }
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
-                int defenseFavorsThrees, int agression, int pace, int year, Context context){
+                int defenseFavorsThrees, int agression, int pace, int year, boolean isSeasonOver, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.isPlayerControlled = isPlayerControlled;
@@ -101,6 +106,8 @@ public class Team {
         this.defenseFavorsThrees = defenseFavorsThrees;
         this.aggression = agression;
         this.pace = pace;
+
+        this.seasonOver = isSeasonOver;
 
         if(this.offenseFavorsThrees == 0){
             this.offenseFavorsThrees = 50;
@@ -251,6 +258,8 @@ public class Team {
         loses = 0;
         gamesPlayed = 0;
         numberOfGames = 0;
+
+        seasonOver = false;
 
         schedule = new ArrayList<>();
         opponents = new ArrayList<>();
@@ -551,12 +560,14 @@ public class Team {
         return numberOfGames;
     }
 
-    public void addOpponent(Team team){
-        opponents.add(team);
+    void addOpponent(Team team){
+        if(!opponents.contains(team)) {
+            opponents.add(team);
+        }
         numberOfGames++;
     }
 
-    public ArrayList<Team> getOpponents(){
+    ArrayList<Team> getOpponents(){
         return opponents;
     }
 
@@ -737,5 +748,101 @@ public class Team {
             total += p.getPerimeterDefense();
         }
         return total / players.size();
+    }
+
+    public boolean isSeasonOver(){
+        return seasonOver;
+    }
+
+    public void toggleSeasonOver(){
+        seasonOver = !seasonOver;
+    }
+
+    private int[] getConferenceRecord(){
+        int[] record = new int[]{0,0};
+        Conference conf = null;
+        for(Conference c: ((MainActivity)context).conferences){
+            if(c.getTeams().contains(this)){
+                conf = c;
+            }
+        }
+
+        if(conf != null) {
+            for (Game g : schedule) {
+                if (g.getHomeTeam().equals(this)) {
+                    if(conf.getTeams().contains(g.getAwayTeam())) {
+                        if(g.isPlayed()) {
+                            if (g.homeTeamWin()) {
+                                record[0]++;
+                            } else {
+                                record[1]++;
+                            }
+                        }
+                    }
+                }
+                else {
+                    if(conf.getTeams().contains(g.getHomeTeam())) {
+                        if(g.isPlayed()) {
+                            if (g.homeTeamWin()) {
+                                record[1]++;
+                            } else {
+                                record[0]++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return record;
+    }
+
+    public int getConferenceWins(){
+        return getConferenceRecord()[0];
+    }
+
+    public int getConferenceLoses(){
+        return getConferenceRecord()[1];
+    }
+
+    public int getConferenceWinPercent(){
+        int[] record = getConferenceRecord();
+        if(record[1] == 0){
+            return 100;
+        }
+        if(record[0] == 0){
+            return 0;
+        }
+
+        return (int) ((record[0] * 1.0) / (record[0] + record[1]));
+    }
+
+    public int getOpponentWinPercent(){
+        int total = 0;
+        for(Game g: schedule){
+            if(g.isPlayed()){
+                if(g.getHomeTeam().equals(this)){
+                    total += g.getAwayTeam().getWinPercent();
+                }
+                else{
+                    total += g.getHomeTeam().getWinPercent();
+                }
+            }
+        }
+        return total;
+    }
+
+    public double getRPI(){
+        int opponentWP = getOpponentWinPercent();
+        double oppOppWP = 0;
+
+        for(Team t: opponents){
+            for(Team y: t.getOpponents()){
+                oppOppWP += y.getWinPercent() / 100.0;
+            }
+        }
+
+        return (.25 * (getWinPercent() / 100.0) + .5 * (opponentWP / 100.0) + .25 * oppOppWP) / 100;
+
     }
 }

@@ -116,7 +116,7 @@ public class Recruit {
         return isCommitted;
     }
 
-    public void toggleIsRecruited(){
+    void toggleIsRecruited(){
         isRecruited = !isRecruited;
     }
 
@@ -124,7 +124,7 @@ public class Recruit {
         return isRecruited;
     }
 
-    public Player startNewSeason(){
+    Player startNewSeason(){
         if(isCommitted){
             Random r = new Random();
             return new Player(lastName, firstName, position, 0, rating + 5 - r.nextInt(10));
@@ -132,26 +132,26 @@ public class Recruit {
         return null;
     }
 
-    public void loseInterest(){
+    void loseInterest(){
         Random r = new Random();
-        interest -= r.nextInt(7) + 3;
+        interest -= r.nextInt(7);
 
         if(interest < 0){
             interest = 0;
         }
     }
 
-    public void attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
+    public boolean attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
         Random r = new Random();
-        if(recruitingAbility > 10) {
-            interest += r.nextInt(recruitingAbility / 10) + recruitingAbility / 10;
+        if(recruitingAbility > 15) {
+            interest += r.nextInt(recruitingAbility / 15) + recruitingAbility / 15 + 1;
         }
         else{
             interest += 1;
         }
 
         if(bigWin){
-            interest += r.nextInt(10);
+            interest += r.nextInt(5);
         }
         else if(badLoss){
             interest -= r.nextInt(10);
@@ -165,14 +165,16 @@ public class Recruit {
         }
 
         if(spotsAvailable > 0) {
-            commit();
+            return commit();
         }
+        return false;
     }
 
-    private void commit(){
+    private boolean commit(){
         Random r = new Random();
         if((interest - 75 >= r.nextInt(25)) || interest == 100){
             isCommitted = true;
         }
+        return isCommitted;
     }
 }

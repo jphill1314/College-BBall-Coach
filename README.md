@@ -11,12 +11,12 @@ List of improvements to add (for version 1.0):
 * Schedule
 - [x] Non-conference games
 - [ ] Games are seperated by time -> in between teams can practice + players' recover from games (after 1.0)
-- [ ] When the player has no games left, it should only take one press of the sim button to simulate the rest of the season
-- [ ] The button should show the proper next action when the fragment loads (ie will show start tournament when it's tournament time)
+- [x] When the player has no games left, it should only take one press of the sim button to simulate the rest of the season
+- [x] The button should show the proper next action when the fragment loads (ie will show start tournament when it's tournament time)
 
 * Standings
 - [x] Sort by win % first and # of wins second
-- [ ] Show rankings and RPI (or something like strength of schedule)
+- [x] Show rankings and RPI (or something like strength of schedule)
 - [x] Show the correct season years
 
 * Recruiting

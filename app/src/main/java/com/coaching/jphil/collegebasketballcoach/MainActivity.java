@@ -272,11 +272,44 @@ public class MainActivity extends AppCompatActivity {
 
     public void generateNationalChampionship(){
         ArrayList<Team> champs = new ArrayList<>();
+        ArrayList<Team> others = RPIRanking();
         for(Conference c: conferences){
             champs.add(c.getChampion());
+            others.remove(champs.get(champs.size()-1));
+        }
+        while(champs.size() < 8){
+            if(others.get(0).getWinPercent() > 50) {
+                champs.add(others.get(0));
+                if(others.get(0).isSeasonOver()){
+                    others.get(0).toggleSeasonOver();
+                }
+            }
+            others.remove(0);
         }
 
         championship = new NationalChampionship(champs);
+    }
+
+    private ArrayList<Team> RPIRanking(){
+        int changes;
+        ArrayList<Team> standing = new ArrayList<>();
+        for(Conference c: conferences){
+            standing.addAll(c.getTeams());
+        }
+
+        do{
+            changes = 0;
+            for(int x = 0; x < standing.size() - 1; x++){
+                for(int y = x + 1; y < standing.size(); y++){
+                    if(standing.get(x).getRPI() < standing.get(y).getRPI()){
+                        Collections.swap(standing, x, y);
+                        changes++;
+                    }
+                }
+            }
+        }while(changes != 0);
+
+        return standing;
     }
 
     public void addGameToMasterSchedule(Game game){
@@ -385,6 +418,7 @@ public class MainActivity extends AppCompatActivity {
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
                         teamsDB[i].aggression = teams.get(i).getAggression();
                         teamsDB[i].pace = teams.get(i).getPace();
+                        teamsDB[i].isSeasonOver = teams.get(i).isSeasonOver();
 
                         teamsDB[i].currentYear = teams.get(i).getCurrentSeasonYear();
 
@@ -397,7 +431,7 @@ public class MainActivity extends AppCompatActivity {
                                 recruits[rIndex] = new RecruitDB();
 
                                 recruits[rIndex].recruitID = recruit.getId();
-                                recruits[rIndex].teamID = teamIndex;
+                                recruits[rIndex].teamID = i + teamIndex;
 
                                 recruits[rIndex].firstName = recruit.getFirstName();
                                 recruits[rIndex].lastName = recruit.getLastName();
@@ -647,7 +681,7 @@ public class MainActivity extends AppCompatActivity {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                             teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
                             teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
-                            teamsDB[i].currentYear, getApplicationContext()));
+                            teamsDB[i].currentYear, teamsDB[i].isSeasonOver, MainActivity.this));
                 }
 
                 for (PlayerDB player : players) {
@@ -671,6 +705,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for (RecruitDB recruit : recruits) {
+                    Log.d("Recruit", "Team: " + teams.get(recruit.teamID).getFullName());
                     teams.get(recruit.teamID).addRecruit(new Recruit(recruit.firstName, recruit.lastName,
                             recruit.pos, recruit.rating, recruit.interest, recruit.isCommitted,
                             recruit.recruitID));

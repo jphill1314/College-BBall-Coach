@@ -210,7 +210,6 @@ public class TeamCreatorFragment extends Fragment {
             int teamIndex = 0;
             int coachIndex = 0;
             int playerIndex = 0;
-            int tournamentIndex = 0;
 
             Log.d("save", "Saving data...");
 
@@ -248,6 +247,7 @@ public class TeamCreatorFragment extends Fragment {
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
                         teamsDB[i].aggression = teams.get(i).getAggression();
                         teamsDB[i].pace = teams.get(i).getPace();
+                        teamsDB[i].isSeasonOver = teams.get(i).isSeasonOver();
 
                         teamsDB[i].currentYear = teams.get(i).getCurrentSeasonYear();
 
