@@ -1,6 +1,8 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.arch.persistence.room.Room;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,10 +19,14 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
+import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.PlayerInfoAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,14 +39,19 @@ public class PlayerInfoFragment extends Fragment {
     }
 
     private int playerIndex;
-    TextView name, rating, training;
-    Spinner spinner;
+    private TextView name, rating, training;
+    private Spinner spinner;
+    private String[] items;
+    private GameStatsDB[] stats;
+
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager manager;
 
     private MainActivity mainActivity;
+
+    private AppDatabase db;
 
     private Player player;
 
@@ -67,8 +78,9 @@ public class PlayerInfoFragment extends Fragment {
         training.setText(getString(R.string.training_desc, getResources().getStringArray(R.array.training_types)[player.getTrainingAs()]));
 
         spinner = view.findViewById(R.id.player_spinner);
+        items = getResources().getStringArray(R.array.player_info_spinner);
         SpinnerAdapter spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item,
-                getResources().getStringArray(R.array.player_info_spinner));
+                items);
         spinner.setAdapter(spinnerAdapter);
         spinner.setSelection(0, false);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -94,10 +106,41 @@ public class PlayerInfoFragment extends Fragment {
         return view;
     }
 
+    private DataAsync data;
     private void changeAdapter(int type){
-        adapter = new PlayerInfoAdapter(player, type, getContext());
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        if(type == items.length - 1){
+            if(db == null){
+                db = Room.databaseBuilder(getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            }
+            if(data == null){
+                data = new DataAsync();
+                data.execute();
+            }
+        }
+        else {
+            adapter = new PlayerInfoAdapter(player, type, getContext());
+            recyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private class DataAsync extends AsyncTask<String, String, String>{
+
+        @Override
+        protected String doInBackground(String... strings){
+            stats = db.appDAO().loadPlayerStats(player.getId());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            ArrayList<String> results = new ArrayList<>();
+            for(GameStatsDB stat: stats){
+                results.add(stat.getStatsAsString());
+            }
+            adapter = new PlayerInfoAdapter(results);
+            recyclerView.setAdapter(adapter);
+        }
     }
 
 }

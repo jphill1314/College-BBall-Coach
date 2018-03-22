@@ -63,7 +63,7 @@ List of improvements to add (for version 1.0):
 - [x] Track more stats like steals and turnovers
 
 * Players
-- [ ] Save game stats
+- [x] Save game stats
 - [x] Generate initial abilities based on position
 - [x] Calculate overall rating based on position 
 - [x] A player can be set to train as a different position, but will improve slower than if they trained as their best position

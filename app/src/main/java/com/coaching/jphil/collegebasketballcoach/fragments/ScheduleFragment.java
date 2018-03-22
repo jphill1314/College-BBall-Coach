@@ -1,6 +1,8 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,8 +17,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
+import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
+import com.coaching.jphil.collegebasketballcoach.adapters.GameSpeechAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
@@ -27,6 +32,8 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Natio
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -49,6 +56,8 @@ public class ScheduleFragment extends Fragment {
     private boolean startNewSeason = false;
     private boolean allConferencesInPostSeason;
     private boolean allConferencesHaveChamp;
+
+    private ArrayList<GameStatsDB> stats;
 
     private SimAsync async;
 
@@ -178,6 +187,8 @@ public class ScheduleFragment extends Fragment {
             simGame.setEnabled(true);
             updateUI();
 
+            new DataAsync().execute();
+
             Log.d("sim", "finished simming: " + results);
         }
 
@@ -187,17 +198,18 @@ public class ScheduleFragment extends Fragment {
         }
 
         private Integer simulateGames(Team team) {
+            stats = new ArrayList<>();
             if (!allConferencesInPostSeason) {
                 for (Game game : mainActivity.masterSchedule) {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                game.simulateGame();
+                                stats.addAll(game.simulateGame());
                                 return -1;
                                 //return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
-                            game.simulateGame();
+                            stats.addAll(game.simulateGame());
                         }
                     }
                 }
@@ -211,12 +223,12 @@ public class ScheduleFragment extends Fragment {
                             if (!game.isPlayed()) {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                                     if (team.isPlayerControlled()) {
-                                        game.simulateGame();
+                                        stats.addAll(game.simulateGame());
                                         return -1;
                                         //return mainActivity.masterSchedule.indexOf(game);
                                     }
                                 } else {
-                                    game.simulateGame();
+                                    stats.addAll(game.simulateGame());
                                 }
                             }
                         }
@@ -235,12 +247,12 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                game.simulateGame();
+                                stats.addAll(game.simulateGame());
                                 return -1;
                                 //return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
-                            game.simulateGame();
+                            stats.addAll(game.simulateGame());
                         }
                     }
                 }
@@ -253,6 +265,34 @@ public class ScheduleFragment extends Fragment {
         private void simRestOfSeason(){
             async = new SimAsync();
             async.execute();
+        }
+    }
+
+    private class DataAsync extends AsyncTask<String, String, String>{
+
+        private AppDatabase db;
+
+
+        @Override
+        protected void onPreExecute(){
+            db = Room.databaseBuilder(ScheduleFragment.this.getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            db.close();
+        }
+
+        @Override
+        protected String doInBackground(String... strings){
+            GameStatsDB[] gameStatsDB = new GameStatsDB[stats.size()];
+            for(int x = 0; x < gameStatsDB.length; x++){
+                gameStatsDB[x] = stats.get(x);
+            }
+
+            db.appDAO().insertGamesStats(gameStatsDB);
+
+            return null;
         }
     }
 

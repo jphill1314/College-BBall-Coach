@@ -1,6 +1,8 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
 
+import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -153,7 +155,7 @@ public class Game {
         return plays;
     }
 
-    public void simulateGame() {
+    public ArrayList<GameStatsDB> simulateGame() {
         savePlays = false;
         debug = true;
 
@@ -170,8 +172,13 @@ public class Game {
         } while (startNextHalf());
         isPlayed = true;
 
-        homeTeam.playGame(homeTeamWin());
-        awayTeam.playGame(!homeTeamWin());
+        ArrayList<GameStatsDB> stats = new ArrayList<>();
+        stats.addAll(homeTeam.playGame(homeTeamWin()));
+        stats.addAll(awayTeam.playGame(!homeTeamWin()));
+
+        for(GameStatsDB db: stats){
+            db.gameId = id;
+        }
 
         boolean bigWin, badLoss;
 
@@ -190,7 +197,7 @@ public class Game {
                 c.recruitRecruits(bigWin, badLoss, getAwayTeam().getNumberOfReturningPlayers());
             }
         }
-
+        return stats;
     }
 
     //TODO: save game stats to DB and continue to balance for realism

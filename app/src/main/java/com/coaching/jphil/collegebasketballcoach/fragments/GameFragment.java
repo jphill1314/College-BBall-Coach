@@ -1,8 +1,10 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.arch.persistence.room.Room;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
+import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameAdapter;
@@ -76,6 +80,8 @@ public class GameFragment extends Fragment {
     private GameRosterAdapter grAdapter;
     private boolean updateGRA = false;
     private int adapterType = 0;
+
+    private ArrayList<GameStatsDB> stats;
 
     private SimGame gameAsync;
 
@@ -287,8 +293,10 @@ public class GameFragment extends Fragment {
                 }
             }while(game.startNextHalf());
             game.setIsPlayed(true);
-            game.getHomeTeam().playGame(game.homeTeamWin());
-            game.getAwayTeam().playGame(!game.homeTeamWin());
+
+            stats = new ArrayList<>();
+            stats.addAll(game.getHomeTeam().playGame(game.homeTeamWin()));
+            stats.addAll(game.getAwayTeam().playGame(!game.homeTeamWin()));
 
             return null;
         }
@@ -320,6 +328,8 @@ public class GameFragment extends Fragment {
         protected void onPostExecute(String results){
             updateUI();
             gameAsync = null;
+
+            new DataAsync().execute();
         }
 
 
@@ -958,5 +968,33 @@ public class GameFragment extends Fragment {
         }
 
         rosterRecycler.setAdapter(grAdapter);
+    }
+
+    private class DataAsync extends AsyncTask<String, String, String>{
+
+        private AppDatabase db;
+
+
+        @Override
+        protected void onPreExecute(){
+            db = Room.databaseBuilder(GameFragment.this.getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            db.close();
+        }
+
+        @Override
+        protected String doInBackground(String... strings){
+            GameStatsDB[] gameStatsDB = new GameStatsDB[stats.size()];
+            for(int x = 0; x < gameStatsDB.length; x++){
+                gameStatsDB[x] = stats.get(x);
+            }
+
+            db.appDAO().insertGamesStats(gameStatsDB);
+
+            return null;
+        }
     }
 }

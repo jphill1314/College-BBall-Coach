@@ -2,6 +2,8 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
 import android.util.Log;
 
+import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -226,7 +228,7 @@ public class Player {
         totalMinutes = 0;
     }
 
-    void playGame(ArrayList<Coach> coaches){
+    GameStatsDB playGame(ArrayList<Coach> coaches){
         if(timePlayed > 0){
             gamesPlayed++;
             totalMinutes += timePlayed / 60;
@@ -239,6 +241,7 @@ public class Player {
         fatigue = 0;
 
         practice(coaches, 1);
+        return saveGameStats();
     }
 
     void preGameSetup(){
@@ -308,7 +311,7 @@ public class Player {
         steals++;
     }
 
-    public void setCurrentPosition(int pos){
+    void setCurrentPosition(int pos){
         if(pos <= 5 && pos > 0) {
             currentPosition = pos;
         }
@@ -317,7 +320,7 @@ public class Player {
         }
     }
 
-    public int getCurrentPosition(){
+    int getCurrentPosition(){
         return currentPosition;
     }
 
@@ -769,7 +772,7 @@ public class Player {
         return overallRating;
     }
 
-    public int getMinutes(){
+    int getMinutes(){
         if(gamesPlayed == 0){
             return 0;
         }
@@ -1072,7 +1075,7 @@ public class Player {
         return (1 - ((Math.exp((fatigue) / 25)) / 100));
     }
 
-    public void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
+    void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
         // for coach type: 0=no effect, 1=less variability, 2=extra variability (good or bad), 3=defensive focus, 4=offensive focus
         int maxModifier = 25;
         double gameModifier = (Math.random() * 2 * gameVariability) - gameVariability;
@@ -1171,5 +1174,27 @@ public class Player {
 
     public int[] getOtherAttributes(){
         return new int[]{stamina, aggressiveness, workEthic};
+    }
+
+    private GameStatsDB saveGameStats(){
+        GameStatsDB gameStats = new GameStatsDB();
+
+        gameStats.playerId = playerId;
+
+        gameStats.minutes = timePlayed / 60;
+        gameStats.fouls = fouls;
+        gameStats.twoPointShotAttempts = twoPointShotAttempts;
+        gameStats.twoPointShotMade = twoPointShotMade;
+        gameStats.threePointShotAttempts = threePointShotAttempts;
+        gameStats.threePointShotMade = threePointShotMade;
+        gameStats.freeThrowAttempts = freeThrowAttempts;
+        gameStats.freeThrowMade = freeThrowMade;
+        gameStats.assists = assists;
+        gameStats.oRebounds = oRebounds;
+        gameStats.dRebounds = dRebounds;
+        gameStats.steals = steals;
+        gameStats.turnovers = turnovers;
+
+        return gameStats;
     }
 }

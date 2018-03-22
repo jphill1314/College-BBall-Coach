@@ -3,6 +3,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim;
 import android.content.Context;
 import android.util.Log;
 
+import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
@@ -302,7 +303,7 @@ public class Team {
         }
     }
 
-    public void preGameSetup(){
+    void preGameSetup(){
         rosterPlayers = new ArrayList<>(players);
         subPlayers = new ArrayList<>(players);
 
@@ -323,7 +324,7 @@ public class Team {
         turnovers = 0;
     }
 
-    public void playGame(boolean wonGame){
+    public ArrayList<GameStatsDB> playGame(boolean wonGame){
         gamesPlayed++;
         if(wonGame){
             wins++;
@@ -332,8 +333,9 @@ public class Team {
             loses++;
         }
 
+        ArrayList<GameStatsDB> stats = new ArrayList<>();
         for(Player p: players){
-            p.playGame(coaches);
+            stats.add(p.playGame(coaches));
         }
 
         players = new ArrayList<>(rosterPlayers);
@@ -345,9 +347,10 @@ public class Team {
             }
         }
         setOverallRating();
+        return stats;
     }
 
-    public int getCoachTalk(int scoreDif){
+    int getCoachTalk(int scoreDif){
         if(scoreDif < lastScoreDif - 5){
             lastScoreDif = scoreDif;
             if(scoreDif > 15){
@@ -361,7 +364,7 @@ public class Team {
         }
     }
 
-    public boolean getTimeout(int scoreDif){
+    boolean getTimeout(int scoreDif){
         // scoreDif needs to be teamScore - opponentScore
         return (scoreDif < lastScoreDif - 8) && (Math.random() > .5) && (lastScoreDif < 30);
     }
@@ -414,15 +417,6 @@ public class Team {
         return pace;
     }
 
-    public int getTotalMinutes(){
-        int minutes = 0;
-        for(Player player: players){
-            minutes += player.getMinutes();
-        }
-
-        return minutes;
-    }
-
     public int getWinPercent(){
         if(wins == 0){
             return 0;
@@ -444,7 +438,7 @@ public class Team {
         overallRating = overallRating / players.size();
     }
 
-    public int getNumberOfPlayersAtPosition(int position, boolean countSeniors){
+    int getNumberOfPlayersAtPosition(int position, boolean countSeniors){
         int num = 0;
         for(Player player:players){
             if(player.getPosition() == position){
@@ -817,32 +811,33 @@ public class Team {
         return (int) ((record[0] * 1.0) / (record[0] + record[1]));
     }
 
-    public int getOpponentWinPercent(){
-        int total = 0;
+    private double getOpponentWinPercent(){
+        int oppWins = 0;
+        int oppLoses = 0;
         for(Game g: schedule){
             if(g.isPlayed()){
                 if(g.getHomeTeam().equals(this)){
-                    total += g.getAwayTeam().getWinPercent();
+                    oppWins += g.getAwayTeam().getWins();
+                    oppLoses += g.getAwayTeam().getLoses();
                 }
                 else{
-                    total += g.getHomeTeam().getWinPercent();
+                    oppWins += g.getHomeTeam().getWins();
+                    oppLoses += g.getHomeTeam().getLoses();
                 }
             }
         }
-        return total;
+        return (oppWins * 1.0) / (oppLoses + oppWins);
     }
 
     public double getRPI(){
-        int opponentWP = getOpponentWinPercent();
+        double opponentWP = getOpponentWinPercent();
         double oppOppWP = 0;
 
         for(Team t: opponents){
-            for(Team y: t.getOpponents()){
-                oppOppWP += y.getWinPercent() / 100.0;
-            }
+            oppOppWP += t.getOpponentWinPercent();
         }
-
-        return (.25 * (getWinPercent() / 100.0) + .5 * (opponentWP / 100.0) + .25 * oppOppWP) / 100;
+        oppOppWP = oppOppWP / opponents.size();
+        return (.25 * (getWinPercent() / 100.0) + .5 * opponentWP + .25 * oppOppWP);
 
     }
 }

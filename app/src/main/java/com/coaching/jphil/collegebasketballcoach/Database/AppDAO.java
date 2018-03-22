@@ -35,6 +35,9 @@ public interface AppDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertTournaments(TournamentDB... tournaments);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public void insertGamesStats(GameStatsDB... gameStats);
+
 
     @Query("SELECT * FROM TeamDB")
     public TeamDB[] loadAllTeams();
@@ -56,6 +59,9 @@ public interface AppDAO {
 
     @Query("SELECT * FROM TournamentDB")
     public TournamentDB[] loadAllTournaments();
+
+    @Query("SELECT * FROM GameStatsDB where playerId = :playerId")
+    public GameStatsDB[] loadPlayerStats(int playerId);
 
 
     @Query("DELETE FROM TeamDB")
@@ -79,4 +85,6 @@ public interface AppDAO {
     @Query("DELETE FROM TournamentDB")
     public void deleteTournaments();
 
+    @Query("DELETE FROM GameStatsDB")
+    public void deleteGameStats();
 }

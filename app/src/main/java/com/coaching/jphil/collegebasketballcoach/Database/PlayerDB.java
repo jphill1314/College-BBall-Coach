@@ -12,7 +12,7 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(foreignKeys = @ForeignKey(entity = TeamDB.class, parentColumns = "id", childColumns = "teamID"))
 public class PlayerDB {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int playerId;
 
     public int teamID;
@@ -22,6 +22,7 @@ public class PlayerDB {
     public int pos;
     public int year;
     public int trainingAs;
+    public int currentRosterLocation;
 
     // Offensive attributes
     public int closeRangeShot;

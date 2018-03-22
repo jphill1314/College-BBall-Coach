@@ -288,15 +288,13 @@ public class TeamCreatorFragment extends Fragment {
                     for (int i = 0; i < teams.size(); i++) {
                         for (Player player : teams.get(i).getPlayers()) {
                             players[pIndex] = new PlayerDB();
-                            player.prepareForSaving();
-                            players[pIndex].playerId = pIndex + playerIndex;
-                            player.setPlayerId(pIndex + playerIndex);
                             players[pIndex].teamID = i + teamIndex;
                             players[pIndex].lastName = player.getlName();
                             players[pIndex].firstName = player.getfName();
                             players[pIndex].year = player.getYear();
                             players[pIndex].pos = player.getPosition();
                             players[pIndex].trainingAs = player.getTrainingAs();
+                            players[pIndex].currentRosterLocation = i;
 
                             players[pIndex].closeRangeShot = player.getCloseRangeShot();
                             players[pIndex].midRangeShot = player.getMidRangeShot();

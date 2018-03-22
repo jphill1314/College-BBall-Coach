@@ -42,6 +42,11 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
         Log.d("adapt", "ehllo");
     }
 
+    public PlayerInfoAdapter(ArrayList<String> items){
+        this.items = items;
+        type = -1;
+    }
+
     private void getItems(Context context){
         Log.d("adapt", "yo");
         switch (type){
@@ -74,6 +79,9 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
                 break;
             case 2:
                 holder.tv.setText(items.get(position) + " " + player.getOtherAttributes()[position]);
+                break;
+            case -1:
+                holder.tv.setText(items.get(position));
         }
     }
 

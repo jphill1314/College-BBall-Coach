@@ -118,6 +118,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void onDataAsyncFinish(){
+        currentTeam = getPlayerTeam();
+        currentConference = getPlayerConference();
+
+        initUI();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, new RosterFragment())
+                .commit();
+
+        dataAsync = null;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
@@ -244,32 +257,6 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private void generateNonConferenceGames(){
-        ArrayList<Game> nonCon = new ScheduleGenerator().generateSchedule(conferences);
-        ArrayList<Game> con = new ArrayList<>();
-        for(Conference c: conferences){
-            con.addAll(c.getMasterSchedule());
-        }
-        Collections.shuffle(con);
-        Collections.shuffle(nonCon);
-
-        masterSchedule = new ArrayList<>();
-        masterSchedule.addAll(nonCon);
-        masterSchedule.addAll(con);
-
-        for(int x = 0; x < masterSchedule.size(); x++){
-            masterSchedule.get(x).getHomeTeam().addGameToSchedule(masterSchedule.get(x));
-            masterSchedule.get(x).getAwayTeam().addGameToSchedule(masterSchedule.get(x));
-            masterSchedule.get(x).setId(x);
-        }
-
-        for(Conference c: conferences){
-            for(Team t: c.getTeams()){
-                Log.d("game", t.getFullName() + " has " + t.getNumberOfGames() + " games scheduled");
-            }
-        }
-    }
-
     public void generateNationalChampionship(){
         ArrayList<Team> champs = new ArrayList<>();
         ArrayList<Team> others = RPIRanking();
@@ -320,8 +307,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class DataAsync extends AsyncTask<String, String, String>{
-        int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
+    private class DataAsync extends AsyncTask<String, String, String> {
+        private int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
 
         @Override
         protected String doInBackground(String... strings){
@@ -336,8 +323,10 @@ public class MainActivity extends AppCompatActivity {
                 if(db != null){
                     db.appDAO().deleteTournaments();
                     db.appDAO().deleteGameDB();
+                    db.appDAO().deleteGameStats();
                 }
                 generateNonConferenceGames();
+                saveData();
                 return "new season";
             }
             else if(strings[0].equals("delete all")){
@@ -351,28 +340,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result){
             if(result != null) {
-                if (result.equals("loaded") || result.equals("new season")) {
-                    currentTeam = getPlayerTeam();
-                    currentConference = getPlayerConference();
-
-                    initUI();
-
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, new RosterFragment())
-                            .commit();
-                }
-                else if(result.equals("new game")){
-                    currentTeam = getPlayerTeam();
-                    currentConference = getPlayerConference();
-
-                    initUI();
-
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, new RosterFragment())
-                            .commit();
-                }
-
-                dataAsync = null;
+                onDataAsyncFinish();
             }
         }
 
@@ -460,14 +428,14 @@ public class MainActivity extends AppCompatActivity {
                         for (Player player : teams.get(i).getPlayers()) {
                             players[pIndex] = new PlayerDB();
                             player.prepareForSaving();
-                            players[pIndex].playerId = pIndex + playerIndex;
-                            player.setPlayerId(pIndex + playerIndex);
+                            players[pIndex].playerId = player.getId();
                             players[pIndex].teamID = i + teamIndex;
                             players[pIndex].lastName = player.getlName();
                             players[pIndex].firstName = player.getfName();
                             players[pIndex].year = player.getYear();
                             players[pIndex].pos = player.getPosition();
                             players[pIndex].trainingAs = player.getTrainingAs();
+                            players[pIndex].currentRosterLocation = i;
 
                             players[pIndex].closeRangeShot = player.getCloseRangeShot();
                             players[pIndex].midRangeShot = player.getMidRangeShot();
@@ -684,6 +652,21 @@ public class MainActivity extends AppCompatActivity {
                             teamsDB[i].currentYear, teamsDB[i].isSeasonOver, MainActivity.this));
                 }
 
+                int changes;
+                do{
+                    changes = 0;
+                    for(int x = 0; x < players.length - 1; x++){
+                        for(int y = x + 1; y < players.length; y++){
+                            if(players[x].currentRosterLocation > players[y].currentRosterLocation){
+                                PlayerDB temp = players[x];
+                                players[x] = players[y];
+                                players[y] = temp;
+                                changes++;
+                            }
+                        }
+                    }
+                }while(changes != 0);
+
                 for (PlayerDB player : players) {
                     teams.get(player.teamID).addPlayer(new Player(player.lastName, player.firstName, player.playerId,
                             player.pos, player.year, player.trainingAs, player.closeRangeShot, player.midRangeShot,
@@ -692,6 +675,7 @@ public class MainActivity extends AppCompatActivity {
                             player.perimeterDefense, player.onBallDefense, player.offBallDefense,
                             player.stealing, player.rebounding, player.stamina, player.aggressiveness,
                             player.workEthic, player.gamesPlayed, player.totalMinutes));
+
 
                     teams.get(player.teamID).getPlayers().get(teams.get(player.teamID).getPlayers().size()-1)
                             .setProgress(player.closeRangeShotProgress, player.midRangeShotProgress,
@@ -811,7 +795,34 @@ public class MainActivity extends AppCompatActivity {
                 db.appDAO().deleteConferences();
             }
         }
+
+        private void generateNonConferenceGames(){
+            ArrayList<Game> nonCon = new ScheduleGenerator().generateSchedule(conferences);
+            ArrayList<Game> con = new ArrayList<>();
+            for(Conference c: conferences){
+                con.addAll(c.getMasterSchedule());
+            }
+            Collections.shuffle(con);
+            Collections.shuffle(nonCon);
+
+            masterSchedule = new ArrayList<>();
+            masterSchedule.addAll(nonCon);
+            masterSchedule.addAll(con);
+
+            for(int x = 0; x < masterSchedule.size(); x++){
+                masterSchedule.get(x).getHomeTeam().addGameToSchedule(masterSchedule.get(x));
+                masterSchedule.get(x).getAwayTeam().addGameToSchedule(masterSchedule.get(x));
+                masterSchedule.get(x).setId(x);
+            }
+
+            for(Conference c: conferences){
+                for(Team t: c.getTeams()){
+                    Log.d("game", t.getFullName() + " has " + t.getNumberOfGames() + " games scheduled");
+                }
+            }
+        }
     }
+
 
 }
 

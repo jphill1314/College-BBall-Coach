@@ -171,8 +171,10 @@ public class Coach {
     }
 
     public void recruitRecruits(boolean bigWin, boolean badLoss, int spots){
-        for(Recruit r: recruits){
-            r.attemptToRecruit(recruitingAbility, bigWin, badLoss, spots);
+        if(recruits != null) {
+            for (Recruit r : recruits) {
+                r.attemptToRecruit(recruitingAbility, bigWin, badLoss, spots);
+            }
         }
     }
 

@@ -89,7 +89,7 @@ public class StandingsFragment extends Fragment {
     }
 
     private void changeView(int type){
-        if(type < names.size() - 2) {
+        if(type < names.size() - 1) {
             adapter = new StandingAdapter(mainActivity.conferences.get(type).getTeams(), type, getContext());
             recyclerView.setAdapter(adapter);
             confWL.setText(getString(R.string.conf_record));
