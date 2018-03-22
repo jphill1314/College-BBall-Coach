@@ -87,5 +87,6 @@ List of improvements to add (for version 1.0):
 - [ ] There should be a couple of pre-made options
 
 * Teams and Conferences
-- [ ] Aim for 100 teams in at least 10 conferences
-- [ ] National Championship should take all conference champs + some at large teams based on their RPI (16 or 32 teams?)
+- [x] Aim for 100 teams in at least 10 conferences
+- [x] National Championship should take all conference champs + some at large teams based on their RPI (16 or 32 teams?)
+- [ ] Add tournament overview view for both conference tournaments and national championship

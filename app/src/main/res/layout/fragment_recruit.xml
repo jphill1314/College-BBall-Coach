@@ -5,6 +5,13 @@
     android:orientation="vertical"
     tools:context="com.coaching.jphil.collegebasketballcoach.fragments.RecruitFragment">
 
+    <TextView
+        android:id="@+id/position_needs"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"

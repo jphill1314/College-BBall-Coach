@@ -290,6 +290,9 @@ public class Team {
         for(int y = 0; y < needs.length; y++){
             for(int x = 0; x < needs[y] * 2; x++){
                 int rating = overallRating + 20 - r.nextInt(40);
+                if(rating > 100){
+                    rating = 100;
+                }
                 recruits.add(new Recruit(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)],
                         y+1, rating, this, recruits.size()));
             }
@@ -438,7 +441,7 @@ public class Team {
         overallRating = overallRating / players.size();
     }
 
-    int getNumberOfPlayersAtPosition(int position, boolean countSeniors){
+    public int getNumberOfPlayersAtPosition(int position, boolean countSeniors){
         int num = 0;
         for(Player player:players){
             if(player.getPosition() == position){
@@ -830,14 +833,16 @@ public class Team {
     }
 
     public double getRPI(){
-        double opponentWP = getOpponentWinPercent();
-        double oppOppWP = 0;
+        if(gamesPlayed > 0) {
+            double opponentWP = getOpponentWinPercent();
+            double oppOppWP = 0;
 
-        for(Team t: opponents){
-            oppOppWP += t.getOpponentWinPercent();
+            for (Team t : opponents) {
+                oppOppWP += t.getOpponentWinPercent();
+            }
+            oppOppWP = oppOppWP / opponents.size();
+            return (.25 * (getWinPercent() / 100.0) + .5 * opponentWP + .25 * oppOppWP);
         }
-        oppOppWP = oppOppWP / opponents.size();
-        return (.25 * (getWinPercent() / 100.0) + .5 * opponentWP + .25 * oppOppWP);
-
+        return 0;
     }
 }

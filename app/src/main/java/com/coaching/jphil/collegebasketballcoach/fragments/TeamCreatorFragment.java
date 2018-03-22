@@ -36,6 +36,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.ScheduleGenerator
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StaggeredTenTeam;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardEightTeam;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardTenTeam;
 
 import java.util.ArrayList;
@@ -196,6 +197,7 @@ public class TeamCreatorFragment extends Fragment {
 
         private void clearData(){
             if(db != null){
+                db.appDAO().deleteGameStats();
                 db.appDAO().deleteRecruitDB();
                 db.appDAO().deleteTournaments();
                 db.appDAO().deleteGameDB();
@@ -294,7 +296,7 @@ public class TeamCreatorFragment extends Fragment {
                             players[pIndex].year = player.getYear();
                             players[pIndex].pos = player.getPosition();
                             players[pIndex].trainingAs = player.getTrainingAs();
-                            players[pIndex].currentRosterLocation = i;
+                            players[pIndex].currentRosterLocation = teams.get(i).getPlayers().indexOf(player);
 
                             players[pIndex].closeRangeShot = player.getCloseRangeShot();
                             players[pIndex].midRangeShot = player.getMidRangeShot();
@@ -415,19 +417,49 @@ public class TeamCreatorFragment extends Fragment {
         }
 
         private void newGameSetup(){
-            String[] names = {"Wofford", "UNCG", "ETSU", "Furman", "Mercer", "Western Carolina", "Samford", "The Citadel", "Chattanooga", "VMI"};
-            String[] mascots = {"Terriers", "Spartans", "Bucs", "Paladins", "Bears", "Catamounts", "Bulldogs", "Bulldogs", "Mocs", "Keydets"};
+            String[] names = {"Boston", "Providence", "Manhattan", "Albany", "Burlington", "Manchester", "Long Island", "New Haven", "Augusta", "Flushing"};
+            String[] mascots = {"Minutemen", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Cheesemakers"};
+            generateConference(names, mascots, "Northeastern Athletic Association", 60, 0, true);
 
-            generateConference(names, mascots, "Southern Conference", 50, 0, true);
+            names = new String[]{"Cleveland", "Detroit", "Milwaukee", "Chicago", "Green Bay", "Indianapolis", "Cincinnati", "Pittsburgh", "Duluth", "Toledo"};
+            mascots = new String[]{"Rockers", "Motors", "Horses", "Politicians", "Cheese", "Racers", "Log Drivers", "Forges", "Bears", "Chipmunks"};
+            generateConference(names, mascots, "Great Lakes Conference", 55, 0, false);
 
-            names = new String[]{"Boston", "New York", "Rhode Island", "Philadelphia", "Michigan", "Ohio", "Chicago", "Indianapolis", "Vermont", "NY State"};
-            generateConference(names, mascots, "Northern Conference", 60, 0, false);
+            names = new String[]{"DC", "Richmond", "Charlotte", "Columbia", "Atlanta", "Baltimore", "Nashville", "Raleigh", "Charleston", "Birmingham"};
+            mascots = new String[]{"Lobbyists", "Bulls", "Bankers", "Cows", "News", "Fishers", "Musicians", "Hogs", "Plane Builders", "Letters"};
+            generateConference(names, mascots, "Tobacco Conference", 55, 0, false);
 
-            names = new String[]{"San Francisco", "Los Angles", "San Diego", "Seattle", "Portland", "Arizona", "Utah", "Los Vegas", "New Mexico", "Texas"};
-            generateConference(names, mascots, "Western Conference", 40, 1, false);
+            names = new String[]{"Tampa", "Tallahassee", "Mobile", "Houston", "San Antonio", "Austin", "Orlando", "Montgomery", "Baton Rogue", "New Orleans"};
+            mascots = new String[]{"Crocodiles", "Alligators", "Shipbuilders", "Scientists", "Capybaras", "Camels", "Beavers", "Riders", "Squirrels", "Party"};
+            generateConference(names, mascots, "Gulf Coast Conference", 50, 0, false);
 
-            names = new String[]{"North Dakota", "South Dakota", "Montana", "Oklahoma", "Iowa", "Denver", "Kansas City", "St. Louis", "Colorado", "St. Paul"};
-            generateConference(names, mascots, "Central Conference", 55, 0, false);
+            names = new String[]{"Las Vegas", "Reno", "Phoenix", "Tucson", "Albuquerque", "El Paso", "Salt Lake City", "Amarillo"};
+            mascots = new String[]{"Gamblers", "Skiers", "Drought", "Oxen", "Balloons", "Cowboys", "Saints", "Armadillos"};
+            generateConference(names, mascots, "Desert Conference", 45, 2, false);
+
+            names = new String[]{"Denver", "Rapid City", "Bismark", "Missoula", "Idaho Falls", "Spokane", "Boulder", "Jackson"};
+            mascots = new String[]{"Mountaineers", "Toads", "Bees", "Roosters", "Farmers", "Sloths", "Basilisks", "Gysers"};
+            generateConference(names, mascots, "Mountain Athletic Association", 40, 2, false);
+
+            names = new String[]{"Dallas", "Ft. Worth", "Oklahoma City", "Kansas City", "St. Louis", "Iowa City", "Omaha", "Minneapolis", "Wichita", "Des Moines"};
+            mascots = new String[]{"Engineers", "Planes", "Lemurs", "Wagon Riders", "Explorers", "Iowans", "Ballers", "Koalas", "Wombats", "Harvesters"};
+            generateConference(names, mascots, "Middle America Conference", 50, 0, false);
+
+            names = new String[]{"Sacramento", "San Francisco", "Los Angeles", "San Diego", "Anaheim", "Long Beach", "San Jose", "Oakland", "Redding", "Fresno"};
+            mascots = new String[]{"Panthers", "Seals", "Celebrities", "Captains", "Pufferfish", "Anglerfish", "Nerds", "Freighters", "Redwoods", "Sequoias"};
+            generateConference(names, mascots, "California Conference", 60, 0, false);
+
+            names = new String[]{"Portland", "Seattle", "Salem", "Olympia", "Anchorage", "Tacoma", "Honolulu", "Yakima"};
+            mascots = new String[]{"Hipsters", "Coffeemakers", "Sharks", "Olympians", "Mushers", "Crabs", "Wave Riders", "Yaks"};
+            generateConference(names, mascots, "Western Conference", 45, 2, false);
+
+            names = new String[]{"Miami", "Jacksonville", "Philadelphia", "Wilmington", "Savannah", "Norfolk", "Dover", "Newark"};
+            mascots = new String[]{"Detectives", "Swordfish", "Founders", "Fear", "Jellyfish", "Eagles", "Monsters", "Sea Bass"};
+            generateConference(names, mascots, "Atlantic Athletic Association", 50, 2, false);
+
+            names = new String[]{"Calgary", "Edmonton", "Winnipeg", "Toronto", "Ottawa", "Montréal", "Québec", "Moncton", "Saskatchewan", "Vancouver"};
+            mascots = new String[]{"Polar Bears", "Caribou", "Wolves", "Lions", "Unicorns", "Narwhals", "Révolution", "Chameleons", "Reindeer", "Tigers"};
+            generateConference(names, mascots, "Canadian Athletic Conference", 50, 0, false);
 
             generateNonConferenceGames();
         }
@@ -462,6 +494,9 @@ public class TeamCreatorFragment extends Fragment {
             }
             else if(type == 1) {
                 conferences.add(new StaggeredTenTeam(confName, teams, getActivity()));
+            }
+            else if(type == 2){
+                conferences.add(new StandardEightTeam(confName, teams, getActivity()));
             }
         }
 

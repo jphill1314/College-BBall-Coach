@@ -12,6 +12,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -35,6 +37,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.NationalChampionship;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StaggeredTenTeam;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardEightTeam;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardTenTeam;
 import com.coaching.jphil.collegebasketballcoach.fragments.RecruitFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
     public FloatingActionButton homeButton;
     public ActionBar actionBar;
 
+    private MenuItem sort0, sort1, sort2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
             dataAsync = new DataAsync();
             dataAsync.execute("load");
         }
+
+        invalidateOptionsMenu();
     }
 
     private void initUI(){
@@ -264,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
             champs.add(c.getChampion());
             others.remove(champs.get(champs.size()-1));
         }
-        while(champs.size() < 8){
+        while(champs.size() < 16){
             if(others.get(0).getWinPercent() > 50) {
                 champs.add(others.get(0));
                 if(others.get(0).isSeasonOver()){
@@ -273,6 +280,19 @@ public class MainActivity extends AppCompatActivity {
             }
             others.remove(0);
         }
+
+        int changes;
+        do{
+            changes = 0;
+            for(int x = 0; x < champs.size() - 1; x++){
+                for(int y = x + 1; y < champs.size(); y++){
+                    if(champs.get(x).getRPI() < champs.get(y).getRPI()){
+                        Collections.swap(champs, x, y);
+                        changes++;
+                    }
+                }
+            }
+        }while(changes != 0);
 
         championship = new NationalChampionship(champs);
     }
@@ -321,9 +341,9 @@ public class MainActivity extends AppCompatActivity {
             }
             else if(strings[0].equals("new season")){
                 if(db != null){
+                    db.appDAO().deleteGameStats();
                     db.appDAO().deleteTournaments();
                     db.appDAO().deleteGameDB();
-                    db.appDAO().deleteGameStats();
                 }
                 generateNonConferenceGames();
                 saveData();
@@ -435,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
                             players[pIndex].year = player.getYear();
                             players[pIndex].pos = player.getPosition();
                             players[pIndex].trainingAs = player.getTrainingAs();
-                            players[pIndex].currentRosterLocation = i;
+                            players[pIndex].currentRosterLocation = teams.get(i).getPlayers().indexOf(player);
 
                             players[pIndex].closeRangeShot = player.getCloseRangeShot();
                             players[pIndex].midRangeShot = player.getMidRangeShot();
@@ -638,8 +658,11 @@ public class MainActivity extends AppCompatActivity {
                     if(conference[c].type == 0) {
                         conferences.add(new StandardTenTeam(conference[c].name, MainActivity.this));
                     }
-                    else{
+                    else if(conference[c].type == 1){
                         conferences.add(new StaggeredTenTeam(conference[c].name, MainActivity.this));
+                    }
+                    else if(conference[c].type == 2){
+                        conferences.add(new StandardEightTeam(conference[c].name, MainActivity.this));
                     }
 
                 }
@@ -786,6 +809,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void clearData(){
             if(db != null){
+                db.appDAO().deleteGameStats();
                 db.appDAO().deleteRecruitDB();
                 db.appDAO().deleteTournaments();
                 db.appDAO().deleteGameDB();

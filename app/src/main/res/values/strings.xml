@@ -156,6 +156,12 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
+    <string name="sort_position">Sort by position</string>
+    <string name="sort_rating">Sort by rating</string>
+    <string name="sort_status">Sort by recruitment status</string>
+
+    <string name="position_needs">Returning players by position\nPG: %d SG: %d SF: %d PF: %d C: %d</string>
+
     <!-- Game Fragment -->
     <string name="timeout">Call timeout</string>
     <string name="end_timeout">Return to game</string>
@@ -211,6 +217,8 @@
     </string-array>
 
     <string name="list_score">%s: %d - %s: %d</string>
+
+    <!-- Names -->
 
     <string-array name="first_names">
         <item>James</item>
