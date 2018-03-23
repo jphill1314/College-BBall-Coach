@@ -36,6 +36,7 @@ public class GameStatsDB {
         int rebounds = oRebounds + dRebounds;
 
         return "Minutes: " + minutes + "\nPoints: " + points + "\nRebounds: " + rebounds +
-                "\nAssists: " + assists + "\nSteals: " + steals + "\nTurnovers: " + turnovers;
+                "\nAssists: " + assists + "\nSteals: " + steals + "\nTurnovers: " + turnovers
+                + "\nFouls: " + fouls;
     }
 }

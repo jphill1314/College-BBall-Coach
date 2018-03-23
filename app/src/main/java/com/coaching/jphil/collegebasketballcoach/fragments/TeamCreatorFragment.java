@@ -418,7 +418,7 @@ public class TeamCreatorFragment extends Fragment {
 
         private void newGameSetup(){
             String[] names = {"Boston", "Providence", "Manhattan", "Albany", "Burlington", "Manchester", "Long Island", "New Haven", "Augusta", "Flushing"};
-            String[] mascots = {"Minutemen", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Cheesemakers"};
+            String[] mascots = {"Colonist", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Cheesemakers"};
             generateConference(names, mascots, "Northeastern Athletic Association", 60, 0, true);
 
             names = new String[]{"Cleveland", "Detroit", "Milwaukee", "Chicago", "Green Bay", "Indianapolis", "Cincinnati", "Pittsburgh", "Duluth", "Toledo"};
@@ -426,7 +426,7 @@ public class TeamCreatorFragment extends Fragment {
             generateConference(names, mascots, "Great Lakes Conference", 55, 0, false);
 
             names = new String[]{"DC", "Richmond", "Charlotte", "Columbia", "Atlanta", "Baltimore", "Nashville", "Raleigh", "Charleston", "Birmingham"};
-            mascots = new String[]{"Lobbyists", "Bulls", "Bankers", "Cows", "News", "Fishers", "Musicians", "Hogs", "Plane Builders", "Letters"};
+            mascots = new String[]{"Lobbyists", "Bulls", "Bankers", "Cows", "News", "Fishermen", "Musicians", "Hogs", "Plane Builders", "Letters"};
             generateConference(names, mascots, "Tobacco Conference", 55, 0, false);
 
             names = new String[]{"Tampa", "Tallahassee", "Mobile", "Houston", "San Antonio", "Austin", "Orlando", "Montgomery", "Baton Rogue", "New Orleans"};

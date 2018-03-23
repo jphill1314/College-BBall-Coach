@@ -219,6 +219,9 @@ public class ScheduleFragment extends Fragment {
                 allConferencesHaveChamp = true;
                 for (Conference c : mainActivity.conferences) {
                     for (Tournament t : c.getTournaments()) {
+                        if(t.getGames() == null){
+                            t.generateNextRound();
+                        }
                         for (Game game : t.getGames()) {
                             if (!game.isPlayed()) {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {

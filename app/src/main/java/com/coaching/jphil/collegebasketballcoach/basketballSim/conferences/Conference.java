@@ -111,7 +111,7 @@ public abstract class Conference {
         Collections.shuffle(masterSchedule);
     }
 
-    public void addTournamentGames(){
+    void addTournamentGames(){
         if(tournaments != null){
             for(Tournament t: tournaments){
                 for(Game g: t.getGames()){
