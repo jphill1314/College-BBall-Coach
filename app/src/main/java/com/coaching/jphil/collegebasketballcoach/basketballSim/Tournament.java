@@ -91,20 +91,24 @@ public class Tournament {
                 games.add(new Game(teams.get(1), teams.get(2), playAtNeutralCourt));
             }
             else if(teams.size() == 8){
-                games.add(new Game(teams.get(0), teams.get(7), playAtNeutralCourt));
-                games.add(new Game(teams.get(1), teams.get(6), playAtNeutralCourt));
-                games.add(new Game(teams.get(2), teams.get(5), playAtNeutralCourt));
-                games.add(new Game(teams.get(3), teams.get(4), playAtNeutralCourt));
+                games.add(new Game(teams.get(0), teams.get(7), playAtNeutralCourt));//1
+                games.add(new Game(teams.get(3), teams.get(4), playAtNeutralCourt));//4
+
+                games.add(new Game(teams.get(1), teams.get(6), playAtNeutralCourt));//2
+                games.add(new Game(teams.get(2), teams.get(5), playAtNeutralCourt));//3
             }
             else if(teams.size() == 16){
-                games.add(new Game(teams.get(0), teams.get(15), playAtNeutralCourt));
-                games.add(new Game(teams.get(1), teams.get(14), playAtNeutralCourt));
-                games.add(new Game(teams.get(2), teams.get(13), playAtNeutralCourt));
-                games.add(new Game(teams.get(3), teams.get(12), playAtNeutralCourt));
-                games.add(new Game(teams.get(4), teams.get(11), playAtNeutralCourt));
-                games.add(new Game(teams.get(5), teams.get(10), playAtNeutralCourt));
-                games.add(new Game(teams.get(6), teams.get(9), playAtNeutralCourt));
-                games.add(new Game(teams.get(7), teams.get(8), playAtNeutralCourt));
+                games.add(new Game(teams.get(0), teams.get(15), playAtNeutralCourt));//1
+                games.add(new Game(teams.get(7), teams.get(8), playAtNeutralCourt));//8
+
+                games.add(new Game(teams.get(2), teams.get(13), playAtNeutralCourt));//3
+                games.add(new Game(teams.get(4), teams.get(11), playAtNeutralCourt));//5
+
+                games.add(new Game(teams.get(1), teams.get(14), playAtNeutralCourt));//2
+                games.add(new Game(teams.get(6), teams.get(9), playAtNeutralCourt));//7
+
+                games.add(new Game(teams.get(3), teams.get(12), playAtNeutralCourt));//4
+                games.add(new Game(teams.get(5), teams.get(10), playAtNeutralCourt));//6
             }
         }
         else if(games.size() == 2 || games.size() == 6 || games.size() == 14){
@@ -221,4 +225,5 @@ public class Tournament {
         }
         return null;
     }
+
 }

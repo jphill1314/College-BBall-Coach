@@ -23,9 +23,6 @@ public class TeamDB {
 
     public int currentYear;
 
-    public int wins;
-    public int loses;
-
     public int offFavorsThrees;
     public int defFavorsThrees;
     public int aggression;

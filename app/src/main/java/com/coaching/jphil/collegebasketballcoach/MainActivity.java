@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     public FloatingActionButton homeButton;
     public ActionBar actionBar;
-    
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -411,9 +411,6 @@ public class MainActivity extends AppCompatActivity {
                         teamsDB[i].schoolName = teams.get(i).getSchoolName();
                         teamsDB[i].schoolMascot = teams.get(i).getMascot();
 
-                        teamsDB[i].wins = teams.get(i).getWins();
-                        teamsDB[i].loses = teams.get(i).getLoses();
-
                         teamsDB[i].offFavorsThrees = teams.get(i).getOffenseFavorsThrees();
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
                         teamsDB[i].aggression = teams.get(i).getAggression();
@@ -689,8 +686,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<Team> teams = new ArrayList<>();
                 for (int i = 0; i < teamsDB.length; i++) {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
-                            teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
-                            teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
+                             teamsDB[i].offFavorsThrees, teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
                             teamsDB[i].currentYear, teamsDB[i].isSeasonOver, teamsDB[i].id, MainActivity.this));
                 }
 

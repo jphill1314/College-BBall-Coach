@@ -180,6 +180,18 @@ public abstract class Conference {
         return true;
     }
 
+    public ArrayList<Game> getTournamentGames(){
+        if(tournaments == null){
+            return null;
+        }
+
+        ArrayList<Game> games = new ArrayList<>();
+        for(Tournament t: tournaments){
+            games.addAll(t.getGames());
+        }
+        return games;
+    }
+
     public abstract void generateTournament();
 
     public abstract boolean isSeasonFinished();

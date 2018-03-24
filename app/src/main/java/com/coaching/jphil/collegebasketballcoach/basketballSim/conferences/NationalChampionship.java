@@ -58,4 +58,8 @@ public class NationalChampionship {
         return tournament;
     }
 
+    public ArrayList<Team> getTeams(){
+        return teams;
+    }
+
 }

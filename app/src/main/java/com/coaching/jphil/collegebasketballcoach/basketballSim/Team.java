@@ -89,7 +89,7 @@ public class Team {
         generateStrategy();
     }
 
-    public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
+    public Team(String schoolName, String mascot, boolean isPlayerControlled, int offenseFavorsThrees,
                 int defenseFavorsThrees, int agression, int pace, int year, boolean isSeasonOver, int id, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
@@ -99,8 +99,8 @@ public class Team {
 
         opponents = new ArrayList<>();
 
-        this.wins = wins;
-        this.loses = loses;
+        this.wins = 0;
+        this.loses = 0;
         gamesPlayed = this.wins + this.loses;
 
         numberOfGames = 0;
@@ -606,6 +606,17 @@ public class Team {
             schedule = new ArrayList<>();
         }
         schedule.add(game);
+
+        if(game.isPlayed()){
+            if(game.homeTeamWin()){
+                if(game.getHomeTeam().equals(this)){
+                    wins++;
+                }
+                else{
+                    loses++;
+                }
+            }
+        }
     }
 
     public boolean hasUnplayedGames(){

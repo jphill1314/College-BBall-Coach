@@ -83,10 +83,10 @@ List of improvements to add (for version 1.0):
 
 * Team Creation
 - [x] User can name the school, the mascot, the conference, and the head coach's name
-- [ ] User can choose the average rating of the other schools in the conference and their own team's overall rating
-- [ ] There should be a couple of pre-made options
+- [x] User can choose the average rating of the other schools in the conference and their own team's overall rating
+- [ ] There should be a couple of pre-made options (maybe later - think scenarios)
 
 * Teams and Conferences
 - [x] Aim for 100 teams in at least 10 conferences
 - [x] National Championship should take all conference champs + some at large teams based on their RPI (16 or 32 teams?)
-- [ ] Add tournament overview view for both conference tournaments and national championship
+- [x] Add tournament overview view for both conference tournaments and national championship

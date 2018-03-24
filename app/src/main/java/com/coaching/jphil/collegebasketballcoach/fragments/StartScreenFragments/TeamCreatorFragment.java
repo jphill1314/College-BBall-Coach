@@ -1,4 +1,4 @@
-package com.coaching.jphil.collegebasketballcoach.fragments;
+package com.coaching.jphil.collegebasketballcoach.fragments.StartScreenFragments;
 
 
 import android.arch.persistence.room.Room;
@@ -13,8 +13,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
@@ -54,12 +59,11 @@ public class TeamCreatorFragment extends Fragment {
     }
 
     private EditText schoolName, mascot, coach;
+    private Spinner confSelector;
     private boolean schoolEnter, mascotEnter, coachEnter;
-    private SeekBar teamRating;
-    private TextView tvTeamRating;
     private FloatingActionButton fab;
 
-    private int teamRatingValue;
+    private int teamStrength, confStrength;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,6 +74,9 @@ public class TeamCreatorFragment extends Fragment {
         schoolEnter = false;
         mascotEnter = false;
         coachEnter = false;
+
+        teamStrength = 0;
+        confStrength = 0;
 
         schoolName = view.findViewById(R.id.school_name);
         schoolName.addTextChangedListener(new TextWatcher() {
@@ -128,29 +135,10 @@ public class TeamCreatorFragment extends Fragment {
             }
         });
 
-        teamRating = view.findViewById(R.id.team_rating);
-        teamRating.setProgress(50);
-        teamRatingValue = 50;
-        tvTeamRating = view.findViewById(R.id.team_rating_tv);
-        tvTeamRating.setText(getString(R.string.team_rating, 50));
-        teamRating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                teamRatingValue = i;
-                tvTeamRating.setText(getString(R.string.team_rating, teamRatingValue));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
+        confSelector = view.findViewById(R.id.conference_spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.conference_names));
+        confSelector.setAdapter(adapter);
 
         fab = view.findViewById(R.id.confirm_button);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -158,6 +146,23 @@ public class TeamCreatorFragment extends Fragment {
             public void onClick(View view) {
                 db = Room.databaseBuilder(getActivity().getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 new NewGameAsync().execute();
+            }
+        });
+
+        ((RadioButton)view.findViewById(R.id.team_normal)).setChecked(true);
+        ((RadioButton)view.findViewById(R.id.conf_normal)).setChecked(true);
+
+        ((RadioGroup)view.findViewById(R.id.radio_team)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                onRadioButtonClicked(i);
+            }
+        });
+
+        ((RadioGroup)view.findViewById(R.id.radio_conf)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                onRadioButtonClicked(i);
             }
         });
 
@@ -171,6 +176,30 @@ public class TeamCreatorFragment extends Fragment {
         }
         else{
             fab.setVisibility(View.GONE);
+        }
+    }
+
+
+    public void onRadioButtonClicked(int id){
+        switch (id){
+            case R.id.team_good:
+                teamStrength = 1;
+                break;
+            case R.id.team_normal:
+                teamStrength = 0;
+                break;
+            case R.id.team_poor:
+                teamStrength = -1;
+                break;
+            case R.id.conf_good:
+                confStrength = 1;
+                break;
+            case R.id.conf_normal:
+                confStrength = 0;
+                break;
+            case R.id.conf_poor:
+                confStrength = -1;
+                break;
         }
     }
 
@@ -241,9 +270,6 @@ public class TeamCreatorFragment extends Fragment {
                         teamsDB[i].isPlayerControlled = teams.get(i).isPlayerControlled();
                         teamsDB[i].schoolName = teams.get(i).getSchoolName();
                         teamsDB[i].schoolMascot = teams.get(i).getMascot();
-
-                        teamsDB[i].wins = teams.get(i).getWins();
-                        teamsDB[i].loses = teams.get(i).getLoses();
 
                         teamsDB[i].offFavorsThrees = teams.get(i).getOffenseFavorsThrees();
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
@@ -417,49 +443,72 @@ public class TeamCreatorFragment extends Fragment {
         }
 
         private void newGameSetup(){
+            boolean[] playerConf = new boolean[11];
+            int[] confStrengths = new int[11];
+            Random r = new Random();
+            for(int x = 0; x < playerConf.length; x++){
+                if(x == confSelector.getSelectedItemPosition()){
+                    playerConf[x] = true;
+                    if(confStrength == -1){
+                        confStrengths[x] = 30 + r.nextInt(20);
+                    }
+                    else if(confStrength == 1){
+                        confStrengths[x] = 50 + + r.nextInt(20);
+                    }
+                    else{
+                        confStrengths[x] = 40 + r.nextInt(20);
+                    }
+                }
+                else{
+                    playerConf[x] = false;
+                    confStrengths[x] = 35 + r.nextInt(40);
+                }
+            }
+
+
             String[] names = {"Boston", "Providence", "Manhattan", "Albany", "Burlington", "Manchester", "Long Island", "New Haven", "Augusta", "Flushing"};
             String[] mascots = {"Colonist", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Cheesemakers"};
-            generateConference(names, mascots, "Northeastern Athletic Association", 60, 0, true);
+            generateConference(names, mascots, "Northeastern Athletic Association", confStrengths[0], 0, playerConf[0]);
 
             names = new String[]{"Cleveland", "Detroit", "Milwaukee", "Chicago", "Green Bay", "Indianapolis", "Cincinnati", "Pittsburgh", "Duluth", "Toledo"};
             mascots = new String[]{"Rockers", "Motors", "Horses", "Politicians", "Cheese", "Racers", "Log Drivers", "Forges", "Bears", "Chipmunks"};
-            generateConference(names, mascots, "Great Lakes Conference", 55, 0, false);
+            generateConference(names, mascots, "Great Lakes Conference", confStrengths[1], 0, playerConf[1]);
 
             names = new String[]{"DC", "Richmond", "Charlotte", "Columbia", "Atlanta", "Baltimore", "Nashville", "Raleigh", "Charleston", "Birmingham"};
             mascots = new String[]{"Lobbyists", "Bulls", "Bankers", "Cows", "News", "Fishermen", "Musicians", "Hogs", "Plane Builders", "Letters"};
-            generateConference(names, mascots, "Tobacco Conference", 55, 0, false);
+            generateConference(names, mascots, "Tobacco Conference", confStrengths[2], 0, playerConf[2]);
 
             names = new String[]{"Tampa", "Tallahassee", "Mobile", "Houston", "San Antonio", "Austin", "Orlando", "Montgomery", "Baton Rogue", "New Orleans"};
             mascots = new String[]{"Crocodiles", "Alligators", "Shipbuilders", "Scientists", "Capybaras", "Camels", "Beavers", "Riders", "Squirrels", "Party"};
-            generateConference(names, mascots, "Gulf Coast Conference", 50, 0, false);
+            generateConference(names, mascots, "Gulf Coast Conference", confStrengths[3], 0, playerConf[3]);
 
             names = new String[]{"Las Vegas", "Reno", "Phoenix", "Tucson", "Albuquerque", "El Paso", "Salt Lake City", "Amarillo"};
             mascots = new String[]{"Gamblers", "Skiers", "Drought", "Oxen", "Balloons", "Cowboys", "Saints", "Armadillos"};
-            generateConference(names, mascots, "Desert Conference", 45, 2, false);
+            generateConference(names, mascots, "Desert Conference", confStrengths[4], 2, playerConf[4]);
 
             names = new String[]{"Denver", "Rapid City", "Bismark", "Missoula", "Idaho Falls", "Spokane", "Boulder", "Jackson"};
             mascots = new String[]{"Mountaineers", "Toads", "Bees", "Roosters", "Farmers", "Sloths", "Basilisks", "Gysers"};
-            generateConference(names, mascots, "Mountain Athletic Association", 40, 2, false);
+            generateConference(names, mascots, "Mountain Athletic Association", confStrengths[5], 2, playerConf[5]);
 
             names = new String[]{"Dallas", "Ft. Worth", "Oklahoma City", "Kansas City", "St. Louis", "Iowa City", "Omaha", "Minneapolis", "Wichita", "Des Moines"};
             mascots = new String[]{"Engineers", "Planes", "Lemurs", "Wagon Riders", "Explorers", "Iowans", "Ballers", "Koalas", "Wombats", "Harvesters"};
-            generateConference(names, mascots, "Middle America Conference", 50, 0, false);
+            generateConference(names, mascots, "Middle America Conference", confStrengths[6], 0, playerConf[6]);
 
             names = new String[]{"Sacramento", "San Francisco", "Los Angeles", "San Diego", "Anaheim", "Long Beach", "San Jose", "Oakland", "Redding", "Fresno"};
             mascots = new String[]{"Panthers", "Seals", "Celebrities", "Captains", "Pufferfish", "Anglerfish", "Nerds", "Freighters", "Redwoods", "Sequoias"};
-            generateConference(names, mascots, "California Conference", 60, 0, false);
+            generateConference(names, mascots, "California Conference", confStrengths[7], 0, playerConf[7]);
 
             names = new String[]{"Portland", "Seattle", "Salem", "Olympia", "Anchorage", "Tacoma", "Honolulu", "Yakima"};
             mascots = new String[]{"Hipsters", "Coffeemakers", "Sharks", "Olympians", "Mushers", "Crabs", "Wave Riders", "Yaks"};
-            generateConference(names, mascots, "Western Conference", 45, 2, false);
+            generateConference(names, mascots, "Western Conference", confStrengths[8], 2, playerConf[8]);
 
             names = new String[]{"Miami", "Jacksonville", "Philadelphia", "Wilmington", "Savannah", "Norfolk", "Dover", "Newark"};
             mascots = new String[]{"Detectives", "Swordfish", "Founders", "Fear", "Jellyfish", "Eagles", "Monsters", "Sea Bass"};
-            generateConference(names, mascots, "Atlantic Athletic Association", 50, 2, false);
+            generateConference(names, mascots, "Atlantic Athletic Association", confStrengths[9], 2, playerConf[9]);
 
             names = new String[]{"Calgary", "Edmonton", "Winnipeg", "Toronto", "Ottawa", "Montréal", "Québec", "Moncton", "Saskatchewan", "Vancouver"};
             mascots = new String[]{"Polar Bears", "Caribou", "Wolves", "Lions", "Unicorns", "Narwhals", "Révolution", "Chameleons", "Reindeer", "Tigers"};
-            generateConference(names, mascots, "Canadian Athletic Conference", 50, 0, false);
+            generateConference(names, mascots, "Canadian Athletic Conference", confStrengths[10], 0, playerConf[10]);
 
             generateNonConferenceGames();
         }
@@ -476,7 +525,7 @@ public class TeamCreatorFragment extends Fragment {
                 }
                 else{
                     if(player) {
-                        rating = teamRatingValue + 10;
+                        rating = minRating + r.nextInt(15) + teamStrength * 10;
                         teams.add(new Team(schoolName.getText().toString(), mascot.getText().toString(), getPlayers(numPlayers, rating), getCoaches(4, rating, true), true, getActivity()));
                     }
                     else{

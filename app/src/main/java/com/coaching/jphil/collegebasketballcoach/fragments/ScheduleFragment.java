@@ -24,6 +24,7 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameSpeechAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
+import com.coaching.jphil.collegebasketballcoach.adapters.TournamentGameAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
@@ -52,11 +53,12 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
     private MainActivity mainActivity;
 
-    private Button simGame;
+    private Button simGame, viewTournament;
     private boolean playerSeasonFinished = false;
     private boolean startNewSeason = false;
     private boolean allConferencesInPostSeason;
     private boolean allConferencesHaveChamp;
+    private boolean isInTournamentView;
 
     private ArrayList<GameStatsDB> stats;
 
@@ -66,6 +68,8 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+
+        isInTournamentView = false;
 
         TextView tvSeason = view.findViewById(R.id.schedule_season);
         mainActivity = (MainActivity) getActivity();
@@ -80,6 +84,7 @@ public class ScheduleFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         simGame = view.findViewById(R.id.sim_game);
+        viewTournament = view.findViewById(R.id.tourn_view);
 
         async = null;
         updateUI();
@@ -107,9 +112,34 @@ public class ScheduleFragment extends Fragment {
                     }
                 }
 
-                ScheduleAdapter adapt = (ScheduleAdapter)adapter;
-                adapt.changeGames(mainActivity.currentTeam.getSchedule());
+                if(isInTournamentView){
+                    if (mainActivity.championship != null) {
+                        ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());
+                    }
+                    else {
+                        ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
+                    }
+                }
+                else {
+                    ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());
+                }
                 adapter.notifyDataSetChanged();
+            }
+        });
+
+        viewTournament.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mainActivity.championship != null){
+                    adapter = new TournamentGameAdapter(mainActivity.championship.getTournament().getGames(), mainActivity.championship.getTeams());
+                }
+                else {
+                    adapter = new TournamentGameAdapter(mainActivity.currentConference.getTournamentGames(), mainActivity.currentConference.getStandings());
+                }
+                recyclerView.setAdapter(adapter);
+                viewTournament.setVisibility(View.GONE);
+                simGame.setVisibility(View.VISIBLE);
+                isInTournamentView = true;
             }
         });
 
@@ -117,8 +147,8 @@ public class ScheduleFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView(){
-        super.onDestroyView();
+    public void onStop(){
+        super.onStop();
 
         if(async != null){
             async.cancel(true);
@@ -306,16 +336,36 @@ public class ScheduleFragment extends Fragment {
             GameDB[] games = new GameDB[gameIndexs.size()];
             for(int x = 0; x < gameIndexs.size(); x++){
                 games[x] = new GameDB();
-                int g = gameIndexs.get(x);
-                games[x].gameID = mainActivity.masterSchedule.get(g).getId();
-                games[x].homeTeamID = mainActivity.masterSchedule.get(g).getHomeTeam().getId();
-                games[x].awayTeamID = mainActivity.masterSchedule.get(g).getAwayTeam().getId();
+                Game game = null;
+                for(Game g: mainActivity.masterSchedule){
+                    if(g.getId() == gameIndexs.get(x)){
+                        game = g;
+                        break;
+                    }
+                }
+                if(game == null && mainActivity.championship != null){
+                    for(Game g: mainActivity.championship.getGames()){
+                        if(g.getId() == gameIndexs.get(x)){
+                            game = g;
+                            break;
+                        }
+                    }
+                }
 
-                games[x].homeScore = mainActivity.masterSchedule.get(g).getHomeScore();
-                games[x].awayScore = mainActivity.masterSchedule.get(g).getAwayScore();
+                if(game != null) {
+                    games[x].gameID = game.getId();
+                    games[x].homeTeamID = game.getHomeTeam().getId();
+                    games[x].awayTeamID = game.getAwayTeam().getId();
 
-                games[x].isNeutralCourt = mainActivity.masterSchedule.get(g).getIsNeutralCourt();
-                games[x].isPlayed = mainActivity.masterSchedule.get(g).isPlayed();
+                    games[x].homeScore = game.getHomeScore();
+                    games[x].awayScore = game.getAwayScore();
+
+                    games[x].isNeutralCourt = game.getIsNeutralCourt();
+                    games[x].isPlayed = game.isPlayed();
+                }
+                else{
+                    Log.e("Save Error", "No game with an ID of: " + gameIndexs.get(x));
+                }
             }
 
             db.appDAO().insertGames(games);
@@ -363,6 +413,11 @@ public class ScheduleFragment extends Fragment {
                 playerSeasonFinished = true;
             }
         }
+
+        if(!isInTournamentView && (mainActivity.currentConference.isInPostSeason() || mainActivity.championship != null)){
+            viewTournament.setVisibility(View.VISIBLE);
+            simGame.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void startTournament(boolean generateConfTourn){
@@ -376,7 +431,17 @@ public class ScheduleFragment extends Fragment {
         }
 
         simGame.setText(R.string.sim_game);
-        ((ScheduleAdapter)adapter).changeGames(mainActivity.currentTeam.getSchedule());
+        if(isInTournamentView){
+            if (mainActivity.championship != null) {
+                ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());
+            }
+            else {
+                ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
+            }
+        }
+        else {
+            ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());
+        }
         //recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

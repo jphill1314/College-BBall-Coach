@@ -1,11 +1,13 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.TeamCreatorFragment">
+    tools:context="com.coaching.jphil.collegebasketballcoach.fragments.StartScreenFragments.TeamCreatorFragment">
 
     <TextView
+        android:layout_alignParentTop="true"
+        android:id="@+id/title"
         android:paddingTop="16dp"
         android:textStyle="bold"
         android:textSize="36sp"
@@ -17,6 +19,7 @@
 
     <EditText
         android:id="@+id/school_name"
+        android:layout_below="@id/title"
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,6 +28,7 @@
 
     <EditText
         android:id="@+id/mascot"
+        android:layout_below="@id/school_name"
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,47 +37,94 @@
 
     <EditText
         android:id="@+id/coach_name"
+        android:layout_below="@id/mascot"
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapWords"
         android:hint="@string/coach_name"/>
 
-    <TextView
-        android:id="@+id/team_rating_tv"
-        android:layout_marginStart="17dp"
+    <Spinner
+        android:id="@+id/conference_spinner"
+        android:layout_below="@id/coach_name"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:text="@string/team_rating"/>
+        android:layout_height="wrap_content"/>
 
-    <SeekBar
-        android:id="@+id/team_rating"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
+    <TextView
+        android:id="@+id/conference_text"
+        android:layout_below="@id/conference_spinner"
+        android:text="@string/radio_conference"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:progress="50"
-        android:max="100"/>
+        android:gravity="center_horizontal"
+        android:textSize="20sp"/>
 
-    <RelativeLayout
+    <RadioGroup
+        android:id="@+id/radio_conf"
+        android:layout_below="@id/conference_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/confirm_button"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/conf_good"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_check_black_24dp"
-            android:visibility="gone"/>
+            android:text="@string/good"/>
+        <RadioButton
+            android:id="@+id/conf_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/normal"/>
+        <RadioButton
+            android:id="@+id/conf_poor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/poor"/>
+    </RadioGroup>
 
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/team_text"
+        android:layout_below="@id/radio_conf"
+        android:text="@string/radio_team"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="20sp"/>
 
+    <RadioGroup
+        android:id="@+id/radio_team"
+        android:layout_below="@id/team_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/team_good"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/good"/>
+        <RadioButton
+            android:id="@+id/team_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/normal"/>
+        <RadioButton
+            android:id="@+id/team_poor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/poor"/>
+    </RadioGroup>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/confirm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_check_black_24dp"
+        android:visibility="gone"/>
 
-</LinearLayout>
+</RelativeLayout>
