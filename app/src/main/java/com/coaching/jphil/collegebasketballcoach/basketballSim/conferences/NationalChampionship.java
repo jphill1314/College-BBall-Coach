@@ -1,5 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
+import android.util.Log;
+
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
@@ -34,10 +36,13 @@ public class NationalChampionship {
 
     public void generateNextRound(){
         if(!tournament.isHasChampion()) {
-            tournament.playNextRound();
+            tournament.generateNextRound();
         }
         else{
             hasChampion = true;
+            for(Game g: tournament.getGames()){
+                Log.d("Nat Champ", g.getHomeTeamName() + " vs " + g.getAwayTeamName());
+            }
         }
     }
 

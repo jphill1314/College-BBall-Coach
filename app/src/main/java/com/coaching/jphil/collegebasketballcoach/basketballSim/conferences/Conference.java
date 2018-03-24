@@ -169,7 +169,7 @@ public abstract class Conference {
         return tournaments != null;
     }
 
-    public boolean allGamesPlayed(){
+    boolean allGamesPlayed(){
         for(Tournament t: getTournaments()){
             for(Game g: t.getGames()){
                 if(!g.isPlayed()){

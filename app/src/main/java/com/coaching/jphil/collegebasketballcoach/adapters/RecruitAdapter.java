@@ -114,6 +114,7 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
              }
          }
          else if(!recruits.get(position).getIsCommitted()){
+             holder.tvInterest.setVisibility(View.VISIBLE);
              builder.setTitle(R.string.alert_title)
                      .setItems(activity.getPlayerTeam().getCoachesNamesAndAbility(),
                              new DialogInterface.OnClickListener() {
@@ -139,6 +140,7 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
          }
          else{
              holder.tvInform.setText(activity.getResources().getString(R.string.committed));
+             holder.tvInterest.setVisibility(View.INVISIBLE);
          }
     }
 

@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
+import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
@@ -145,6 +146,7 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Integer results){
+            Log.d("results", "Results1: " + results);
             if(results > -1){
                 GameFragment frag = new GameFragment();
                 Bundle args = new Bundle();
@@ -159,23 +161,25 @@ public class ScheduleFragment extends Fragment {
             }
             else if(results == -2){
                 startTournament(!allConferencesHaveChamp);
-                if(mainActivity.getPlayerTeam().isSeasonOver()){
-                    simRestOfSeason();
-                }
+//                if(mainActivity.getPlayerTeam().isSeasonOver()){
+//                    simRestOfSeason();
+//                }
             }
             else if(results == -100){
                 if(mainActivity.championship != null && mainActivity.championship.hasChampion()) {
+                    Log.d("Champ", "Champion: " + mainActivity.championship.getTournament().getChampion().getFullName());
                     startNewSeason = true;
                 }
                 else if(mainActivity.championship != null){
                     for(Game g: mainActivity.championship.getGames()){
                         Log.d("champs", g.getHomeTeamName() + " vs. " + g.getAwayTeamName());
                     }
-                    if(mainActivity.getPlayerTeam().isSeasonOver()){
-                        simRestOfSeason();
-                    }
+//                    if(mainActivity.getPlayerTeam().isSeasonOver()){
+//                        simRestOfSeason();
+//                    }
                 }
                 else{
+                    Log.d("results", "Results: " + results);
                     startTournament(false);
                     if(mainActivity.getPlayerTeam().isSeasonOver()){
                         simRestOfSeason();
@@ -227,7 +231,7 @@ public class ScheduleFragment extends Fragment {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                                     if (team.isPlayerControlled()) {
                                         stats.addAll(game.simulateGame());
-                                        return -1;
+                                        //return -1;
                                         //return mainActivity.masterSchedule.indexOf(game);
                                     }
                                 } else {
@@ -251,7 +255,7 @@ public class ScheduleFragment extends Fragment {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
                                 stats.addAll(game.simulateGame());
-                                return -1;
+                                //return -1;
                                 //return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
@@ -289,11 +293,34 @@ public class ScheduleFragment extends Fragment {
         @Override
         protected String doInBackground(String... strings){
             GameStatsDB[] gameStatsDB = new GameStatsDB[stats.size()];
+            ArrayList<Integer> gameIndexs = new ArrayList<>();
+
             for(int x = 0; x < gameStatsDB.length; x++){
                 gameStatsDB[x] = stats.get(x);
+                if(!gameIndexs.contains(gameStatsDB[x].gameId)){
+                    gameIndexs.add(gameStatsDB[x].gameId);
+                }
             }
 
+
+            GameDB[] games = new GameDB[gameIndexs.size()];
+            for(int x = 0; x < gameIndexs.size(); x++){
+                games[x] = new GameDB();
+                int g = gameIndexs.get(x);
+                games[x].gameID = mainActivity.masterSchedule.get(g).getId();
+                games[x].homeTeamID = mainActivity.masterSchedule.get(g).getHomeTeam().getId();
+                games[x].awayTeamID = mainActivity.masterSchedule.get(g).getAwayTeam().getId();
+
+                games[x].homeScore = mainActivity.masterSchedule.get(g).getHomeScore();
+                games[x].awayScore = mainActivity.masterSchedule.get(g).getAwayScore();
+
+                games[x].isNeutralCourt = mainActivity.masterSchedule.get(g).getIsNeutralCourt();
+                games[x].isPlayed = mainActivity.masterSchedule.get(g).isPlayed();
+            }
+
+            db.appDAO().insertGames(games);
             db.appDAO().insertGamesStats(gameStatsDB);
+            Log.d("Saves", "Finished saving games");
 
             return null;
         }
@@ -349,8 +376,8 @@ public class ScheduleFragment extends Fragment {
         }
 
         simGame.setText(R.string.sim_game);
-        ScheduleAdapter adapt = (ScheduleAdapter)adapter;
-        adapt.changeGames(mainActivity.currentTeam.getSchedule());
+        ((ScheduleAdapter)adapter).changeGames(mainActivity.currentTeam.getSchedule());
+        //recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 

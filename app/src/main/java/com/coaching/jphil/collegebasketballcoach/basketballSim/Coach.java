@@ -1,6 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 /**
@@ -172,10 +173,18 @@ public class Coach {
 
     public void recruitRecruits(boolean bigWin, boolean badLoss, int spots){
         if(recruits != null) {
-            for (Recruit r : recruits) {
-                r.attemptToRecruit(recruitingAbility, bigWin, badLoss, spots);
+            Iterator<Recruit> itr = recruits.iterator();
+            while(itr.hasNext()) {
+                Recruit r = itr.next();
+                if(r.attemptToRecruit(recruitingAbility, bigWin, badLoss, spots)){
+                    itr.remove();
+                }
             }
         }
+    }
+
+    void newSeason(){
+        recruits = new ArrayList<>();
     }
 
     private void generateAttributes(int ability){

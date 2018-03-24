@@ -1,12 +1,15 @@
 package com.coaching.jphil.collegebasketballcoach.Database;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.coaching.jphil.collegebasketballcoach.adapters.RecruitAdapter;
+
+import java.util.ArrayList;
 
 /**
  * Created by jphil on 2/17/2018.
@@ -87,4 +90,7 @@ public interface AppDAO {
 
     @Query("DELETE FROM GameStatsDB")
     public void deleteGameStats();
+
+    @Delete
+    public void deletePlayers(ArrayList<PlayerDB> players);
 }

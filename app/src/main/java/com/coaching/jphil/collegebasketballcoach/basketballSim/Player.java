@@ -100,9 +100,12 @@ public class Player {
         this.position = position;
         currentPosition = position;
         generateAttributes(overallRating);
+        improveAttributes(1);
 
         gamesPlayed = 0;
         totalMinutes = 0;
+
+        playerId = -1;
 
         prepareForSave = false;
     }

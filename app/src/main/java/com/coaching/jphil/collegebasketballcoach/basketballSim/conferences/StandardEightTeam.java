@@ -1,7 +1,9 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
@@ -38,8 +40,8 @@ public class StandardEightTeam extends Conference{
     @Override
     public boolean isSeasonFinished(){
         if(getTournaments() != null) {
-            if (getTournaments().size() == 3) {
-                if (getTournaments().get(2).isHasChampion()) {
+            if (getTournaments().size() == 1) {
+                if (getTournaments().get(0).isHasChampion()) {
                     return true;
                 }
             }

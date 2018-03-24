@@ -71,8 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     public FloatingActionButton homeButton;
     public ActionBar actionBar;
-
-    private MenuItem sort0, sort1, sort2;
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,13 +148,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause(){
-        super.onPause();
-
-        Log.d("onPause", "onPause has been called");
+    protected void onStop(){
+        super.onStop();
 
         if(dataAsync != null) {
             dataAsync.cancel(true);
+        }
+        if(!db.isOpen()){
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
         }
         dataAsync = new DataAsync();
         dataAsync.execute("save");
@@ -233,9 +233,6 @@ public class MainActivity extends AppCompatActivity {
         for(Conference c: conferences){
             c.startNewSeason();
         }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, new RosterFragment())
-                .commit();
 
         Log.d("async", "new season");
         dataAsync = new DataAsync();
@@ -344,9 +341,20 @@ public class MainActivity extends AppCompatActivity {
                     db.appDAO().deleteGameStats();
                     db.appDAO().deleteTournaments();
                     db.appDAO().deleteGameDB();
+
+                    PlayerDB[] players = db.appDAO().loadAllPlayers();
+                    ArrayList<PlayerDB> removedPlayers = new ArrayList<>();
+                    for(PlayerDB player: players){
+                        if(player.year == 3){
+                            removedPlayers.add(player);
+                        }
+                    }
+                    db.appDAO().deletePlayers(removedPlayers);
                 }
                 generateNonConferenceGames();
                 saveData();
+                saveGames();
+                loadData();
                 return "new season";
             }
             else if(strings[0].equals("delete all")){
@@ -361,6 +369,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result){
             if(result != null) {
                 onDataAsyncFinish();
+            }
+
+            if(db.isOpen()){
+                db.close();
             }
         }
 
@@ -393,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
 
                     for (int i = 0; i < teams.size(); i++) {
                         teamsDB[i] = new TeamDB();
-                        teamsDB[i].id = i + teamIndex;
+                        teamsDB[i].id = teams.get(i).getId();
                         teamsDB[i].conferenceID = q;
                         teamsDB[i].isPlayerControlled = teams.get(i).isPlayerControlled();
                         teamsDB[i].schoolName = teams.get(i).getSchoolName();
@@ -410,8 +422,6 @@ public class MainActivity extends AppCompatActivity {
 
                         teamsDB[i].currentYear = teams.get(i).getCurrentSeasonYear();
 
-                        teams.get(i).setId(i + teamIndex);
-
                         if(teams.get(i).isPlayerControlled() && teams.get(i).getRecruits() != null){
                             recruits = new RecruitDB[teams.get(i).getRecruits().size()];
                             int rIndex = 0;
@@ -419,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
                                 recruits[rIndex] = new RecruitDB();
 
                                 recruits[rIndex].recruitID = recruit.getId();
-                                recruits[rIndex].teamID = i + teamIndex;
+                                recruits[rIndex].teamID = teams.get(i).getId();
 
                                 recruits[rIndex].firstName = recruit.getFirstName();
                                 recruits[rIndex].lastName = recruit.getLastName();
@@ -448,8 +458,11 @@ public class MainActivity extends AppCompatActivity {
                         for (Player player : teams.get(i).getPlayers()) {
                             players[pIndex] = new PlayerDB();
                             player.prepareForSaving();
-                            players[pIndex].playerId = player.getId();
-                            players[pIndex].teamID = i + teamIndex;
+                            if(player.getId() != -1){
+                                players[pIndex].playerId = player.getId();
+                            }
+
+                            players[pIndex].teamID = teams.get(i).getId();
                             players[pIndex].lastName = player.getlName();
                             players[pIndex].firstName = player.getfName();
                             players[pIndex].year = player.getYear();
@@ -515,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
                         for (Coach coach : teams.get(i).getCoaches()) {
                             coaches[cIndex] = new CoachDB();
                             coaches[cIndex].coachID = cIndex + coachIndex;
-                            coaches[cIndex].teamID = i + teamIndex;
+                            coaches[cIndex].teamID = teams.get(i).getId();
 
                             coaches[cIndex].firstName = coach.getFirstName();
                             coaches[cIndex].lastName = coach.getLastName();
@@ -570,7 +583,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             for(int z = 0; z < conferences.get(q).getTournaments().get(x).getTeams().size(); z++){
-                                tournaments[x].teamIDs += (conferences.get(q).getTournaments().get(x).getTeams().get(z).getId() - teamIndex) + ",";
+                                tournaments[x].teamIDs += (conferences.get(q).getTournaments().get(x).getTeams().get(z).getId()) + ",";
                             }
 
                             tournaments[x].conferenceId = q;
@@ -592,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
                     champ.gameIDs = "";
 
                     for(int z = 0; z < championship.getTournament().getTeams().size(); z++){
-                        champ.teamIDs += championship.getTournament().getTeams().get(z).getFullName() + ",";
+                        champ.teamIDs += championship.getTournament().getTeams().get(z).getId() + ",";
                     }
 
                     GameDB[] games = new GameDB[championship.getGames().size()];
@@ -620,26 +633,31 @@ public class MainActivity extends AppCompatActivity {
                     db.appDAO().insertGames(games);
                     db.appDAO().insertTournaments(champ);
                 }
-
-                GameDB[] games = new GameDB[masterSchedule.size()];
-                for(int g = 0; g < masterSchedule.size(); g++) {
-                    games[g] = new GameDB();
-                    games[g].gameID = masterSchedule.get(g).getId();
-                    games[g].homeTeamID = masterSchedule.get(g).getHomeTeam().getId();
-                    games[g].awayTeamID = masterSchedule.get(g).getAwayTeam().getId();
-
-                    games[g].homeScore = masterSchedule.get(g).getHomeScore();
-                    games[g].awayScore = masterSchedule.get(g).getAwayScore();
-
-                    games[g].isNeutralCourt = masterSchedule.get(g).getIsNeutralCourt();
-                    games[g].isPlayed = masterSchedule.get(g).isPlayed();
-                }
-                db.appDAO().insertGames(games);
-
-                db.close();
             }
 
             Log.d("save", "finished saving");
+        }
+
+        private void saveGames(){
+            if(!db.isOpen()){
+                db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            }
+
+            GameDB[] games = new GameDB[masterSchedule.size()];
+            for(int x = 0; x < masterSchedule.size(); x++){
+                games[x] = new GameDB();
+                games[x].gameID = masterSchedule.get(x).getId();
+                games[x].homeTeamID = masterSchedule.get(x).getHomeTeam().getId();
+                games[x].awayTeamID = masterSchedule.get(x).getAwayTeam().getId();
+
+                games[x].homeScore = masterSchedule.get(x).getHomeScore();
+                games[x].awayScore = masterSchedule.get(x).getAwayScore();
+
+                games[x].isNeutralCourt = masterSchedule.get(x).getIsNeutralCourt();
+                games[x].isPlayed = masterSchedule.get(x).isPlayed();
+            }
+
+            db.appDAO().insertGames(games);
         }
 
         private void loadData(){
@@ -654,6 +672,7 @@ public class MainActivity extends AppCompatActivity {
                 TournamentDB[] tournaments = db.appDAO().loadAllTournaments();
 
                 conferences = new ArrayList<>();
+                masterSchedule = new ArrayList<>();
                 for (int c = 0; c < conference.length; c++) {
                     if(conference[c].type == 0) {
                         conferences.add(new StandardTenTeam(conference[c].name, MainActivity.this));
@@ -672,7 +691,7 @@ public class MainActivity extends AppCompatActivity {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                             teamsDB[i].wins, teamsDB[i].loses, teamsDB[i].offFavorsThrees,
                             teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
-                            teamsDB[i].currentYear, teamsDB[i].isSeasonOver, MainActivity.this));
+                            teamsDB[i].currentYear, teamsDB[i].isSeasonOver, teamsDB[i].id, MainActivity.this));
                 }
 
                 int changes;
@@ -712,7 +731,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 for (RecruitDB recruit : recruits) {
-                    Log.d("Recruit", "Team: " + teams.get(recruit.teamID).getFullName());
                     teams.get(recruit.teamID).addRecruit(new Recruit(recruit.firstName, recruit.lastName,
                             recruit.pos, recruit.rating, recruit.interest, recruit.isCommitted,
                             recruit.recruitID));
@@ -759,7 +777,6 @@ public class MainActivity extends AppCompatActivity {
                         if(t.conferenceId != -1) {
                             for (String s : Arrays.asList(t.gameIDs.split(","))) {
                                 int i = Integer.parseInt(s);
-                                Log.d("load", "Index: " + i);
                                 if(i < masterSchedule.size()) {
                                     tourn.addGame(masterSchedule.get(i));
                                 }
@@ -769,7 +786,11 @@ public class MainActivity extends AppCompatActivity {
                             }
                             for (String s : Arrays.asList(t.teamIDs.split(","))) {
                                 int i = Integer.parseInt(s);
-                                tourn.addTeam(conferences.get(t.conferenceId).getTeams().get(i));
+                                for(Team team: conferences.get(t.conferenceId).getTeams()){
+                                    if(team.getId() == i){
+                                        tourn.addTeam(team);
+                                    }
+                                }
                             }
                             conferences.get(t.conferenceId).addTournament(tourn);
                         }
@@ -778,7 +799,7 @@ public class MainActivity extends AppCompatActivity {
                                 Team team = null;
                                 for(Conference c: conferences){
                                     for(Team team1: c.getTeams()){
-                                        if(team1.getFullName().equals(s)){
+                                        if(team1.getId() == Integer.parseInt(s)){
                                             team = team1;
                                         }
                                     }
@@ -837,12 +858,6 @@ public class MainActivity extends AppCompatActivity {
                 masterSchedule.get(x).getHomeTeam().addGameToSchedule(masterSchedule.get(x));
                 masterSchedule.get(x).getAwayTeam().addGameToSchedule(masterSchedule.get(x));
                 masterSchedule.get(x).setId(x);
-            }
-
-            for(Conference c: conferences){
-                for(Team t: c.getTeams()){
-                    Log.d("game", t.getFullName() + " has " + t.getNumberOfGames() + " games scheduled");
-                }
             }
         }
     }

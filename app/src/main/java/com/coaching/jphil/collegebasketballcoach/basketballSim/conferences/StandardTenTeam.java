@@ -1,12 +1,14 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Jake on 3/1/2018.
@@ -39,29 +41,16 @@ public class StandardTenTeam extends Conference {
             addTournament(new Tournament(PlayIn8v9, "8 vs 9 Play in", true));
         }
         else if(getTournaments().size() == 2 && allGamesPlayed()){
-            for(Tournament t: getTournaments()){
-                t.playNextRound();
-            }
-
-            if(getTournaments().get(1).getChampion().equals(teams.get(7))){
-                teams.remove(8);
-            }
-            else{
-                teams.remove(7);
-            }
-
-            if(getTournaments().get(0).getChampion().equals(teams.get(6))){
-                teams.remove(8);
-            }
-            else{
-                teams.remove(6);
+            Iterator<Team> itr = teams.iterator();
+            while(itr.hasNext()){
+                Team t = itr.next();
+                Log.d("Team", "Team: " + t.getFullName());
+                if(t.isSeasonOver()){
+                    Log.d("Team", "Removed");
+                    itr.remove();
+                }
             }
             addTournament(new Tournament(teams, getName() + " Championship", true));
-        }
-        else if(allGamesPlayed()){
-            for(Tournament t: getTournaments()){
-                t.playNextRound();
-            }
         }
         addTournamentGames();
     }

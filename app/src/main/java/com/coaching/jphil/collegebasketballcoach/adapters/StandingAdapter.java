@@ -1,6 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,33 +33,16 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView tvPos, tvName, tvWins, tvLoses;
+        View view;
 
-        public ViewHolder(View view, final MainActivity activity, final int type){
+        public ViewHolder(View view, final int type){
             super(view);
 
             tvPos = view.findViewById(R.id.standing_position);
             tvName = view.findViewById(R.id.standing_team);
             tvWins = view.findViewById(R.id.standing_conf);
             tvLoses = view.findViewById(R.id.standing_overall);
-
-            if(type != -1) {
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Bundle args = new Bundle();
-                        args.putInt("team", getLayoutPosition());
-                        args.putInt("conf", type);
-                        RosterFragment frag = new RosterFragment();
-                        frag.setArguments(args);
-
-                        activity.getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.content_frame, frag)
-                                .commit();
-
-                        activity.homeButton.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
+            this.view = view;
         }
     }
 
@@ -77,7 +61,7 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
     @Override
     public StandingAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.standings_list_item, parent, false);
-        return new ViewHolder(view, (MainActivity)parent.getContext(), type);
+        return new ViewHolder(view, type);
     }
 
     @Override
@@ -93,6 +77,34 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
         }
         holder.tvLoses.setText((context.getResources().getString(R.string.record_string, standing.get(position).getWins(),
                 standing.get(position).getLoses())));
+
+        if(standing.get(position).isPlayerControlled()){
+            holder.view.setBackgroundColor(Color.rgb(225,225,225));
+        }
+        else{
+            holder.view.setBackgroundColor(Color.rgb(250,250,250));
+        }
+
+        if(type != -1) {
+            final int pos = position;
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle args = new Bundle();
+                    Log.d("Team", "ID: " + standing.get(pos).getId());
+                    args.putInt("team", standing.get(pos).getId());
+                    args.putInt("conf", type);
+                    RosterFragment frag = new RosterFragment();
+                    frag.setArguments(args);
+
+                    ((MainActivity) context).getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_frame, frag)
+                            .commit();
+
+                    ((MainActivity) context).homeButton.setVisibility(View.VISIBLE);
+                }
+            });
+        }
     }
 
     @Override

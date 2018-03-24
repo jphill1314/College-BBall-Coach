@@ -69,7 +69,12 @@ public class Tournament {
     }
 
     public boolean isHasChampion() {
-        return hasChampion;
+        if(games.size() == teams.size()-1){
+            if(games.get(games.size()-1).isPlayed()){
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isPlayAtNeutralCourt() {
@@ -133,7 +138,7 @@ public class Tournament {
 
             for(int x = 0; x < 2; x++){
                 Team hTeam, aTeam;
-                if(games.get(2*x).homeTeamWin()){
+                if(games.get(2*x+gameMod).homeTeamWin()){
                     hTeam = games.get(2*x + gameMod).getHomeTeam();
                     games.get(2*x + gameMod).getAwayTeam().toggleSeasonOver();
                 }
@@ -142,7 +147,7 @@ public class Tournament {
                     games.get(2*x + gameMod).getHomeTeam().toggleSeasonOver();
                 }
 
-                if(games.get(1).homeTeamWin()){
+                if(games.get(2*x+1+gameMod).homeTeamWin()){
                     aTeam = games.get(2*x + 1 + gameMod).getHomeTeam();
                     games.get(2*x + 1 + gameMod).getAwayTeam().toggleSeasonOver();
                 }
@@ -176,6 +181,7 @@ public class Tournament {
                 games.add(new Game(hTeam, aTeam, true));
             }
         }
+        getChampion();
     }
 
     public void playNextRound() {
@@ -198,12 +204,18 @@ public class Tournament {
     }
 
     public Team getChampion(){
-        if(hasChampion){
+        if(isHasChampion()){
             Game champGame = games.get(games.size()-1);
             if(champGame.homeTeamWin()){
+                if(!champGame.getAwayTeam().isSeasonOver()){
+                    champGame.getAwayTeam().toggleSeasonOver();
+                }
                 return champGame.getHomeTeam();
             }
             else{
+                if(!champGame.getHomeTeam().isSeasonOver()){
+                    champGame.getHomeTeam().toggleSeasonOver();
+                }
                 return champGame.getAwayTeam();
             }
         }

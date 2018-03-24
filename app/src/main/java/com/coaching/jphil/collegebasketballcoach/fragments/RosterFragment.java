@@ -41,12 +41,16 @@ public class RosterFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_roster, container, false);
 
-        final MainActivity mainActivity = (MainActivity)getActivity();
+        MainActivity mainActivity = (MainActivity)getActivity();
 
         Bundle args = getArguments();
         if(args != null){
             mainActivity.currentConference = mainActivity.conferences.get(args.getInt("conf"));
-            mainActivity.currentTeam = generateStandings(mainActivity.currentConference.getTeams()).get(args.getInt("team"));
+            for(Team t: mainActivity.currentConference.getTeams()){
+                if(t.getId() == args.getInt("team")){
+                    mainActivity.currentTeam = t;
+                }
+            }
             mainActivity.actionBar.setTitle(mainActivity.currentTeam.getFullName());
         }
         pendingSubs = new ArrayList<>(mainActivity.currentTeam.getPlayers());
@@ -62,7 +66,7 @@ public class RosterFragment extends Fragment {
             confirmButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mainActivity.currentTeam.makeSubs(pendingSubs);
+                    ((MainActivity)getActivity()).currentTeam.makeSubs(pendingSubs);
                     adapter.notifyDataSetChanged();
                     confirmButton.setVisibility(View.GONE);
                 }
@@ -96,30 +100,4 @@ public class RosterFragment extends Fragment {
 
         return view;
     }
-
-
-    private ArrayList<Team> generateStandings(ArrayList<Team> standing){
-        int changes = 0;
-
-        do{
-            changes = 0;
-            for(int x = 0; x < standing.size() - 1; x++){
-                for(int y = x + 1; y < standing.size(); y++) {
-                    if (standing.get(x).getWinPercent() < standing.get(y).getWinPercent()) {
-                        Collections.swap(standing, x, y);
-                        changes++;
-                    }
-                    else if(standing.get(x).getWinPercent() == standing.get(y).getWinPercent()){
-                        if(standing.get(x).getWins() > standing.get(y).getWins()){
-                            Collections.swap(standing, x, y);
-                            changes++;
-                        }
-                    }
-                }
-            }
-        }while(changes != 0);
-
-        return  standing;
-    }
-
 }

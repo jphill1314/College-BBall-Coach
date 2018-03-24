@@ -39,7 +39,6 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
         this.player = player;
         this.type = type;
         getItems(context);
-        Log.d("adapt", "ehllo");
     }
 
     public PlayerInfoAdapter(ArrayList<String> items){
@@ -48,10 +47,8 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
     }
 
     private void getItems(Context context){
-        Log.d("adapt", "yo");
         switch (type){
             case 0:
-                Log.d("adapt", "yo");
                 items = new ArrayList<>(Arrays.asList(context.getResources().getStringArray(R.array.off_attributes)));
                 break;
             case 1:

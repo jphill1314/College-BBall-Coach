@@ -84,16 +84,18 @@ public class Team {
 
         seasonOver = false;
 
+        setLineup();
         setOverallRating();
         generateStrategy();
     }
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int wins, int loses, int offenseFavorsThrees,
-                int defenseFavorsThrees, int agression, int pace, int year, boolean isSeasonOver, Context context){
+                int defenseFavorsThrees, int agression, int pace, int year, boolean isSeasonOver, int id, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.isPlayerControlled = isPlayerControlled;
         this.context = context;
+        this.id = id;
 
         opponents = new ArrayList<>();
 
@@ -231,7 +233,7 @@ public class Team {
 
     public void addRecruit(Recruit recruit){
         if(recruits == null){
-            recruits = new ArrayList<Recruit>();
+            recruits = new ArrayList<>();
         }
         recruits.add(recruit);
     }
@@ -246,11 +248,17 @@ public class Team {
             }
         }
 
-        for(Recruit r: recruits){
-            Player newPlayer = r.startNewSeason();
-            if(newPlayer != null){
-                players.add(newPlayer);
+        if(recruits != null) {
+            for (Recruit r : recruits) {
+                Player newPlayer = r.startNewSeason();
+                if (newPlayer != null) {
+                    players.add(newPlayer);
+                }
             }
+        }
+
+        for(Coach c: coaches){
+            c.newSeason();
         }
 
         generateRecruits();
@@ -266,10 +274,24 @@ public class Team {
         opponents = new ArrayList<>();
 
         int newNum = (int) (12 + Math.random() * 4);
+        Log.d("New Season", "Number of players to make: " + (newNum - players.size()));
         if(players.size() < newNum){
             generateFreshman(newNum - players.size());
         }
 
+        int[] needs = positionNeeds(true);
+        int unmetNeeds = 0;
+        for(int x : needs){
+            if(x > 0){
+                unmetNeeds += x;
+            }
+        }
+
+        if(unmetNeeds > 0){
+            generateFreshman(unmetNeeds);
+        }
+
+        setLineup();
         currentSeasonYear++;
         setOverallRating();
     }
@@ -445,7 +467,12 @@ public class Team {
         int num = 0;
         for(Player player:players){
             if(player.getPosition() == position){
-                if(!countSeniors && player.getYear() != 3){
+                if(!countSeniors){
+                    if(player.getYear() != 3) {
+                        num++;
+                    }
+                }
+                else{
                     num++;
                 }
             }
@@ -458,12 +485,10 @@ public class Team {
         String[] lastNames = context.getResources().getStringArray(R.array.last_names);
         String[] firstNames = context.getResources().getStringArray(R.array.first_names);
 
-        int[] needs = positionNeeds(true);
         for(int x = 1; x < 6; x++){
-            while(needs[x-1] > 0){
+            while(getNumberOfPlayersAtPosition(x, true) < 2){
                 players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
                         x, 0, overallRating - r.nextInt(10)));
-                needs[x-1]--;
                 numPlayers--;
             }
         }
@@ -844,5 +869,83 @@ public class Team {
             return (.25 * (getWinPercent() / 100.0) + .5 * opponentWP + .25 * oppOppWP);
         }
         return 0;
+    }
+
+    private void setLineup(){
+        ArrayList<Player> pgs = new ArrayList<>();
+        ArrayList<Player> sgs = new ArrayList<>();
+        ArrayList<Player> sfs = new ArrayList<>();
+        ArrayList<Player> pfs = new ArrayList<>();
+        ArrayList<Player> cs = new ArrayList<>();
+
+        for(Player p: players){
+            switch (p.getPosition()){
+                case 1:
+                    pgs.add(p);
+                    break;
+                case 2:
+                    sgs.add(p);
+                    break;
+                case 3:
+                    sfs.add(p);
+                    break;
+                case 4:
+                    pfs.add(p);
+                    break;
+                case 5:
+                    cs.add(p);
+                    break;
+            }
+        }
+
+        sortPlayersByRating(pgs);
+        sortPlayersByRating(sgs);
+        sortPlayersByRating(sfs);
+        sortPlayersByRating(pfs);
+        sortPlayersByRating(cs);
+
+        players = new ArrayList<>();
+        players.add(pgs.get(0));
+        players.add(sgs.get(0));
+        players.add(sfs.get(0));
+        players.add(pfs.get(0));
+        players.add(cs.get(0));
+
+        players.add(pgs.get(1));
+        players.add(sgs.get(1));
+        players.add(sfs.get(1));
+        players.add(pfs.get(1));
+        players.add(cs.get(1));
+
+        for(int x = 2; x < pgs.size(); x++){
+            players.add(pgs.get(x));
+        }
+        for(int x = 2; x < sgs.size(); x++){
+            players.add(sgs.get(x));
+        }
+        for(int x = 2; x < sfs.size(); x++){
+            players.add(sfs.get(x));
+        }
+        for(int x = 2; x < pfs.size(); x++){
+            players.add(pfs.get(x));
+        }
+        for(int x = 2; x < cs.size(); x++){
+            players.add(cs.get(x));
+        }
+    }
+
+    private void sortPlayersByRating(ArrayList<Player> list){
+        int chagnes;
+        do{
+            chagnes = 0;
+            for(int x = 0; x < list.size()-1; x++){
+                for(int y = x + 1; y < list.size(); y++){
+                    if(list.get(x).getOverallRating() < list.get(y).getOverallRating()){
+                        Collections.swap(list, x, y);
+                        chagnes++;
+                    }
+                }
+            }
+        }while(chagnes != 0);
     }
 }

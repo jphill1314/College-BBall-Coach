@@ -134,24 +134,18 @@ public class Recruit {
 
     void loseInterest(){
         Random r = new Random();
-        interest -= r.nextInt(7);
+        interest -= r.nextInt(3);
 
         if(interest < 0){
             interest = 0;
         }
     }
 
-    public boolean attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
+    boolean attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
         Random r = new Random();
-        if(recruitingAbility > 15) {
-            interest += r.nextInt(recruitingAbility / 15) + recruitingAbility / 15 + 1;
-        }
-        else{
-            interest += 1;
-        }
 
         if(bigWin){
-            interest += r.nextInt(5);
+            interest += r.nextInt(10);
         }
         else if(badLoss){
             interest -= r.nextInt(10);
@@ -164,15 +158,12 @@ public class Recruit {
             interest = 100;
         }
 
-        if(spotsAvailable > 0) {
-            return commit();
-        }
-        return false;
+        return (spotsAvailable > 0) && commit(recruitingAbility);
     }
 
-    private boolean commit(){
+    private boolean commit(int recruitingAbility){
         Random r = new Random();
-        if((interest - 75 >= r.nextInt(25)) || interest == 100){
+        if((recruitingAbility / 10 + interest >= r.nextInt(100)) || interest == 100){
             isCommitted = true;
         }
         return isCommitted;
