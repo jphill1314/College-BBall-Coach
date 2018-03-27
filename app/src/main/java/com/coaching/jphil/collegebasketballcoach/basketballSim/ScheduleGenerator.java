@@ -17,8 +17,6 @@ public class ScheduleGenerator {
     public ScheduleGenerator(){}
 
     private int numberOfGames = 25;
-    private int minDaysBetweenGames = 2;
-    private int maxDaysBetweenGames = 7;
 
     public ArrayList<Game> generateSchedule(ArrayList<Conference> conferences){
         ArrayList<Game> masterSchedule = new ArrayList<>();
@@ -27,6 +25,8 @@ public class ScheduleGenerator {
         for(Conference c: conferences){
             allTeams.addAll(c.getTeams());
         }
+
+        Collections.shuffle(allTeams);
 
         for(int x = 0; x < allTeams.size() - conferences.get(conferences.size()-1).getTeams().size(); x++){
             Team t = allTeams.get(x);
@@ -38,7 +38,7 @@ public class ScheduleGenerator {
                     opponent = allTeams.get(r.nextInt(allTeams.size()-x) + x);
                     repeats++;
                     if(repeats > 100){
-                        Log.d("hope", "Games expected: " + ((numberOfGames - 18) * 20) + " actual games: " + masterSchedule.size());
+                        Log.d("hope", "Games expected: " + ((numberOfGames - 18) * 51) + " actual games: " + masterSchedule.size());
                         return masterSchedule;
                     }
                 }
@@ -51,7 +51,7 @@ public class ScheduleGenerator {
                 }
             }
         }
-        Log.d("hope", "Games expected: " + ((numberOfGames - 18) * 20) + " actual games: " + masterSchedule.size());
+        Log.d("hope", "Games expected: " + ((numberOfGames - 18) * 51) + " actual games: " + masterSchedule.size());
         return masterSchedule;
     }
 }

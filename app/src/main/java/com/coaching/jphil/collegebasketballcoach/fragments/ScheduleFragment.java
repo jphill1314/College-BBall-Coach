@@ -98,6 +98,7 @@ public class ScheduleFragment extends Fragment {
             public void onClick(View view) {
                 if(simGame.getText().equals(getString(R.string.new_season))){
                     startNewSeason();
+                    simGame.setEnabled(false);
                 }
                 else if(playerSeasonFinished){
                     if(async == null){
@@ -238,9 +239,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                stats.addAll(game.simulateGame());
-                                return -1;
-                                //return mainActivity.masterSchedule.indexOf(game);
+                                //stats.addAll(game.simulateGame());
+                                //return -1;
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -260,9 +261,9 @@ public class ScheduleFragment extends Fragment {
                             if (!game.isPlayed()) {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                                     if (team.isPlayerControlled()) {
-                                        stats.addAll(game.simulateGame());
+                                        //stats.addAll(game.simulateGame());
                                         //return -1;
-                                        //return mainActivity.masterSchedule.indexOf(game);
+                                        return mainActivity.masterSchedule.indexOf(game);
                                     }
                                 } else {
                                     stats.addAll(game.simulateGame());
@@ -284,9 +285,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                stats.addAll(game.simulateGame());
+                                //stats.addAll(game.simulateGame());
                                 //return -1;
-                                //return mainActivity.masterSchedule.indexOf(game);
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -434,6 +435,7 @@ public class ScheduleFragment extends Fragment {
         if(isInTournamentView){
             if (mainActivity.championship != null) {
                 ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());
+                ((TournamentGameAdapter)adapter).changeTeams(mainActivity.championship.getTeams());
             }
             else {
                 ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
@@ -442,7 +444,6 @@ public class ScheduleFragment extends Fragment {
         else {
             ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());
         }
-        //recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 

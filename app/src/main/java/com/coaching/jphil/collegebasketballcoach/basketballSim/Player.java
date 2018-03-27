@@ -380,7 +380,7 @@ public class Player {
         timePlayed += time;
         if(time > 0){
             if(event == 1){
-                fatigue += 3 * (1.5 - (stamina / 100.0));
+                fatigue += 1.5 - (stamina / 100.0);
                 if(fatigue > 100){
                     fatigue = 100.0;
                 }
@@ -913,62 +913,107 @@ public class Player {
     }
 
     public int getCloseRangeShot() {
+        if((int)((closeRangeShot + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int)((closeRangeShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getMidRangeShot() {
+        if((int) ((midRangeShot + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((midRangeShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getLongRangeShot() {
+        if((int) ((longRangeShot + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((longRangeShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getFreeThrowShot(){
+        if((int)((freeThrowShot + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int)((freeThrowShot + offensiveModifier) * getFatigueFactor());
     }
 
     public int getPostMove(){
+        if((int)((postMove + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int)((postMove + offensiveModifier) * getFatigueFactor());
     }
 
     public int getBallHandling() {
+        if((int) ((ballHandling + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((ballHandling + offensiveModifier) * getFatigueFactor());
     }
 
     public int getPassing() {
+        if((int) ((passing + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((passing + offensiveModifier) * getFatigueFactor());
     }
 
     public int getScreening() {
+        if((int) ((screening + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((screening + offensiveModifier) * getFatigueFactor());
     }
 
     public int getOffBallMovement(){
+        if((int) ((offBallMovement + offensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((offBallMovement + offensiveModifier) * getFatigueFactor());
     }
 
     public int getPostDefense() {
+        if((int) ((postDefense + defensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((postDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getPerimeterDefense() {
+        if((int) ((perimeterDefense + defensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((perimeterDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getOnBallDefense() {
+        if((int) ((onBallDefense + defensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((onBallDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getOffBallDefense() {
+        if((int) ((offBallDefense + defensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((offBallDefense + defensiveModifier) * getFatigueFactor());
     }
 
     public int getStealing() {
+        if((int) ((stealing + defensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((stealing + defensiveModifier) * getFatigueFactor());
     }
 
     public int getRebounding() {
+        if((int) ((rebounding + defensiveModifier) * getFatigueFactor()) <= 1){
+            return 1;
+        }
         return (int) ((rebounding + defensiveModifier) * getFatigueFactor());
     }
 
@@ -1080,7 +1125,7 @@ public class Player {
 
     void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
         // for coach type: 0=no effect, 1=less variability, 2=extra variability (good or bad), 3=defensive focus, 4=offensive focus
-        int maxModifier = 25;
+        int maxModifier = 30;
         double gameModifier = (Math.random() * 2 * gameVariability) - gameVariability;
         if(coachType == 1){
             gameModifier /= 2;
@@ -1093,14 +1138,22 @@ public class Player {
             // players play better at home
             gameModifier += 3;
         }
-        if(scoreDif > 0){
-            if(scoreDif > 30){
-                gameModifier -= maxModifier;
-            }
-            else{
-                gameModifier -= scoreDif * (1 - scoreDif/100.0);
-            }
 
+        if(scoreDif > 10 && gameModifier < 0){
+            gameModifier = -gameModifier;
+        }
+        else if(scoreDif < -10 && gameModifier > 0){
+            gameModifier = 0;
+        }
+
+        if(scoreDif > 0){
+            gameModifier *= (1 + scoreDif / 100.0);
+        }
+        else if(scoreDif > -15){
+            gameModifier *= (1 - scoreDif / 100.0);
+        }
+        else{
+            gameModifier = scoreDif;
         }
 
         if(coachType == 3){

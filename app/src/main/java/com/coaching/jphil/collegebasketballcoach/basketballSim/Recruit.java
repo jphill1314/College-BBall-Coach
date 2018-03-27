@@ -163,7 +163,7 @@ public class Recruit {
 
     private boolean commit(int recruitingAbility){
         Random r = new Random();
-        if((recruitingAbility / 10 + interest >= r.nextInt(100)) || interest == 100){
+        if((recruitingAbility / 10 + interest >= r.nextInt(100 * 20)) || interest == 100){
             isCommitted = true;
         }
         return isCommitted;

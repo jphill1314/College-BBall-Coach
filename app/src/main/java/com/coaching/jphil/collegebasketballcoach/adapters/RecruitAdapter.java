@@ -246,4 +246,8 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
         }while(changes != 0);
         notifyDataSetChanged();
     }
+
+    public int getSortType(){
+        return sortType;
+    }
 }

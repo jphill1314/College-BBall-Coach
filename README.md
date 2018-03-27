@@ -44,7 +44,7 @@ List of improvements to add (for version 1.0):
 
 * Game Viewer
 - [x] Add empty list items so that the FAB doesn't always block bottom item in lists
-- [ ] Indicate which team has the ball in the Play-by-Play screen
+- [x] Indicate which team has the ball in the Play-by-Play screen
 - [ ] Add more varriety to team talks
 - [x] Give better indication of a player's rating, prefered position, condition, and if they are a pending sub on roster page
 - [x] Add additional screen on roster page to get a better view of stats
@@ -52,7 +52,7 @@ List of improvements to add (for version 1.0):
 - [ ] (maybe 1.0) Add ability to 'run a play' out of a timeout in close and late situations
 - [x] Prevent the user from accessing other parts of the game while in the game view
 - [ ] If the user quits while in game, reopening the app should place the user back into the game
-- [ ] Add ability to pause the sim
+- [x] Add ability to pause the sim
 
 * Game Simulation
 - [ ] Save games that are quit while in progress

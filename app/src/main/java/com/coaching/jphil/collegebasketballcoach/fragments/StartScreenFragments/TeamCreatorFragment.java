@@ -2,7 +2,9 @@ package com.coaching.jphil.collegebasketballcoach.fragments.StartScreenFragments
 
 
 import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -221,6 +223,10 @@ public class TeamCreatorFragment extends Fragment {
         protected void onPostExecute(String results){
             db = null;
             startActivity(new Intent(getActivity(), MainActivity.class));
+
+            SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
+            editor.putBoolean(getString(R.string.shared_pref_never_opened), false);
+            editor.apply();
             getActivity().finish();
         }
 

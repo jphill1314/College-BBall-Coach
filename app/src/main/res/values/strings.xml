@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">College Basketball Coach</string>
 
+    <string name="shared_pref_disp_scoring">com.coaching.show_scoring</string>
+    <string name="shared_pref_disp_cop">com.coaching.show_cop</string>
+    <string name="shared_pref_disp_fouls">com.coaching.show_fouls</string>
+    <string name="shared_pref_disp_misc">com.coaching.show_misc</string>
+    <string name="shared_pref_alert_dead_ball">com.coaching.alert_dead_ball</string>
+    <string name="shared_pref_never_opened">com.coaching.never_opened</string>
+    <string name="shared_pref_recruit_sort">com.coaching.recruit_sort</string>
 
     <!-- Start Screen-->
     <string name="new_game_button">New Game</string>
@@ -193,6 +200,7 @@
     <string name="half">Half: %d</string>
     <string name="game_time">%s (%d)</string>
     <string name="game_speed">Simulation speed</string>
+    <string name="sim_paused">Simulation is currently paused</string>
     <string name="timeout_left">TO: %d</string>
     <string name="team_fouls">Fouls: %d</string>
     <string name="fouled_out">One of your players has fouled out!\nPlease select a substitute.</string>
@@ -216,6 +224,10 @@
     <string name="steals">Steals</string>
     <string name="to">TO</string>
 
+    <string name="view_options">Change displayed events</string>
+    <string name="pause_option">Pause during dead balls</string>
+    <string name="unpause_option">Don\'t pause during dead balls</string>
+
     <string-array name="timeout_array">
         <item>Skip speech</item>
         <item>Good work guys! Keep it up!</item>
@@ -236,6 +248,14 @@
         <item>Selection Information</item>
         <item>Offensive Stats</item>
         <item>Defensive Stats</item>
+    </string-array>
+
+    <string name="game_options_prompt">Select the types of plays to display</string>
+    <string-array name="game_view_options">
+        <item>Point scoring plays</item>
+        <item>Change of possession</item>
+        <item>Fouls</item>
+        <item>Miscellaneous plays</item>
     </string-array>
 
     <string name="list_score">%s: %d - %s: %d</string>

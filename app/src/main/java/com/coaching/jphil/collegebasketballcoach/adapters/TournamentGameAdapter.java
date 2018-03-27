@@ -51,6 +51,11 @@ public class TournamentGameAdapter extends RecyclerView.Adapter<TournamentGameAd
         notifyDataSetChanged();
     }
 
+    public void changeTeams(ArrayList<Team> teams){
+        this.teams = teams;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

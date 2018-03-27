@@ -9,8 +9,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.R;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.GameEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -20,22 +22,29 @@ import java.util.ArrayList;
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView  play;
+        TextView  play;
+        View view;
 
         public ViewHolder(View view){
             super(view);
 
+            this.view = view;
             play = view.findViewById(R.id.play);
         }
     }
 
-    private ArrayList<String> plays;
+    private ArrayList<GameEvent> plays;
+    private ArrayList<String> talks;
 
-    public GameAdapter(ArrayList<String> plays){
+    public GameAdapter(ArrayList<GameEvent> plays){
         this.plays = plays;
     }
 
-    public void setPlays(ArrayList<String>  newPlays){
+    public GameAdapter(ArrayList<String> talks, int extra){
+        this.talks = talks;
+    }
+
+    public void setPlays(ArrayList<GameEvent>  newPlays){
         plays = newPlays;
     }
 
@@ -48,14 +57,29 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(GameAdapter.ViewHolder holder, int position) {
-        holder.play.setText(plays.get(position));
+        holder.view.setBackgroundColor(Color.rgb(250,250,250));
+        if(plays != null) {
+            holder.play.setText(plays.get(position).getEvent());
+            if(plays.get(position).isHomeTeam()){
+                holder.view.setBackgroundColor(Color.rgb(240,240,240));
+            }
+            else{
+                holder.view.setBackgroundColor(Color.rgb(250,250,250));
+            }
+        }
+        else if(talks != null){
+            holder.play.setText(talks.get(position));
+        }
 
     }
 
     @Override
     public int getItemCount() {
         if(plays == null){
-            return 0;
+            if(talks == null) {
+                return 0;
+            }
+            return talks.size();
         }
         return plays.size();
     }

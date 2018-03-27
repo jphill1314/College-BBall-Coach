@@ -1,6 +1,8 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -45,7 +47,10 @@ public class RecruitFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recruit_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new RecruitAdapter(activity.currentTeam.getRecruits(), activity, 0);
+
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        adapter = new RecruitAdapter(activity.currentTeam.getRecruits(), activity, prefs.getInt(getString(R.string.shared_pref_recruit_sort), 0));
         recyclerView.setAdapter(adapter);
 
         int[] needs = getNeeds();
@@ -60,6 +65,15 @@ public class RecruitFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         inflater.inflate(R.menu.sort_menu, menu);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+
+        SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
+        editor.putInt(getString(R.string.shared_pref_recruit_sort), ((RecruitAdapter)adapter).getSortType());
+        editor.apply();
     }
 
     @Override

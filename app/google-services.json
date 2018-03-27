@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "314407690904",
+    "firebase_url": "https://collegebasketballcoach.firebaseio.com",
+    "project_id": "collegebasketballcoach",
+    "storage_bucket": "collegebasketballcoach.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314407690904:android:890c9ff7e04addb5",
+        "android_client_info": {
+          "package_name": "com.coaching.jphil.collegebasketballcoach"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "314407690904-0tct8khmff573c9v6cfouhn3aamhuof8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.coaching.jphil.collegebasketballcoach",
+            "certificate_hash": "10783cd2a02a8c8228e31b1e4442e320e39b411c"
+          }
+        },
+        {
+          "client_id": "314407690904-93vg0odmnhgsr88dnskc32n2l76669ro.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJakjWsUtXvLvqxKJ6asN6TI_TDOA5SUQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "314407690904-93vg0odmnhgsr88dnskc32n2l76669ro.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

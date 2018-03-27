@@ -1,7 +1,9 @@
 package com.coaching.jphil.collegebasketballcoach.fragments.StartScreenFragments;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.StartScreenActivity;
+import com.crashlytics.android.Crashlytics;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,6 +52,14 @@ public class StartScreenFragment extends Fragment {
                 t.replace(R.id.frame_layout, new TeamCreatorFragment()).commit();
             }
         });
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(prefs.getBoolean(getString(R.string.shared_pref_never_opened), true)){
+            loadGame.setEnabled(false);
+        }
+        else{
+            loadGame.setEnabled(true);
+        }
 
         return view;
     }

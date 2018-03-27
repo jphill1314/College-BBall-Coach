@@ -37,8 +37,8 @@ public class StandardTenTeam extends Conference {
             PlayIn8v9.add(teams.get(7));
             PlayIn8v9.add(teams.get(8));
 
-            addTournament(new Tournament(PlayIn7v10, "7 vs 10 Play In", true));
             addTournament(new Tournament(PlayIn8v9, "8 vs 9 Play in", true));
+            addTournament(new Tournament(PlayIn7v10, "7 vs 10 Play In", true));
         }
         else if(getTournaments().size() == 2 && allGamesPlayed()){
             Iterator<Team> itr = teams.iterator();

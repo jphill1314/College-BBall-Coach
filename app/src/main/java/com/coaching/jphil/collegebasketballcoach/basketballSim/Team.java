@@ -273,10 +273,12 @@ public class Team {
         schedule = new ArrayList<>();
         opponents = new ArrayList<>();
 
-        int newNum = (int) (12 + Math.random() * 4);
-        Log.d("New Season", "Number of players to make: " + (newNum - players.size()));
-        if(players.size() < newNum){
-            generateFreshman(newNum - players.size());
+        if(!isPlayerControlled) {
+            int newNum = (int) (12 + Math.random() * 4);
+            Log.d("New Season", "Number of players to make: " + (newNum - players.size()));
+            if (players.size() < newNum) {
+                generateFreshman(newNum - players.size());
+            }
         }
 
         int[] needs = positionNeeds(true);
@@ -482,20 +484,26 @@ public class Team {
 
     private void generateFreshman(int numPlayers){
         Random r = new Random();
+        int vary = 10;
         String[] lastNames = context.getResources().getStringArray(R.array.last_names);
         String[] firstNames = context.getResources().getStringArray(R.array.first_names);
+
+        int rating = overallRating;
+        if(isPlayerControlled){
+            rating -= 25;
+        }
 
         for(int x = 1; x < 6; x++){
             while(getNumberOfPlayersAtPosition(x, true) < 2){
                 players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                        x, 0, overallRating - r.nextInt(10)));
+                        x, 0, rating - r.nextInt(2 * vary) + vary));
                 numPlayers--;
             }
         }
 
         for(int i = 0; i < numPlayers; i++){
             players.add(new Player(lastNames[r.nextInt(lastNames.length)], firstNames[r.nextInt(firstNames.length)],
-                    r.nextInt(4) + 1, 0, overallRating - r.nextInt(10)));
+                    r.nextInt(4) + 1, 0, rating - r.nextInt(2 * vary) + vary));
         }
     }
 

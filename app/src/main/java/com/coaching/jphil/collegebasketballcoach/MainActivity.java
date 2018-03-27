@@ -337,7 +337,11 @@ public class MainActivity extends AppCompatActivity {
                 saveData();
             }
             else if(strings[0].equals("new season")){
+
                 if(db != null){
+                    if(!db.isOpen()){
+                        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+                    }
                     db.appDAO().deleteGameStats();
                     db.appDAO().deleteTournaments();
                     db.appDAO().deleteGameDB();

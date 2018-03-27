@@ -1,17 +1,25 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.app.AlertDialog;
 import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,6 +41,7 @@ import com.coaching.jphil.collegebasketballcoach.adapters.GameRosterAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameSpeechAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.GameEvent;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
@@ -59,6 +68,8 @@ public class GameFragment extends Fragment {
     private boolean isInTimeout = false;
     private boolean forceSub = false;
     private boolean alertDeadBall = false;
+    private boolean showDeadBallAlerts;
+    private boolean pauseSim = false;
 
     public FloatingActionButton fab;
     private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls;
@@ -80,6 +91,7 @@ public class GameFragment extends Fragment {
     private GameRosterAdapter grAdapter;
     private boolean updateGRA = false;
     private int adapterType = 0;
+    private boolean[] displayPlay;
 
     private ArrayList<GameStatsDB> stats;
 
@@ -152,7 +164,8 @@ public class GameFragment extends Fragment {
         rosterSpinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.game_roster_spinner));
         rosterSpinner.setAdapter(rosterSpinnerAdapter);
 
-        adapter = new GameAdapter(new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.timeout_array))));
+
+        adapter = new GameAdapter(new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.timeout_array))), 0);
         recyclerView.setAdapter(adapter);
 
         recyclerView.setVisibility(View.GONE);
@@ -188,12 +201,56 @@ public class GameFragment extends Fragment {
         setClickListeners();
         setStrategyView();
 
+        setHasOptionsMenu(true);
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        displayPlay = new boolean[]{prefs.getBoolean(getString(R.string.shared_pref_disp_scoring), true),
+                prefs.getBoolean(getString(R.string.shared_pref_disp_cop), true),
+                prefs.getBoolean(getString(R.string.shared_pref_disp_fouls), true),
+                prefs.getBoolean(getString(R.string.shared_pref_disp_misc), true)};
+
+        showDeadBallAlerts = prefs.getBoolean(getString(R.string.shared_pref_alert_dead_ball), true);
+
         return view;
     }
 
     @Override
-    public void onDestroyView(){
-        super.onDestroyView();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        inflater.inflate(R.menu.game_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.view_options:
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(getString(R.string.game_options_prompt));
+                builder.setMultiChoiceItems(getResources().getStringArray(R.array.game_view_options),
+                        displayPlay, new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                                displayPlay[i] = b;
+                            }
+                        });
+                builder.show();
+                break;
+            case R.id.pause_options:
+                if(showDeadBallAlerts){
+                    item.setTitle(getString(R.string.pause_option));
+                }
+                else{
+                    item.setTitle(getString(R.string.unpause_option));
+                }
+                showDeadBallAlerts = !showDeadBallAlerts;
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
         if(gameAsync != null) {
             gameAsync.cancel(true);
         }
@@ -219,6 +276,15 @@ public class GameFragment extends Fragment {
         ((MainActivity)getActivity()).actionBar.setDisplayHomeAsUpEnabled(true);
         ((MainActivity)getActivity()).actionBar.setTitle((((MainActivity) getActivity()).currentTeam.getFullName()));
         ((MainActivity)getActivity()).drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(getString(R.string.shared_pref_disp_scoring), displayPlay[0]);
+        editor.putBoolean(getString(R.string.shared_pref_disp_cop), displayPlay[1]);
+        editor.putBoolean(getString(R.string.shared_pref_disp_fouls), displayPlay[2]);
+        editor.putBoolean(getString(R.string.shared_pref_disp_misc), displayPlay[3]);
+        editor.putBoolean(getString(R.string.shared_pref_alert_dead_ball), showDeadBallAlerts);
+        editor.apply();
     }
 
     private class SimGame extends AsyncTask<String, String, String>{
@@ -251,7 +317,7 @@ public class GameFragment extends Fragment {
                             }
                         }
                     }
-                    else if(playResult == 2){
+                    else if(playResult == 2 && showDeadBallAlerts){
                         alertDeadBall = true;
                         publishProgress();
                         while(alertDeadBall){
@@ -284,6 +350,14 @@ public class GameFragment extends Fragment {
                             else{
                                 sleep(100);
                             }
+                        }
+                        catch (InterruptedException e){
+                            Log.e("sleep error", e.toString());
+                        }
+                    }
+                    while(pauseSim){
+                        try{
+                            sleep(250);
                         }
                         catch (InterruptedException e){
                             Log.e("sleep error", e.toString());
@@ -344,7 +418,8 @@ public class GameFragment extends Fragment {
             time.setText(getString(R.string.game_time, game.getFormattedTime(), game.getShotClock()));
 
             if(adapterType == 0) {
-                ((GameAdapter) adapter).setPlays(game.getPlays());
+                //((GameAdapter) adapter).setPlays(game.getPlays());
+                ((GameAdapter)adapter).setPlays(game.getPlaysOfType(convertDisplayPlay()));
                 adapter.notifyDataSetChanged();
                 grAdapter.notifyDataSetChanged();
             }
@@ -476,7 +551,14 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                pauseSim = gameSpeed == 11;
 
+                if(pauseSim){
+                    gameSpeedText.setText(getString(R.string.sim_paused));
+                }
+                else{
+                    gameSpeedText.setText(getString(R.string.game_speed));
+                }
             }
         });
 
@@ -512,7 +594,7 @@ public class GameFragment extends Fragment {
                         deadBall.setVisibility(View.INVISIBLE);
                         updateGRA = true;
 
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_black_24dp));
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_timeout));
                     }
                     else if(game.getPlayerWantsTO()){
                         game.setPlayerWantsTO(false);
@@ -545,11 +627,11 @@ public class GameFragment extends Fragment {
                 }
                 else if(adapterType == 5) {
                     if (game.getHomeTeam().isPlayerControlled()) {
-                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
-                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore());
+                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getAwayScore() - game.getHomeScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
+                        game.coachTalk(game.getAwayTeam(), false, game.getHomeScore() - game.getAwayScore());
                     } else {
-                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore());
-                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
+                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getAwayScore() - game.getHomeScore());
+                        game.coachTalk(game.getAwayTeam(), false, game.getHomeScore() - game.getAwayScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
                     }
                     spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
                     spinner.setAdapter(spinnerAdapter);
@@ -770,7 +852,7 @@ public class GameFragment extends Fragment {
                 deadBall.setVisibility(View.VISIBLE);
             }
             else {
-                fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_black_24dp));
+                fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_timeout));
             }
             fab.setVisibility(View.VISIBLE);
 
@@ -968,6 +1050,32 @@ public class GameFragment extends Fragment {
         }
 
         rosterRecycler.setAdapter(grAdapter);
+    }
+
+    private Integer[] convertDisplayPlay(){
+        int numTrue = 1;
+        for(boolean b: displayPlay){
+            if(b){
+                numTrue++;
+            }
+        }
+        Integer[] display = new Integer[numTrue];
+        display[0] = 0;
+        int index = 1;
+        if(displayPlay[0]){
+            display[index++] = 1;
+        }
+        if(displayPlay[1]){
+            display[index++] = 2;
+        }
+        if(displayPlay[2]){
+            display[index++] = 3;
+        }
+        if(displayPlay[3]){
+            display[index] = -1;
+        }
+
+        return display;
     }
 
     private class DataAsync extends AsyncTask<String, String, String>{
