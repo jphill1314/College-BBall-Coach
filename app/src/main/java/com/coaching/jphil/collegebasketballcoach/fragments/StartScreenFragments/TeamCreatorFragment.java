@@ -146,6 +146,7 @@ public class TeamCreatorFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                fab.setVisibility(View.GONE);
                 db = Room.databaseBuilder(getActivity().getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 new NewGameAsync().execute();
             }
