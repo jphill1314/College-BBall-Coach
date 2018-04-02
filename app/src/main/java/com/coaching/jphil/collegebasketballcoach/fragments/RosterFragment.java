@@ -29,7 +29,6 @@ public class RosterFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
 
     private FloatingActionButton confirmButton;
-    private ArrayList<Player> pendingSubs;
 
     public RosterFragment() {
         // Required empty public constructor
@@ -53,12 +52,11 @@ public class RosterFragment extends Fragment {
             }
             mainActivity.actionBar.setTitle(mainActivity.currentTeam.getFullName());
         }
-        pendingSubs = new ArrayList<>(mainActivity.currentTeam.getPlayers());
 
         recyclerView = view.findViewById(R.id.roster_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new RosterAdapter(pendingSubs);
+        adapter = new RosterAdapter(mainActivity.currentTeam.getPlayers(), mainActivity.currentTeam.isPlayerControlled(), this);
         recyclerView.setAdapter(adapter);
 
         if(mainActivity.currentTeam.isPlayerControlled()){
@@ -66,38 +64,18 @@ public class RosterFragment extends Fragment {
             confirmButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((MainActivity)getActivity()).currentTeam.makeSubs(pendingSubs);
+                    ((MainActivity)getActivity()).currentTeam.makeSubs(((RosterAdapter)adapter).getSubs());
                     adapter.notifyDataSetChanged();
                     confirmButton.setVisibility(View.GONE);
                 }
             });
 
-
-            ItemTouchHelper.Callback ithCallback = new ItemTouchHelper.Callback() {
-                @Override
-                public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                    return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
-                            ItemTouchHelper.DOWN | ItemTouchHelper.UP);
-                }
-
-                @Override
-                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                    Collections.swap(pendingSubs, viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                    adapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                    confirmButton.setVisibility(View.VISIBLE);
-                    return true;
-                }
-
-                @Override
-                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-                }
-            };
-
-            ItemTouchHelper ith = new ItemTouchHelper(ithCallback);
-            ith.attachToRecyclerView(recyclerView);
         }
 
         return view;
+    }
+
+    public void makeFABVisible(){
+        confirmButton.setVisibility(View.VISIBLE);
     }
 }

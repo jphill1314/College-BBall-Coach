@@ -523,6 +523,16 @@ public class Team {
         return false;
     }
 
+    public boolean updateSubs(ArrayList<Player> newSubs){
+        subPlayers = new ArrayList<>(newSubs);
+        for(int x = 0; x < 5; x++){
+            if(!newSubs.get(x).isEligible()){
+                return false;
+            }
+        }
+        return true;
+    }
+
     void makeSubs(){
         players = new ArrayList<>(subPlayers);
         updateCurrentPositions();

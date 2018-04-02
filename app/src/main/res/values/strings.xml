@@ -196,13 +196,13 @@
     <string name="end_timeout">Return to game</string>
     <string name="start_game">Start game</string>
     <string name="start_2nd">Start 2nd half</string>
-    <string name="scores">%s\n%d</string>
+    <string name="scores">%d</string>
     <string name="half">Half: %d</string>
     <string name="game_time">%s (%d)</string>
     <string name="game_speed">Simulation speed</string>
     <string name="sim_paused">Simulation is currently paused</string>
-    <string name="timeout_left">TO: %d</string>
-    <string name="team_fouls">Fouls: %d</string>
+    <string name="timeout_left">T: %d</string>
+    <string name="team_fouls">F: %d</string>
     <string name="fouled_out">One of your players has fouled out!\nPlease select a substitute.</string>
     <string name="alert_dead_ball">Dead ball!\nMake any desired changes before pressing continue.</string>
     <string name="alert_foul_trouble">One or more of your players may be in foul trouble!</string>

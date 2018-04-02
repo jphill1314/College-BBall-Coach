@@ -13,6 +13,8 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.fragments.GameFragment;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -23,9 +25,9 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
 
     private ArrayList<Player> players;
     private GameFragment gameFragment;
-    private boolean[] pendingSub;
+    private ArrayList<Player> pendingSub;
     private boolean isPlayerTeam;
-    private int index1, index2;
+    private int index1;
     private int type;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
@@ -57,16 +59,12 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
 
     public GameRosterAdapter(ArrayList<Player> players, int type, GameFragment gameFragment){
         this.players = players;
+        pendingSub = new ArrayList<>(this.players);
         this.type = type;
         this.gameFragment = gameFragment;
         isPlayerTeam = true;
 
         index1 = -1;
-        index2 = -1;
-        pendingSub = new boolean[players.size()];
-        for(int x = 0; x < players.size(); x++){
-            pendingSub[x] = false;
-        }
     }
 
     public GameRosterAdapter(ArrayList<Player> players, int type){
@@ -75,27 +73,9 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
         isPlayerTeam = false;
 
         index1 = -1;
-        index2 = -1;
-        pendingSub = new boolean[players.size()];
-        for(int x = 0; x < players.size(); x++){
-            pendingSub[x] = false;
-        }
+        pendingSub = new ArrayList<>(this.players);
     }
 
-    public int[] getIndexes(){
-        int[] values = new int[]{index1, index2};
-        if(index1 != -1) {
-            pendingSub[index1] = true;
-        }
-        if(index2 != -1) {
-            pendingSub[index2] = true;
-        }
-        index1 = -1;
-        index2 = -1;
-
-        notifyDataSetChanged();
-        return values;
-    }
 
     @Override
     public GameRosterAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
@@ -131,18 +111,18 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
                 ps = "-";
         }
         holder.pos.setText(ps);
-        holder.prefPos.setText(players.get(position).getPositionAbr());
+        holder.prefPos.setText(pendingSub.get(position).getPositionAbr());
 
-        int condition = 100 - players.get(position).getFatigue();
+        int condition = 100 - pendingSub.get(position).getFatigue();
         holder.condition.setText("" + condition);
 
         if(position < 5){
-            holder.rating.setText(players.get(position).calculateRatingAtPosition(position+1) + "");
+            holder.rating.setText(pendingSub.get(position).calculateRatingAtPosition(position+1) + "");
         }
         else{
-            holder.rating.setText(players.get(position).getOverallRating() + "");
+            holder.rating.setText(pendingSub.get(position).getOverallRating() + "");
         }
-        holder.fouls.setText(""+players.get(position).getFouls());
+        holder.fouls.setText(""+pendingSub.get(position).getFouls());
 
         holder.view.setBackgroundColor(Color.rgb(250, 250,250));
 
@@ -158,17 +138,17 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
     }
 
     private void bindType1(GameRosterAdapter.ViewHolder holder, int position){
-        holder.stat1.setText(players.get(position).getTwoPointShotMade() + "/" + players.get(position).getTwoPointShotAttempts());
-        holder.stat2.setText(players.get(position).getThreePointShotMade() + "/" + players.get(position).getThreePointShotAttempts());
-        holder.stat3.setText(players.get(position).getFreeThrowMade() + "/" + players.get(position).getFreeThrowAttempts());
-        holder.stat4.setText(players.get(position).getAssists()+"");
+        holder.stat1.setText(pendingSub.get(position).getTwoPointShotMade() + "/" + pendingSub.get(position).getTwoPointShotAttempts());
+        holder.stat2.setText(pendingSub.get(position).getThreePointShotMade() + "/" + pendingSub.get(position).getThreePointShotAttempts());
+        holder.stat3.setText(pendingSub.get(position).getFreeThrowMade() + "/" + pendingSub.get(position).getFreeThrowAttempts());
+        holder.stat4.setText(pendingSub.get(position).getAssists()+"");
     }
 
     private void bindType2(GameRosterAdapter.ViewHolder holder, int position){
-        holder.stat1.setText(players.get(position).getoRebounds()+"");
-        holder.stat2.setText(players.get(position).getdRebounds()+"");
-        holder.stat3.setText(players.get(position).getSteals()+"");
-        holder.stat4.setText(players.get(position).getTurnovers()+"");
+        holder.stat1.setText(pendingSub.get(position).getoRebounds()+"");
+        holder.stat2.setText(pendingSub.get(position).getdRebounds()+"");
+        holder.stat3.setText(pendingSub.get(position).getSteals()+"");
+        holder.stat4.setText(pendingSub.get(position).getTurnovers()+"");
     }
 
     @Override
@@ -183,38 +163,65 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
             bindType2(holder, position);
         }
 
-        holder.name.setText(players.get(position).getFullName());
-
-        if(position == index1 || position == index2){
-            holder.view.setBackgroundColor(Color.LTGRAY);
+        if(players.get(position).equals(pendingSub.get(position)) && index1 != position){
+            if(type == 0){
+                holder.pos.setTextColor(Color.BLACK);
+                holder.prefPos.setTextColor(Color.BLACK);
+                holder.rating.setTextColor(Color.BLACK);
+                holder.fouls.setTextColor(Color.BLACK);
+            }
+            else{
+                holder.stat1.setTextColor(Color.BLACK);
+                holder.stat2.setTextColor(Color.BLACK);
+                holder.stat3.setTextColor(Color.BLACK);
+                holder.stat4.setTextColor(Color.BLACK);
+            }
+            holder.name.setTextColor(Color.BLACK);
+        }
+        else{
+            if(type == 0){
+                holder.pos.setTextColor(Color.GRAY);
+                holder.prefPos.setTextColor(Color.GRAY);
+                holder.rating.setTextColor(Color.GRAY);
+                holder.fouls.setTextColor(Color.GRAY);
+            }
+            else{
+                holder.stat1.setTextColor(Color.GRAY);
+                holder.stat2.setTextColor(Color.GRAY);
+                holder.stat3.setTextColor(Color.GRAY);
+                holder.stat4.setTextColor(Color.GRAY);
+            }
+            holder.name.setTextColor(Color.GRAY);
         }
 
-        if(pendingSub[position]){
-            holder.view.setBackgroundColor(Color.DKGRAY);
-        }
-
-        if(!players.get(position).isEligible()){
-            holder.view.setBackgroundColor(Color.BLACK);
-        }
+        holder.name.setText(pendingSub.get(position).getFullName());
 
         if(isPlayerTeam) {
             final int pos = position;
             holder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (index1 == -1 && !pendingSub[pos]) {
+                    if(index1 == -1){
                         index1 = pos;
-                    } else if (pos != index1 && !pendingSub[pos]) {
-                        index2 = pos;
-                        gameFragment.fab.setVisibility(View.VISIBLE);
-                    } else {
-                        index1 = -1;
-                        index2 = -1;
+                    }
+                    else{
+                        if(index1 == pos){
+                            index1 = -1;
+                        }
+                        else{
+                            Collections.swap(pendingSub, index1, pos);
+                            index1 = -1;
+                            gameFragment.fab.setVisibility(View.VISIBLE);
+                        }
                     }
                     notifyDataSetChanged();
                 }
             });
         }
+    }
+
+    public ArrayList<Player> getSubs(){
+        return pendingSub;
     }
 
     @Override

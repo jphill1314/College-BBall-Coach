@@ -72,7 +72,7 @@ public class GameFragment extends Fragment {
     private boolean pauseSim = false;
 
     public FloatingActionButton fab;
-    private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls;
+    private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls, homeName, awayName;
     private TextView deadBall, gameSpeedText, tvIntentFoul, posLabel, label1, label2, label3, label4;
     private TextView h2FG, h3FG, hFT, hA, hOB, hDB, hS, hTO, a2FG, a3FG, aFT, aA, aOB, aDB, aS, aTO, hName, aName;
     private SeekBar gameSpeedBar;
@@ -139,8 +139,8 @@ public class GameFragment extends Fragment {
         tvIntentFoul = strategyView.findViewById(R.id.tv_foul);
         tbIntentFoul = strategyView.findViewById(R.id.foul_button);
 
-        homeScore.setText(getString(R.string.scores, game.getHomeTeam().getFullName(), game.getHomeScore()));
-        awayScore.setText(getString(R.string.scores, game.getAwayTeam().getFullName(), game.getAwayScore()));
+        homeScore.setText(getString(R.string.scores, game.getHomeScore()));
+        awayScore.setText(getString(R.string.scores, game.getAwayScore()));
 
         homeTO.setText(getString(R.string.timeout_left, 4));
         awayTO.setText(getString(R.string.timeout_left, 4));
@@ -184,6 +184,11 @@ public class GameFragment extends Fragment {
         rosterRecycler = gameRosterView.findViewById(R.id.roster_list);
         rosterManager = new LinearLayoutManager(getContext());
         rosterRecycler.setLayoutManager(rosterManager);
+
+        homeName = view.findViewById(R.id.home_team_name);
+        homeName.setText(game.getHomeTeam().getMascot());
+        awayName = view.findViewById(R.id.away_team_name);
+        awayName.setText(game.getAwayTeam().getMascot());
 
         posLabel = gameRosterView.findViewById(R.id.pos_label);
         label1 = gameRosterView.findViewById(R.id.label1);
@@ -342,17 +347,17 @@ public class GameFragment extends Fragment {
                         }
                     }
                     else{
-                        publishProgress();
-                        try{
-                            if(gameSpeed != 1) {
-                                sleep(gameSpeed * 250);
+                        if(adapter.getItemCount() != game.getPlaysOfType(convertDisplayPlay()).size()) {
+                            publishProgress();
+                            try {
+                                if (gameSpeed != 1) {
+                                    sleep(gameSpeed * 250);
+                                } else {
+                                    sleep(100);
+                                }
+                            } catch (InterruptedException e) {
+                                Log.e("sleep error", e.toString());
                             }
-                            else{
-                                sleep(100);
-                            }
-                        }
-                        catch (InterruptedException e){
-                            Log.e("sleep error", e.toString());
                         }
                     }
                     while(pauseSim){
@@ -408,8 +413,8 @@ public class GameFragment extends Fragment {
 
 
         private void updateUI(){
-            homeScore.setText(getString(R.string.scores, game.getHomeTeam().getFullName(), game.getHomeScore()));
-            awayScore.setText(getString(R.string.scores, game.getAwayTeam().getFullName(), game.getAwayScore()));
+            homeScore.setText(getString(R.string.scores, game.getHomeScore()));
+            awayScore.setText(getString(R.string.scores, game.getAwayScore()));
 
             homeFouls.setText(getString(R.string.team_fouls, game.getHomeFouls()));
             awayFouls.setText(getString(R.string.team_fouls, game.getAwayFouls()));
@@ -604,26 +609,21 @@ public class GameFragment extends Fragment {
                     }
                 }
                 else if(adapterType == 1 || adapterType == 2){
-                    int[] indexes = grAdapter.getIndexes();
                     boolean success = false;
-                    if(indexes[0] != -1 && indexes[1] != -1){
-                        if(game.getHomeTeam().isPlayerControlled()){
-                            success = game.getHomeTeam().updateSubs(indexes[0], indexes[1]);
-                        }
-                        else{
-                            success = game.getAwayTeam().updateSubs(indexes[0], indexes[1]);
-                        }
+                    if(game.getHomeTeam().isPlayerControlled()){
+                        success = game.getHomeTeam().updateSubs(grAdapter.getSubs());
+                    }
+                    else{
+                        success = game.getAwayTeam().updateSubs(grAdapter.getSubs());
                     }
 
                     if(success){
                         fab.setVisibility(View.GONE);
+                        if(forceSub){
+                            forceSub = false;
+                        }
                     }
 
-                    if(forceSub && success){
-                        forceSub = false;
-                        spinner.setSelection(0, true);
-                        changeAdapters(0);
-                    }
                 }
                 else if(adapterType == 5) {
                     if (game.getHomeTeam().isPlayerControlled()) {
