@@ -206,7 +206,8 @@ public class Coach {
 
         recruitingAbility = ability + 2 * r.nextInt(abilityVariability) - abilityVariability;
 
-        tendencyToSub = 25 + r.nextInt(50);
+        //tendencyToSub = 25 + r.nextInt(50);
+        tendencyToSub = 5 + r.nextInt(10);
 
         calculateOverallRating();
     }

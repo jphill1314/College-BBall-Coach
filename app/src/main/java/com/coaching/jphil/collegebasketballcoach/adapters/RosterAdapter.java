@@ -160,6 +160,6 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
 
     @Override
     public int getItemCount(){
-        return subs.size();
+        return players.size();
     }
 }

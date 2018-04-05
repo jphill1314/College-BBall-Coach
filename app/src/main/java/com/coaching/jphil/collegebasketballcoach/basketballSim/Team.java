@@ -33,6 +33,7 @@ public class Team {
     private int wins, loses, overallRating;
 
     private String schoolName, mascot;
+    private int colorMain, colorDark, colorLight;
 
     private int numberOfGames;
 
@@ -63,12 +64,16 @@ public class Team {
     private int id;
 
     public Team(String schoolName, String mascot, ArrayList<Player> players, ArrayList<Coach> coaches,
-                boolean isPlayerControlled, Context context){
+                boolean isPlayerControlled, int[] colors, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.players = players;
         this.coaches = coaches;
         this.context = context;
+
+        colorMain = colors[0];
+        colorDark = colors[1];
+        colorLight = colors[2];
 
         this.isPlayerControlled = isPlayerControlled;
 
@@ -90,12 +95,17 @@ public class Team {
     }
 
     public Team(String schoolName, String mascot, boolean isPlayerControlled, int offenseFavorsThrees,
-                int defenseFavorsThrees, int agression, int pace, int year, boolean isSeasonOver, int id, Context context){
+                int defenseFavorsThrees, int agression, int pace, int year, boolean isSeasonOver,
+                int colorMain, int colorDark, int colorLight, int id, Context context){
         this.schoolName = schoolName;
         this.mascot = mascot;
         this.isPlayerControlled = isPlayerControlled;
         this.context = context;
         this.id = id;
+
+        this.colorMain = colorMain;
+        this.colorLight = colorLight;
+        this.colorDark = colorDark;
 
         opponents = new ArrayList<>();
 
@@ -330,6 +340,18 @@ public class Team {
         }
     }
 
+    public int getColorMain(){
+        return colorMain;
+    }
+
+    public int getColorDark(){
+        return colorDark;
+    }
+
+    public int getColorLight(){
+        return colorLight;
+    }
+
     void preGameSetup(){
         rosterPlayers = new ArrayList<>(players);
         subPlayers = new ArrayList<>(players);
@@ -533,7 +555,7 @@ public class Team {
         return true;
     }
 
-    void makeSubs(){
+    public void makeSubs(){
         players = new ArrayList<>(subPlayers);
         updateCurrentPositions();
     }
@@ -561,9 +583,9 @@ public class Team {
 
         for(int x = 0; x < 5; x++){
             if(subPlayers.get(x).isEligible()){
-                if(subPlayers.get(x).getFatigue() > r.nextInt(15) + 60 - tendToSub ||
-                        (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && r.nextInt(35) + tendToSub > 75)){
-                    int sub = findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition());
+                if(subPlayers.get(x).getFatigue() > r.nextInt(10) - 5 + tendToSub ||
+                        (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && tendToSub > r.nextInt(30))){
+                    int sub = findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition(), false);
                     if(subPlayers.get(x).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition()) / subPlayers.get(x).getFatigue() <
                             subPlayers.get(sub).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition())/ subPlayers.get(sub).getFatigue()){
                         updateSubs(x, sub);
@@ -571,22 +593,27 @@ public class Team {
                 }
             }
             else{
-                updateSubs(x, findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition()));
+                updateSubs(x, findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition(), true));
             }
         }
     }
 
-    private int findSub(int half, int timeRemaining, int position){
-        int indexOfBest = 5;
+    private int findSub(int half, int timeRemaining, int position, boolean mustSub){
+        int indexOfBest = -5;
         Random r = new Random();
         Player best = subPlayers.get(5);
 
-        for(int x = 6; x < subPlayers.size(); x++){
+        for(int x = 5; x < subPlayers.size(); x++){
+            if(indexOfBest == -5 && subPlayers.get(x).isEligible()){
+                indexOfBest = x;
+                best = subPlayers.get(x);
+                continue;
+            }
             if(subPlayers.get(x).isEligible()) {
                 if (best.calculateRatingAtPosition(position) / best.getFatigue() <
                         subPlayers.get(x).calculateRatingAtPosition(position) / subPlayers.get(x).getFatigue() &&
-                        (!subPlayers.get(x).isInFoulTrouble(half, timeRemaining) &&
-                                r.nextInt(35) + coaches.get(0).getTendencyToSub() > 75)) {
+                        (mustSub || (!subPlayers.get(x).isInFoulTrouble(half, timeRemaining) ||
+                                coaches.get(0).getTendencyToSub() > r.nextInt(30)))) {
                     indexOfBest = x;
                     best = subPlayers.get(indexOfBest);
                 }

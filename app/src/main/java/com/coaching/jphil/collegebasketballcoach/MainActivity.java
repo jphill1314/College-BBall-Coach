@@ -1,7 +1,11 @@
 package com.coaching.jphil.collegebasketballcoach;
 
 import android.arch.persistence.room.Room;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -104,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
 
                 actionBar.setTitle(currentTeam.getFullName());
+                updateColors();
             }
         });
 
@@ -117,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
         actionBar.setTitle(currentTeam.getFullName());
+        updateColors();
 
         adapter = new NavDrawerAdapter(getResources().getStringArray(R.array.drawer_items));
         drawerList.setAdapter(adapter);
@@ -175,18 +181,22 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 t.replace(R.id.content_frame, new RosterFragment());
                 makeSwitch = true;
+                actionBar.setTitle(currentTeam.getFullName());
                 break;
             case 1:
                 t.replace(R.id.content_frame, new ScheduleFragment());
                 makeSwitch = true;
+                actionBar.setTitle(getString(R.string.season_name, currentTeam.getCurrentSeasonYear(), currentTeam.getCurrentSeasonYear() + 1));
                 break;
             case 2:
                 t.replace(R.id.content_frame, new StandingsFragment());
+                actionBar.setTitle(currentTeam.getFullName());
                 makeSwitch = true;
                 break;
             case 3:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new RecruitFragment());
+                    actionBar.setTitle(currentTeam.getFullName());
                     makeSwitch = true;
                 }
                 else{
@@ -196,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             case 4:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new StrategyFragment());
+                    actionBar.setTitle(currentTeam.getFullName());
                     makeSwitch = true;
                 }
                 else{
@@ -204,11 +215,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 5:
                 t.replace(R.id.content_frame, new StaffFragment());
+                actionBar.setTitle(currentTeam.getFullName());
                 makeSwitch = true;
                 break;
             case 6:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new TrainingFragment());
+                    actionBar.setTitle(currentTeam.getFullName());
                     makeSwitch = true;
                 }
                 else{
@@ -323,6 +336,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateColors(){
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(currentTeam.getColorMain())));
+        if(Build.VERSION.SDK_INT >= 21) {
+            getWindow().setStatusBarColor(getResources().getColor(currentTeam.getColorDark()));
+        }
+
+        homeButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(currentTeam.getColorLight())));
+    }
+
 
     private class DataAsync extends AsyncTask<String, String, String> {
         private int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
@@ -365,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
                 clearData();
                 return "data cleared";
             }
-
             return null;
         }
 
@@ -414,6 +435,10 @@ public class MainActivity extends AppCompatActivity {
                         teamsDB[i].isPlayerControlled = teams.get(i).isPlayerControlled();
                         teamsDB[i].schoolName = teams.get(i).getSchoolName();
                         teamsDB[i].schoolMascot = teams.get(i).getMascot();
+
+                        teamsDB[i].colorMain = teams.get(i).getColorMain();
+                        teamsDB[i].colorDark = teams.get(i).getColorDark();
+                        teamsDB[i].colorLight = teams.get(i).getColorLight();
 
                         teamsDB[i].offFavorsThrees = teams.get(i).getOffenseFavorsThrees();
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
@@ -691,7 +716,8 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < teamsDB.length; i++) {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                              teamsDB[i].offFavorsThrees, teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
-                            teamsDB[i].currentYear, teamsDB[i].isSeasonOver, teamsDB[i].id, MainActivity.this));
+                            teamsDB[i].currentYear, teamsDB[i].isSeasonOver, teamsDB[i].colorMain,
+                            teamsDB[i].colorDark,teamsDB[i].colorLight, teamsDB[i].id, MainActivity.this));
                 }
 
                 int changes;

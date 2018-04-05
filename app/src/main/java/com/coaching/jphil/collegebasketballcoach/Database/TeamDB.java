@@ -28,5 +28,9 @@ public class TeamDB {
     public int aggression;
     public int pace;
 
+    public int colorMain;
+    public int colorDark;
+    public int colorLight;
+
     public boolean isSeasonOver;
 }

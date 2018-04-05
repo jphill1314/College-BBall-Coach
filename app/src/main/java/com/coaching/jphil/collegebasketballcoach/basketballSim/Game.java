@@ -200,7 +200,6 @@ public class Game {
         return stats;
     }
 
-    //TODO: save game stats to DB and continue to balance for realism
     private ArrayList<GameEvent> plays;
     private int half, timeRemaining, playerWithBall, location, shotClock;
     private int lastPlayerWithBall, lastShotClock, lastTimeRemaining, playType;
@@ -966,9 +965,6 @@ public class Game {
             }
             shooter.addTwoPointShot(false);
             offense.addTwoPointShot(false);
-            if(!currentPlay.equals("") && savePlays) {
-                plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 1, homeTeamHasBall));
-            }
         }
         else{
             if(isFouled){
@@ -985,9 +981,6 @@ public class Game {
             }
             shooter.addThreePointShot(false);
             offense.addThreePointShot(false);
-            if(!currentPlay.equals("") && savePlays) {
-                plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 1, homeTeamHasBall));
-            }
         }
 
         getRebound(offense, defense);
@@ -1387,8 +1380,8 @@ public class Game {
         int chance = withBall.getBallHandling() + r.nextInt(randomBoundValue) -
                 (ballDef.getStealing() + ballDef.getOnBallDefense() + r.nextInt(randomBoundValue)) / 2;
 
-        if(chance < -20 - ballDef.getAggressiveness() / 10){
-            if(chance < -40 - ballDef.getAggressiveness() / 10){
+        if(chance < -25 - ballDef.getAggressiveness() / 10){
+            if(r.nextDouble() > .75){
                 currentPlay += " " + withBall.getFullName() + " has lost the ball out of bounds! You can credit " +
                         ballDef.getFullName() + " with causing that turnover!";
                 deadBall = true;

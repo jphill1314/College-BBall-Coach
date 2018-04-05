@@ -6,6 +6,7 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -155,6 +156,12 @@ public class GameFragment extends Fragment {
         half.setText(getString(R.string.half, 1));
 
         fab = view.findViewById(R.id.game_fab);
+        if(game.getHomeTeam().isPlayerControlled()){
+            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+        }
+        else{
+            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
+        }
 
         recyclerView = (RecyclerView) inflater.inflate(R.layout.game_list_view, container, false);
         manager = new LinearLayoutManager(getContext());
@@ -165,7 +172,7 @@ public class GameFragment extends Fragment {
         rosterSpinner.setAdapter(rosterSpinnerAdapter);
 
 
-        adapter = new GameAdapter(new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.timeout_array))), 0);
+        adapter = new GameAdapter(new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.timeout_array))));
         recyclerView.setAdapter(adapter);
 
         recyclerView.setVisibility(View.GONE);
@@ -256,7 +263,9 @@ public class GameFragment extends Fragment {
     @Override
     public void onStop(){
         super.onStop();
+        Log.d("stop", "onStop called for GameFragment");
         if(gameAsync != null) {
+            Log.d("stop", "canceling gameAsync");
             gameAsync.cancel(true);
         }
 
@@ -309,32 +318,34 @@ public class GameFragment extends Fragment {
         protected String doInBackground(String... strings) {
             do{
                 int playResult = game.simPlay();
-                while(playResult != -1){
-                    if(playResult == 1) {
+                while(playResult != -1 && !isCancelled()){
+                    if(playResult == 1 && !isCancelled()) {
                         isInTimeout = true;
                         publishProgress();
-                        while(isInTimeout){
+                        while(isInTimeout && !isCancelled()){
                             try {
                                 sleep(500);
                             }
                             catch (InterruptedException e){
                                 Log.e("sleep error", e.toString());
+                                cancel(true);
                             }
                         }
                     }
-                    else if(playResult == 2 && showDeadBallAlerts){
+                    else if(playResult == 2 && showDeadBallAlerts && !isCancelled()){
                         alertDeadBall = true;
                         publishProgress();
-                        while(alertDeadBall){
+                        while(alertDeadBall && !isCancelled()){
                             try {
                                 sleep(500);
                             }
                             catch (InterruptedException e){
                                 Log.e("sleep error", e.toString());
+                                cancel(true);
                             }
                         }
                     }
-                    else if(playResult == 3){
+                    else if(playResult == 3 && !isCancelled()){
                         forceSub = true;
                         publishProgress();
                         while(forceSub){
@@ -343,10 +354,11 @@ public class GameFragment extends Fragment {
                             }
                             catch (InterruptedException e){
                                 Log.e("sleep error", e.toString());
+                                cancel(true);
                             }
                         }
                     }
-                    else{
+                    else if(!isCancelled()){
                         if(adapter.getItemCount() != game.getPlaysOfType(convertDisplayPlay()).size()) {
                             publishProgress();
                             try {
@@ -357,26 +369,32 @@ public class GameFragment extends Fragment {
                                 }
                             } catch (InterruptedException e) {
                                 Log.e("sleep error", e.toString());
+                                cancel(true);
                             }
                         }
                     }
-                    while(pauseSim){
+                    while(pauseSim && !isCancelled()){
                         try{
                             sleep(250);
                         }
                         catch (InterruptedException e){
                             Log.e("sleep error", e.toString());
+                            cancel(true);
                         }
                     }
-                    playResult = game.simPlay();
+                    if(!isCancelled()) {
+                        playResult = game.simPlay();
+                    }
                 }
-            }while(game.startNextHalf());
-            game.setIsPlayed(true);
+            }while(game.startNextHalf() && !isCancelled());
 
-            stats = new ArrayList<>();
-            stats.addAll(game.getHomeTeam().playGame(game.homeTeamWin()));
-            stats.addAll(game.getAwayTeam().playGame(!game.homeTeamWin()));
+            if(!isCancelled()) {
+                game.setIsPlayed(true);
 
+                stats = new ArrayList<>();
+                stats.addAll(game.getHomeTeam().playGame(game.homeTeamWin()));
+                stats.addAll(game.getAwayTeam().playGame(!game.homeTeamWin()));
+            }
             return null;
         }
 
@@ -411,6 +429,10 @@ public class GameFragment extends Fragment {
             new DataAsync().execute();
         }
 
+        @Override
+        protected void onCancelled(){
+            gameAsync = null;
+        }
 
         private void updateUI(){
             homeScore.setText(getString(R.string.scores, game.getHomeScore()));
@@ -609,7 +631,7 @@ public class GameFragment extends Fragment {
                     }
                 }
                 else if(adapterType == 1 || adapterType == 2){
-                    boolean success = false;
+                    boolean success;
                     if(game.getHomeTeam().isPlayerControlled()){
                         success = game.getHomeTeam().updateSubs(grAdapter.getSubs());
                     }
@@ -621,6 +643,8 @@ public class GameFragment extends Fragment {
                         fab.setVisibility(View.GONE);
                         if(forceSub){
                             forceSub = false;
+                            game.getHomeTeam().makeSubs();
+                            game.getAwayTeam().makeSubs();
                         }
                     }
 
@@ -843,7 +867,7 @@ public class GameFragment extends Fragment {
                 frame.addView(recyclerView);
             }
 
-            adapter = new GameAdapter(new ArrayList<>(game.getPlays()));
+            adapter = new GameAdapter(new ArrayList<>(game.getPlays()), game.getAwayTeam().getColorLight());
             if(gameAsync == null){
                 fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
             }
@@ -883,11 +907,12 @@ public class GameFragment extends Fragment {
 
             fab.setVisibility(View.GONE);
             if(game.getHomeTeam().isPlayerControlled()){
-                rosterRecycler.setAdapter(grAdapter);
+                grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0, this);
             }
             else{
-                rosterRecycler.setAdapter(new GameRosterAdapter(game.getHomeTeam().getPlayers(),0));
+                grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0);
             }
+            rosterRecycler.setAdapter(grAdapter);
             grAdapter.notifyDataSetChanged();
             rosterSpinner.setSelection(0, false);
 
@@ -918,11 +943,12 @@ public class GameFragment extends Fragment {
 
             fab.setVisibility(View.GONE);
             if(game.getAwayTeam().isPlayerControlled()){
-                rosterRecycler.setAdapter(grAdapter);
+                grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0, this);
             }
             else{
-                rosterRecycler.setAdapter(new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0));
+                grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0);
             }
+            rosterRecycler.setAdapter(grAdapter);
             grAdapter.notifyDataSetChanged();
             rosterSpinner.setSelection(0, false);
 
@@ -1086,11 +1112,13 @@ public class GameFragment extends Fragment {
         @Override
         protected void onPreExecute(){
             db = Room.databaseBuilder(GameFragment.this.getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            Log.d("save games", "Start saving games");
         }
 
         @Override
         protected void onPostExecute(String result){
             db.close();
+            Log.d("save games", "Finished saving games");
         }
 
         @Override

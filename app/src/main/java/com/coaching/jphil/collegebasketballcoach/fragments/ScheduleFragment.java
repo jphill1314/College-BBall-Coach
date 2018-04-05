@@ -3,8 +3,11 @@ package com.coaching.jphil.collegebasketballcoach.fragments;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,7 +56,8 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
     private MainActivity mainActivity;
 
-    private Button simGame, viewTournament;
+    //private Button simGame, viewTournament;
+    private FloatingActionButton nextAction;
     private boolean playerSeasonFinished = false;
     private boolean startNewSeason = false;
     private boolean allConferencesInPostSeason;
@@ -63,6 +67,7 @@ public class ScheduleFragment extends Fragment {
     private ArrayList<GameStatsDB> stats;
 
     private SimAsync async;
+    private DataAsync dataAsync;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,10 +76,10 @@ public class ScheduleFragment extends Fragment {
 
         isInTournamentView = false;
 
-        TextView tvSeason = view.findViewById(R.id.schedule_season);
+        //TextView tvSeason = view.findViewById(R.id.schedule_season);
         mainActivity = (MainActivity) getActivity();
 
-        tvSeason.setText(getResources().getString(R.string.season_name, mainActivity.getPlayerTeam().getCurrentSeasonYear(), mainActivity.getPlayerTeam().getCurrentSeasonYear() + 1));
+        //tvSeason.setText(getResources().getString(R.string.season_name, mainActivity.getPlayerTeam().getCurrentSeasonYear(), mainActivity.getPlayerTeam().getCurrentSeasonYear() + 1));
 
         recyclerView = view.findViewById(R.id.schedule_list);
         manager = new LinearLayoutManager(getContext());
@@ -83,64 +88,51 @@ public class ScheduleFragment extends Fragment {
                 , mainActivity.currentTeam);
         recyclerView.setAdapter(adapter);
 
-        simGame = view.findViewById(R.id.sim_game);
-        viewTournament = view.findViewById(R.id.tourn_view);
+        nextAction = view.findViewById(R.id.adavance_fab);
+        nextAction.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(mainActivity.currentTeam.getColorLight())));
+        //simGame = view.findViewById(R.id.sim_game);
+        //viewTournament = view.findViewById(R.id.tourn_view);
 
         async = null;
         updateUI();
 
-        if(!mainActivity.currentTeam.isPlayerControlled()){
-            simGame.setVisibility(View.GONE);
-        }
-
-        simGame.setOnClickListener(new View.OnClickListener() {
+        nextAction.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if(simGame.getText().equals(getString(R.string.new_season))){
+            public void onClick(View v) {
+                //TODO: this currently doesn't enter the tournament view or sim tournament games
+                if(mainActivity.championship != null && mainActivity.championship.hasChampion()){
                     startNewSeason();
-                    simGame.setEnabled(false);
+                    nextAction.setEnabled(false);
                 }
-                else if(playerSeasonFinished){
-                    if(async == null){
-                        async = new SimAsync();
-                        async.execute();
-                    }
-                }
-                else if(!startNewSeason){
-                    if(async == null){
-                        async = new SimAsync();
-                        async.execute();
-                    }
-                }
-
-                if(isInTournamentView){
-                    if (mainActivity.championship != null) {
+                else{
+                    if(isInTournamentView){
+                        if (mainActivity.championship != null) {
                         ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());
+                        }
+                        else {
+                            ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
+                        }
+                        async = new SimAsync();
+                        async.execute();
                     }
-                    else {
-                        ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
+                    else{
+                        if(mainActivity.currentConference.isInPostSeason()){
+                            adapter = new TournamentGameAdapter(mainActivity.currentConference.getTournamentGames(), mainActivity.currentConference.getStandings());
+                            recyclerView.setAdapter(adapter);
+                            isInTournamentView = true;
+                        }
+                        else if(mainActivity.currentConference.isSeasonFinished() && mainActivity.currentConference != null){
+                            adapter = new TournamentGameAdapter(mainActivity.championship.getTournament().getGames(), mainActivity.championship.getTeams());
+                            recyclerView.setAdapter(adapter);
+                            isInTournamentView = true;
+                        }
+                        else {
+                            async = new SimAsync();
+                            async.execute();
+                        }
                     }
-                }
-                else {
-                    ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());
                 }
                 adapter.notifyDataSetChanged();
-            }
-        });
-
-        viewTournament.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mainActivity.championship != null){
-                    adapter = new TournamentGameAdapter(mainActivity.championship.getTournament().getGames(), mainActivity.championship.getTeams());
-                }
-                else {
-                    adapter = new TournamentGameAdapter(mainActivity.currentConference.getTournamentGames(), mainActivity.currentConference.getStandings());
-                }
-                recyclerView.setAdapter(adapter);
-                viewTournament.setVisibility(View.GONE);
-                simGame.setVisibility(View.VISIBLE);
-                isInTournamentView = true;
             }
         });
 
@@ -162,7 +154,8 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
-            simGame.setEnabled(false);
+            //simGame.setEnabled(false);
+            nextAction.setEnabled(false);
         }
 
         @Override
@@ -192,22 +185,16 @@ public class ScheduleFragment extends Fragment {
             }
             else if(results == -2){
                 startTournament(!allConferencesHaveChamp);
-//                if(mainActivity.getPlayerTeam().isSeasonOver()){
-//                    simRestOfSeason();
-//                }
             }
             else if(results == -100){
                 if(mainActivity.championship != null && mainActivity.championship.hasChampion()) {
                     Log.d("Champ", "Champion: " + mainActivity.championship.getTournament().getChampion().getFullName());
                     startNewSeason = true;
                 }
-                else if(mainActivity.championship != null){
-                    for(Game g: mainActivity.championship.getGames()){
+                else if(mainActivity.championship != null) {
+                    for (Game g : mainActivity.championship.getGames()) {
                         Log.d("champs", g.getHomeTeamName() + " vs. " + g.getAwayTeamName());
                     }
-//                    if(mainActivity.getPlayerTeam().isSeasonOver()){
-//                        simRestOfSeason();
-//                    }
                 }
                 else{
                     Log.d("results", "Results: " + results);
@@ -219,10 +206,12 @@ public class ScheduleFragment extends Fragment {
             }
             async = null;
             adapter.notifyDataSetChanged();
-            simGame.setEnabled(true);
+            nextAction.setEnabled(true);
             updateUI();
 
-            new DataAsync().execute();
+            dataAsync = new DataAsync();
+            dataAsync.execute("");
+
 
             Log.d("sim", "finished simming: " + results);
         }
@@ -319,10 +308,22 @@ public class ScheduleFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             db.close();
+            dataAsync = null;
         }
 
         @Override
         protected String doInBackground(String... strings){
+            if(strings[0].equals("tournament")){
+                saveTournamentGames();
+            }
+            else{
+                saveGameAndStats();
+            }
+
+            return null;
+        }
+
+        private void saveGameAndStats(){
             GameStatsDB[] gameStatsDB = new GameStatsDB[stats.size()];
             ArrayList<Integer> gameIndexs = new ArrayList<>();
 
@@ -372,8 +373,40 @@ public class ScheduleFragment extends Fragment {
             db.appDAO().insertGames(games);
             db.appDAO().insertGamesStats(gameStatsDB);
             Log.d("Saves", "Finished saving games");
+        }
 
-            return null;
+        private void saveTournamentGames(){
+            int numGames = 0;
+            for(Conference c: mainActivity.conferences){
+                for(Tournament t: c.getTournaments()){
+                    for(Game g: t.getGames()){
+                        numGames++;
+                    }
+                }
+            }
+
+            GameDB[] games = new GameDB[numGames];
+            int gameIndex = 0;
+            for(Conference c: mainActivity.conferences){
+                for(Tournament t: c.getTournaments()){
+                    for(Game game: t.getGames()){
+                        games[gameIndex] = new GameDB();
+                        games[gameIndex].gameID = game.getId();
+                        games[gameIndex].homeTeamID = game.getHomeTeam().getId();
+                        games[gameIndex].awayTeamID = game.getAwayTeam().getId();
+
+                        games[gameIndex].homeScore = game.getHomeScore();
+                        games[gameIndex].awayScore = game.getAwayScore();
+
+                        games[gameIndex].isNeutralCourt = game.getIsNeutralCourt();
+                        games[gameIndex].isPlayed = game.isPlayed();
+                        gameIndex++;
+                    }
+                }
+            }
+
+            db.appDAO().insertGames(games);
+            Log.d("save", "tournament games saved");
         }
     }
 
@@ -397,14 +430,14 @@ public class ScheduleFragment extends Fragment {
 
         if(!mainActivity.getPlayerTeam().hasUnplayedGames()){
             if(!mainActivity.getPlayerTeam().getConference().isInPostSeason()){
-                simGame.setText(getString(R.string.start_tournament));
+                //simGame.setText(getString(R.string.start_tournament));
                 playerSeasonFinished = false;
             }
             else if(mainActivity.championship != null){
                 if(mainActivity.championship.hasChampion()){
                     playerSeasonFinished = true;
                     startNewSeason = true;
-                    simGame.setText(getString(R.string.new_season));
+                    //simGame.setText(getString(R.string.new_season));
                 }
                 else {
                     playerSeasonFinished = false;
@@ -415,10 +448,10 @@ public class ScheduleFragment extends Fragment {
             }
         }
 
-        if(!isInTournamentView && (mainActivity.currentConference.isInPostSeason() || mainActivity.championship != null)){
-            viewTournament.setVisibility(View.VISIBLE);
-            simGame.setVisibility(View.INVISIBLE);
-        }
+//        if(!isInTournamentView && (mainActivity.currentConference.isInPostSeason() || mainActivity.championship != null)){
+//            viewTournament.setVisibility(View.VISIBLE);
+//            simGame.setVisibility(View.INVISIBLE);
+//        }
     }
 
     private void startTournament(boolean generateConfTourn){
@@ -426,12 +459,13 @@ public class ScheduleFragment extends Fragment {
             for (Conference c : mainActivity.conferences) {
                 c.generateTournament();
             }
+            new DataAsync().execute("tournament");
         }
         else{
             mainActivity.generateNationalChampionship();
         }
 
-        simGame.setText(R.string.sim_game);
+        //simGame.setText(R.string.sim_game);
         if(isInTournamentView){
             if (mainActivity.championship != null) {
                 ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());

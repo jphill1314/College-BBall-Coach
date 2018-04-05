@@ -1,6 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -51,6 +52,7 @@ public class RosterFragment extends Fragment {
                 }
             }
             mainActivity.actionBar.setTitle(mainActivity.currentTeam.getFullName());
+            mainActivity.updateColors();
         }
 
         recyclerView = view.findViewById(R.id.roster_list);
@@ -61,6 +63,7 @@ public class RosterFragment extends Fragment {
 
         if(mainActivity.currentTeam.isPlayerControlled()){
             confirmButton = view.findViewById(R.id.confirm_roster_button);
+            confirmButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(((MainActivity)getActivity()).currentTeam.getColorLight())));
             confirmButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

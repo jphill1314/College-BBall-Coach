@@ -35,6 +35,7 @@ import com.coaching.jphil.collegebasketballcoach.Database.TournamentDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.StartScreenActivity;
+import com.coaching.jphil.collegebasketballcoach.adapters.ColorSpinnerAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
@@ -61,7 +62,7 @@ public class TeamCreatorFragment extends Fragment {
     }
 
     private EditText schoolName, mascot, coach;
-    private Spinner confSelector;
+    private Spinner confSelector, colorSelector;
     private boolean schoolEnter, mascotEnter, coachEnter;
     private FloatingActionButton fab;
 
@@ -136,6 +137,11 @@ public class TeamCreatorFragment extends Fragment {
                 showFab();
             }
         });
+
+        colorSelector = view.findViewById(R.id.color_spinner);
+        colorSelector.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.colors)));
+
 
         confSelector = view.findViewById(R.id.conference_spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item,
@@ -277,6 +283,10 @@ public class TeamCreatorFragment extends Fragment {
                         teamsDB[i].isPlayerControlled = teams.get(i).isPlayerControlled();
                         teamsDB[i].schoolName = teams.get(i).getSchoolName();
                         teamsDB[i].schoolMascot = teams.get(i).getMascot();
+
+                        teamsDB[i].colorMain = teams.get(i).getColorMain();
+                        teamsDB[i].colorDark = teams.get(i).getColorDark();
+                        teamsDB[i].colorLight = teams.get(i).getColorLight();
 
                         teamsDB[i].offFavorsThrees = teams.get(i).getOffenseFavorsThrees();
                         teamsDB[i].defFavorsThrees = teams.get(i).getDefenseFavorsThrees();
@@ -528,15 +538,16 @@ public class TeamCreatorFragment extends Fragment {
                 int numPlayers = 12 + r.nextInt(4);
                 int rating = r.nextInt(15) + minRating;
                 if(i != 0) {
-                    teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating, false), false, getActivity()));
+                    teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating, false), false, getTeamColors(), getActivity()));
                 }
                 else{
                     if(player) {
                         rating = minRating + r.nextInt(15) + teamStrength * 10;
-                        teams.add(new Team(schoolName.getText().toString(), mascot.getText().toString(), getPlayers(numPlayers, rating), getCoaches(4, rating, true), true, getActivity()));
+                        teams.add(new Team(schoolName.getText().toString(), mascot.getText().toString(), getPlayers(numPlayers, rating), getCoaches(4, rating, true), true,
+                                getTeamColors(colorSelector.getSelectedItemPosition()), getActivity()));
                     }
                     else{
-                        teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating, false), false, getActivity()));
+                        teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating, false), false, getTeamColors(), getActivity()));
                     }
                 }
             }
@@ -606,6 +617,176 @@ public class TeamCreatorFragment extends Fragment {
                 coaches.add(new Coach(firstNames[r.nextInt(firstNames.length)], lastNames[r.nextInt(lastNames.length)], 2, teamRating - 5));
             }
             return coaches;
+        }
+
+        private int[] getTeamColors(){
+            Random r = new Random();
+            int color = r.nextInt(15);
+            int[] colors = new int[3];
+
+            switch (color){
+                case 0:
+                    colors[0] = R.color.redPrimary;
+                    colors[1] = R.color.redDark;
+                    colors[2] = R.color.redAccent;
+                    break;
+                case 1:
+                    colors[0] = R.color.pinkPrimary;
+                    colors[1] = R.color.pinkDark;
+                    colors[2] = R.color.pinkAccent;
+                    break;
+                case 2:
+                    colors[0] = R.color.purplePrimary;
+                    colors[1] = R.color.purpleDark;
+                    colors[2] = R.color.purpleAccent;
+                    break;
+                case 3:
+                    colors[0] = R.color.deepPurplePrimary;
+                    colors[1] = R.color.deepPurpleDark;
+                    colors[2] = R.color.deepPurpleAccent;
+                    break;
+                case 4:
+                    colors[0] = R.color.indigoPrimary;
+                    colors[1] = R.color.indigoDark;
+                    colors[2] = R.color.indigoAccent;
+                    break;
+                case 5:
+                    colors[0] = R.color.bluePrimary;
+                    colors[1] = R.color.blueDark;
+                    colors[2] = R.color.blueAccent;
+                    break;
+                case 6:
+                    colors[0] = R.color.lightBluePrimary;
+                    colors[1] = R.color.lightBlueDark;
+                    colors[2] = R.color.lightBlueAccent;
+                    break;
+                case 7:
+                    colors[0] = R.color.cyanPrimary;
+                    colors[1] = R.color.cyanDark;
+                    colors[2] = R.color.cyanAccent;
+                    break;
+                case 8:
+                    colors[0] = R.color.tealPrimary;
+                    colors[1] = R.color.tealDark;
+                    colors[2] = R.color.tealAccent;
+                    break;
+                case 9:
+                    colors[0] = R.color.greenPrimary;
+                    colors[1] = R.color.greenDark;
+                    colors[2] = R.color.greenAccent;
+                    break;
+                case 10:
+                    colors[0] = R.color.lightGreenPrimary;
+                    colors[1] = R.color.lightGreenDark;
+                    colors[2] = R.color.lightGreenAccent;
+                    break;
+                case 11:
+                    colors[0] = R.color.yellowPrimary;
+                    colors[1] = R.color.yellowDark;
+                    colors[2] = R.color.yellowAccent;
+                    break;
+                case 12:
+                    colors[0] = R.color.orangePrimary;
+                    colors[1] = R.color.orangeDark;
+                    colors[2] = R.color.orangeAccent;
+                    break;
+                case 13:
+                    colors[0] = R.color.deepOrangePrimary;
+                    colors[1] = R.color.deepOrangeDark;
+                    colors[2] = R.color.deepOrangeAccent;
+                    break;
+                case 14:
+                    colors[0] = R.color.blueGreyPrimary;
+                    colors[1] = R.color.blueGreyDark;
+                    colors[2] = R.color.blueGreyAccent;
+                    break;
+            }
+
+            return colors;
+        }
+
+        private int[] getTeamColors(int color){
+            int[] colors = new int[3];
+
+            switch (color){
+                case 0:
+                    colors[0] = R.color.redPrimary;
+                    colors[1] = R.color.redDark;
+                    colors[2] = R.color.redAccent;
+                    break;
+                case 1:
+                    colors[0] = R.color.pinkPrimary;
+                    colors[1] = R.color.pinkDark;
+                    colors[2] = R.color.pinkAccent;
+                    break;
+                case 2:
+                    colors[0] = R.color.purplePrimary;
+                    colors[1] = R.color.purpleDark;
+                    colors[2] = R.color.purpleAccent;
+                    break;
+                case 3:
+                    colors[0] = R.color.deepPurplePrimary;
+                    colors[1] = R.color.deepPurpleDark;
+                    colors[2] = R.color.deepPurpleAccent;
+                    break;
+                case 4:
+                    colors[0] = R.color.indigoPrimary;
+                    colors[1] = R.color.indigoDark;
+                    colors[2] = R.color.indigoAccent;
+                    break;
+                case 5:
+                    colors[0] = R.color.bluePrimary;
+                    colors[1] = R.color.blueDark;
+                    colors[2] = R.color.blueAccent;
+                    break;
+                case 6:
+                    colors[0] = R.color.lightBluePrimary;
+                    colors[1] = R.color.lightBlueDark;
+                    colors[2] = R.color.lightBlueAccent;
+                    break;
+                case 7:
+                    colors[0] = R.color.cyanPrimary;
+                    colors[1] = R.color.cyanDark;
+                    colors[2] = R.color.cyanAccent;
+                    break;
+                case 8:
+                    colors[0] = R.color.tealPrimary;
+                    colors[1] = R.color.tealDark;
+                    colors[2] = R.color.tealAccent;
+                    break;
+                case 9:
+                    colors[0] = R.color.greenPrimary;
+                    colors[1] = R.color.greenDark;
+                    colors[2] = R.color.greenAccent;
+                    break;
+                case 10:
+                    colors[0] = R.color.lightGreenPrimary;
+                    colors[1] = R.color.lightGreenDark;
+                    colors[2] = R.color.lightGreenAccent;
+                    break;
+                case 11:
+                    colors[0] = R.color.yellowPrimary;
+                    colors[1] = R.color.yellowDark;
+                    colors[2] = R.color.yellowAccent;
+                    break;
+                case 12:
+                    colors[0] = R.color.orangePrimary;
+                    colors[1] = R.color.orangeDark;
+                    colors[2] = R.color.orangeAccent;
+                    break;
+                case 13:
+                    colors[0] = R.color.deepOrangePrimary;
+                    colors[1] = R.color.deepOrangeDark;
+                    colors[2] = R.color.deepOrangeAccent;
+                    break;
+                case 14:
+                    colors[0] = R.color.blueGreyPrimary;
+                    colors[1] = R.color.blueGreyDark;
+                    colors[2] = R.color.blueGreyAccent;
+                    break;
+            }
+
+            return colors;
         }
 
         private void generateNonConferenceGames(){

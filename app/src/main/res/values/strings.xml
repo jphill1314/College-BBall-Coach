@@ -42,6 +42,26 @@
         <item>Canadian Athletic Conference</item>
     </string-array>
 
+    <string name="color_spinner_label">School color:</string>
+
+    <string-array name="colors">
+        <item>Red</item>
+        <item>Pink</item>
+        <item>Purple</item>
+        <item>Deep Purple</item>
+        <item>Indigo</item>
+        <item>Blue</item>
+        <item>Light Blue</item>
+        <item>Cyan</item>
+        <item>Teal</item>
+        <item>Green</item>
+        <item>Light Green</item>
+        <item>Yellow</item>
+        <item>Orange</item>
+        <item>Deep Orange</item>
+        <item>Blue Grey</item>
+    </string-array>
+
     <string-array name="drawer_items">
         <item>Roster</item>
         <item>Schedule</item>
