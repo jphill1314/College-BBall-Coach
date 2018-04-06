@@ -49,7 +49,9 @@ public class StartScreenFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 android.support.v4.app.FragmentTransaction t = getActivity().getSupportFragmentManager().beginTransaction();
-                t.replace(R.id.frame_layout, new TeamCreatorFragment()).commit();
+                t.replace(R.id.frame_layout, new TeamCreatorFragment())
+                        .addToBackStack("create team")
+                        .commit();
             }
         });
 

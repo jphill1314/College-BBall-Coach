@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/College-BBall-Coach.iml" filepath="$PROJECT_DIR$/College-BBall-Coach.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CollegeBasketballCoach.iml" filepath="$PROJECT_DIR$/CollegeBasketballCoach.iml" />
-      <module fileurl="file://$USER_HOME$/Documents/Android Stuff/College_Basketball_Coach/College-BBall-Coach/CollegeBasketballCoach.iml" filepath="$USER_HOME$/Documents/Android Stuff/College_Basketball_Coach/College-BBall-Coach/CollegeBasketballCoach.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

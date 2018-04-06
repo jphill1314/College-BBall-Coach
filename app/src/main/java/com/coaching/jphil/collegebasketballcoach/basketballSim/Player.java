@@ -3,6 +3,7 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim;
 import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
+import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -90,7 +91,8 @@ public class Player {
     private double fatigue;
     private int timePlayed; // time in seconds
 
-    private boolean prepareForSave = false;
+    private boolean prepareForSave;
+    private boolean savedInProgress;
 
 
     public Player(String lName, String fName, int position, int year, int overallRating){
@@ -266,6 +268,7 @@ public class Player {
         currentPosition = position;
 
         prepareForSave = false;
+        savedInProgress = true;
     }
 
     void addFoul(){
@@ -1232,6 +1235,22 @@ public class Player {
         return new int[]{stamina, aggressiveness, workEthic};
     }
 
+    public int getOffensiveModifier(){
+        return offensiveModifier;
+    }
+
+    public int getDefensiveModifier(){
+        return defensiveModifier;
+    }
+
+    public boolean isSavedInProgress(){
+        return savedInProgress;
+    }
+
+    public void setSavedInProgress(boolean bool){
+        savedInProgress = bool;
+    }
+
     private GameStatsDB saveGameStats(){
         GameStatsDB gameStats = new GameStatsDB();
 
@@ -1252,5 +1271,24 @@ public class Player {
         gameStats.turnovers = turnovers;
 
         return gameStats;
+    }
+
+    public void setUpGameInProgress(PlayerDB playerDB){
+        fouls = playerDB.gameFouls;
+        twoPointShotAttempts = playerDB.gameTwoPointShotAttempts;
+        twoPointShotMade = playerDB.gameTwoPointShotMade;
+        threePointShotAttempts = playerDB.gameThreePointShotAttempts;
+        threePointShotMade = playerDB.gameThreePointShotMade;
+        freeThrowAttempts = playerDB.gameFreeThrowAttempts;
+        freeThrowMade = playerDB.gameFreeThrowMade;
+        assists = playerDB.gameAssists;
+        oRebounds = playerDB.gameORebounds;
+        dRebounds = playerDB.gameDRebounds;
+        steals = playerDB.gameSteals;
+        turnovers = playerDB.gameTurnovers;
+        timePlayed = playerDB.gameTimePlayed;
+        fatigue = playerDB.gameFatigue;
+        offensiveModifier = playerDB.offensiveModifier;
+        defensiveModifier = playerDB.defensiveModifier;
     }
 }

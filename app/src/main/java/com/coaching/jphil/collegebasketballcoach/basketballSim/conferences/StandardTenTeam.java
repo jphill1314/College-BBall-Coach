@@ -8,6 +8,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -26,8 +27,8 @@ public class StandardTenTeam extends Conference {
 
     @Override
     public void generateTournament() {
-        ArrayList<Team> teams = new ArrayList<>(getTeams());
         if(getTournaments() == null) {
+            ArrayList<Team> teams = new ArrayList<>(getStandings());
             ArrayList<Team> PlayIn7v10 = new ArrayList<>();
             ArrayList<Team> PlayIn8v9 = new ArrayList<>();
 
@@ -41,6 +42,7 @@ public class StandardTenTeam extends Conference {
             addTournament(new Tournament(PlayIn7v10, "7 vs 10 Play In", true));
         }
         else if(getTournaments().size() == 2 && allGamesPlayed()){
+            ArrayList<Team> teams = new ArrayList<>(getTeams());
             Iterator<Team> itr = teams.iterator();
             while(itr.hasNext()){
                 Team t = itr.next();
@@ -49,6 +51,10 @@ public class StandardTenTeam extends Conference {
                     Log.d("Team", "Removed");
                     itr.remove();
                 }
+            }
+
+            if(teams.get(teams.size()-1).equals(getTournaments().get(1).getChampion())){
+                Collections.swap(teams, teams.size()-1, teams.size()-2);
             }
             addTournament(new Tournament(teams, getName() + " Championship", true));
         }

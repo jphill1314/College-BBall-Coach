@@ -126,20 +126,31 @@ public abstract class Conference {
 
     public ArrayList<Team> getStandings(){
         ArrayList<Team> standing = teams;
+        int totalGames = (teams.size() * 2) - 2;
 
-        int changes = 0;
+        int changes ;
         do{
             changes = 0;
             for(int x = 0; x < standing.size() - 1; x++){
                 for(int y = x + 1; y < standing.size(); y++) {
-                    if (standing.get(x).getWinPercent() < standing.get(y).getWinPercent()) {
+                    if(standing.get(x).getConferenceWinPercent(totalGames) < standing.get(y).getConferenceWinPercent(totalGames)){
                         Collections.swap(standing, x, y);
-                        changes++;
                     }
-                    else if(standing.get(x).getWinPercent() == standing.get(y).getWinPercent()){
-                        if(standing.get(x).getWins() > standing.get(y).getWins()){
+                    else if(standing.get(x).getConferenceWinPercent(totalGames) == standing.get(y).getConferenceWinPercent(totalGames)){
+                        if(standing.get(x).getConferenceWins(totalGames) < standing.get(y).getConferenceWins(totalGames)){
                             Collections.swap(standing, x, y);
-                            changes++;
+                        }
+                        else if (standing.get(x).getConferenceWins(totalGames) == standing.get(y).getConferenceWins(totalGames)){
+                            if(standing.get(x).getWinPercent() < standing.get(y).getWinPercent()) {
+                                Collections.swap(standing, x, y);
+                                changes++;
+                            }
+                            else if(standing.get(x).getWinPercent() == standing.get(y).getWinPercent()) {
+                                if (standing.get(x).getWins() < standing.get(y).getWins()) {
+                                    Collections.swap(standing, x, y);
+                                    changes++;
+                                }
+                            }
                         }
                     }
                 }

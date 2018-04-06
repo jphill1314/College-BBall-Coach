@@ -10,4 +10,7 @@
     <item
         android:id="@+id/sort_status"
         android:title="@string/sort_status"/>
+    <item
+        android:id="@+id/sort_interest"
+        android:title="@string/sort_interest"/>
 </menu>

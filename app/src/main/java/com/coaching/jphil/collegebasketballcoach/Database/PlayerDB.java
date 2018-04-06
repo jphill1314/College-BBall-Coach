@@ -70,4 +70,23 @@ public class PlayerDB {
     // Tracked Stats
     public int gamesPlayed;
     public int totalMinutes;
+
+    // Stuff saved for games in progress
+    public int gameFouls = -1;
+    public int gameTwoPointShotAttempts;
+    public int gameTwoPointShotMade;
+    public int gameThreePointShotAttempts;
+    public int gameThreePointShotMade;
+    public int gameFreeThrowAttempts;
+    public int gameFreeThrowMade;
+    public int gameAssists;
+    public int gameORebounds;
+    public int gameDRebounds;
+    public int gameSteals;
+    public int gameTurnovers;
+    public int gameTimePlayed;
+    public double gameFatigue;
+    public int gameRosterLocation;
+    public int offensiveModifier;
+    public int defensiveModifier;
 }

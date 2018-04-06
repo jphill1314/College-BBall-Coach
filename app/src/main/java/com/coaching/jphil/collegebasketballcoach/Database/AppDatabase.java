@@ -9,7 +9,7 @@ import android.arch.persistence.room.RoomDatabase;
  */
 
 @Database(entities = {TeamDB.class, PlayerDB.class, GameDB.class, CoachDB.class, RecruitDB.class,
-        ConferenceDB.class, TournamentDB.class, GameStatsDB.class}, version = 1)
+        ConferenceDB.class, TournamentDB.class, GameStatsDB.class, GameEventDB.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract AppDAO appDAO();
 }

@@ -15,12 +15,12 @@ import com.coaching.jphil.collegebasketballcoach.R;
 public class ColorSpinnerAdapter extends ArrayAdapter {
 
     private String[] colorNames;
-    private LayoutInflater inflater;
+    private Context context;
 
     public ColorSpinnerAdapter(@NonNull Context context, int resource, String[] strings) {
         super(context, resource);
-        inflater = LayoutInflater.from(context);
         colorNames = strings;
+        this.context = context;
     }
 
     @Override
@@ -28,13 +28,30 @@ public class ColorSpinnerAdapter extends ArrayAdapter {
         return 15;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view = inflater.inflate(R.layout.player_info_list_item, null);
-        TextView tv = view.findViewById(R.id.player_info_tv);
-        tv.setText("Team Color");
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        if(convertView == null){
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.player_info_list_item,null);
+        }
+        TextView tv = convertView.findViewById(R.id.player_info_tv);
+        tv.setText(context.getResources().getString(R.string.color_spinner_label));
         tv.setBackgroundResource(getTeamColors(position));
-        return view;
+        return convertView;
+    }
+
+    @NonNull
+    @Override
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+        if(convertView == null){
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.player_info_list_item,null);
+        }
+        TextView tv = convertView.findViewById(R.id.player_info_tv);
+        tv.setText(colorNames[position]);
+        tv.setBackgroundResource(getTeamColors(position));
+        return convertView;
     }
 
 

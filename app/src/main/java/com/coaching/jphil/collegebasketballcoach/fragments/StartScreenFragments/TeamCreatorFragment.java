@@ -139,7 +139,7 @@ public class TeamCreatorFragment extends Fragment {
         });
 
         colorSelector = view.findViewById(R.id.color_spinner);
-        colorSelector.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item,
+        colorSelector.setAdapter(new ColorSpinnerAdapter(getContext(), R.layout.player_info_list_item,
                 getResources().getStringArray(R.array.colors)));
 
 
@@ -187,7 +187,6 @@ public class TeamCreatorFragment extends Fragment {
             fab.setVisibility(View.GONE);
         }
     }
-
 
     public void onRadioButtonClicked(int id){
         switch (id){
@@ -247,6 +246,7 @@ public class TeamCreatorFragment extends Fragment {
                 db.appDAO().deleteCoachDB();
                 db.appDAO().deleteTeamDB();
                 db.appDAO().deleteConferences();
+                db.appDAO().deleteGameEvents();
             }
         }
 

@@ -44,19 +44,21 @@ public class Recruit {
     }
 
     private void generateInterest(Team team){
+        Random r = new Random();
         interest = 0;
+
         if(team.getOverallRating() > rating){
-            interest += 25 + (team.getOverallRating() - rating);
+            interest += r.nextInt(5 + (team.getOverallRating() - rating)) + 5;
         }
         else if(team.getOverallRating() + 10 >= rating){
-            interest += 10;
+            interest += r.nextInt(5) + 5;
         }
 
         if(team.getNumberOfPlayersAtPosition(position, false) > 1){
-            interest -= 10 * team.getNumberOfPlayersAtPosition(position, false);
+            interest -= r.nextInt(5 * team.getNumberOfPlayersAtPosition(position, false)) + 5;
         }
         else{
-            interest += 25;
+            interest += r.nextInt(20) + 10;
         }
 
         if(interest < 0){
@@ -144,6 +146,8 @@ public class Recruit {
     boolean attemptToRecruit(int recruitingAbility, boolean bigWin, boolean badLoss, int spotsAvailable){
         Random r = new Random();
 
+        interest += r.nextInt(recruitingAbility / 15);
+
         if(bigWin){
             interest += r.nextInt(10);
         }
@@ -163,7 +167,7 @@ public class Recruit {
 
     private boolean commit(int recruitingAbility){
         Random r = new Random();
-        if((recruitingAbility / 10 + interest >= r.nextInt(100 * 20)) || interest == 100){
+        if((recruitingAbility / 15 + interest >= r.nextInt(100 * 25)) || interest == 100){
             isCommitted = true;
         }
         return isCommitted;

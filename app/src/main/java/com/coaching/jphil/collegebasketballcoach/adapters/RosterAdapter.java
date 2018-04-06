@@ -29,7 +29,7 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView tvPos, tvName, tvRating, tvPrefPos, tvYear;
         View view;
-        public ViewHolder(View view, final MainActivity activity){
+        public ViewHolder(View view){
             super(view);
             tvPos = view.findViewById(R.id.roster_position);
             tvName = view.findViewById(R.id.roster_name);
@@ -37,12 +37,109 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
             tvPrefPos = view.findViewById(R.id.roster_pref_pos);
             tvYear = view.findViewById(R.id.roster_year);
             this.view = view;
+        }
+    }
 
-            view.setOnClickListener(new View.OnClickListener() {
+    private RosterFragment roster;
+    private ArrayList<Player> players;
+    private ArrayList<Player> subs;
+    private boolean playerControlled;
+    private MainActivity activity;
+    private int player1;
+
+    public RosterAdapter(ArrayList<Player> players, boolean playerControlled, RosterFragment roster){
+        this.players = players;
+        subs = new ArrayList<>(this.players);
+        this.playerControlled = playerControlled;
+        this.roster = roster;
+        player1 = -1;
+    }
+
+    @Override
+    public RosterAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.roster_list_item, parent, false);
+        ViewHolder vh = new ViewHolder(view);
+        activity = (MainActivity)parent.getContext();
+        return vh;
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position){
+        if(position < players.size()) {
+            if (subs.get(position).equals(players.get(position)) && player1 != position) {
+                holder.tvName.setTextColor(Color.BLACK);
+                holder.tvPos.setTextColor(Color.BLACK);
+                holder.tvPrefPos.setTextColor(Color.BLACK);
+                holder.tvYear.setTextColor(Color.BLACK);
+                holder.tvRating.setTextColor(Color.BLACK);
+            } else {
+                holder.tvName.setTextColor(Color.GRAY);
+                holder.tvPos.setTextColor(Color.GRAY);
+                holder.tvPrefPos.setTextColor(Color.GRAY);
+                holder.tvYear.setTextColor(Color.GRAY);
+                holder.tvRating.setTextColor(Color.GRAY);
+            }
+
+            holder.tvName.setText(subs.get(position).getFullName());
+            holder.tvPrefPos.setText(subs.get(position).getPositionAbr());
+            holder.tvYear.setText(subs.get(position).getYearAsString());
+
+            if (position < 5) {
+                holder.tvRating.setText(subs.get(position).calculateRatingAtPosition(position + 1) + "");
+            } else {
+                holder.tvRating.setText(subs.get(position).getOverallRating() + "");
+            }
+
+            String pos;
+            switch (position) {
+                case 0:
+                    pos = "PG";
+                    break;
+                case 1:
+                    pos = "SG";
+                    break;
+                case 2:
+                    pos = "SF";
+                    break;
+                case 3:
+                    pos = "PF";
+                    break;
+                case 4:
+                    pos = "C";
+                    break;
+                default:
+                    pos = "-";
+            }
+
+            holder.tvPos.setText(pos);
+
+            final int fpos = position;
+            if (playerControlled) {
+                holder.view.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        if (player1 == -1) {
+                            player1 = fpos;
+                        } else {
+                            if (player1 == fpos) {
+                                player1 = -1;
+                            } else {
+                                Collections.swap(subs, player1, fpos);
+                                roster.makeFABVisible();
+                                player1 = -1;
+                            }
+                        }
+                        notifyDataSetChanged();
+                        return true;
+                    }
+                });
+            }
+
+            holder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Bundle args = new Bundle();
-                    args.putInt("player", getLayoutPosition());
+                    args.putInt("player", fpos);
                     PlayerInfoFragment frag = new PlayerInfoFragment();
                     frag.setArguments(args);
 
@@ -53,103 +150,14 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
                 }
             });
         }
-    }
-
-    private RosterFragment roster;
-    private ArrayList<Player> players;
-    private ArrayList<Player> subs;
-    private boolean playerControlled;
-    private int player1;
-
-    public RosterAdapter(ArrayList<Player> players, boolean playerControlled, RosterFragment roster){
-        this.players = players;
-        subs = new ArrayList<>(this.players);
-        this.playerControlled = playerControlled;
-        this.roster = roster;
-
-        player1 = -1;
-    }
-
-    @Override
-    public RosterAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.roster_list_item, parent, false);
-
-        ViewHolder vh = new ViewHolder(view, (MainActivity)parent.getContext());
-        return vh;
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position){
-        if(subs.get(position).equals(players.get(position)) && player1 != position) {
-            holder.tvName.setTextColor(Color.BLACK);
-            holder.tvPos.setTextColor(Color.BLACK);
-            holder.tvPrefPos.setTextColor(Color.BLACK);
-            holder.tvYear.setTextColor(Color.BLACK);
-            holder.tvRating.setTextColor(Color.BLACK);
-        }
         else{
-            holder.tvName.setTextColor(Color.GRAY);
-            holder.tvPos.setTextColor(Color.GRAY);
-            holder.tvPrefPos.setTextColor(Color.GRAY);
-            holder.tvYear.setTextColor(Color.GRAY);
-            holder.tvRating.setTextColor(Color.GRAY);
-        }
-
-        holder.tvName.setText(subs.get(position).getFullName());
-        holder.tvPrefPos.setText(subs.get(position).getPositionAbr());
-        holder.tvYear.setText(subs.get(position).getYearAsString());
-
-        if (position < 5) {
-            holder.tvRating.setText(subs.get(position).calculateRatingAtPosition(position + 1) + "");
-        } else {
-            holder.tvRating.setText(subs.get(position).getOverallRating() + "");
-        }
-
-        String pos;
-        switch (position){
-            case 0:
-                pos = "PG";
-                break;
-            case 1:
-                pos = "SG";
-                break;
-            case 2:
-                pos = "SF";
-                break;
-            case 3:
-                pos = "PF";
-                break;
-            case 4:
-                pos = "C";
-                break;
-            default:
-                pos = "-";
-        }
-
-        holder.tvPos.setText(pos);
-
-        if(playerControlled){
-            final int fpos = position;
-            holder.view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if(player1 == -1){
-                        player1 = fpos;
-                    }
-                    else{
-                        if(player1 == fpos){
-                            player1 = -1;
-                        }
-                        else{
-                            Collections.swap(subs, player1, fpos);
-                            roster.makeFABVisible();
-                            player1 = -1;
-                        }
-                    }
-                    notifyDataSetChanged();
-                    return true;
-                }
-            });
+            holder.view.setOnClickListener(null);
+            holder.view.setOnLongClickListener(null);
+            holder.tvPos.setText("");
+            holder.tvName.setText("");
+            holder.tvRating.setText("");
+            holder.tvPrefPos.setText("");
+            holder.tvYear.setText("");
         }
     }
 
@@ -160,6 +168,6 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
 
     @Override
     public int getItemCount(){
-        return players.size();
+        return players.size() + 1;
     }
 }

@@ -35,11 +35,9 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
 
     private ArrayList<GameEvent> plays;
     private ArrayList<String> talks;
-    private int awayColor;
 
-    public GameAdapter(ArrayList<GameEvent> plays, int awayColor){
+    public GameAdapter(ArrayList<GameEvent> plays, int extra){
         this.plays = plays;
-        this.awayColor = awayColor;
     }
 
     public GameAdapter(ArrayList<String> talks){
@@ -66,7 +64,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder> {
                 holder.view.setBackgroundColor(Color.rgb(250,250,250));
             }
             else{
-                holder.view.setBackgroundResource(awayColor);
+                holder.view.setBackgroundColor(Color.rgb(235,235,235));
             }
         }
         else if(talks != null){

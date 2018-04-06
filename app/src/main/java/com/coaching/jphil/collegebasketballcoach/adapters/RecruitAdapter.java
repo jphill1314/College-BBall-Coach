@@ -241,6 +241,18 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
                             }
                         }
                     }
+                    else if(type == 3){
+                        if(recruits.get(x).getInterest() < recruits.get(y).getInterest()){
+                            Collections.swap(recruits, x, y);
+                            changes++;
+                        }
+                        else if(recruits.get(x).getInterest() == recruits.get(y).getInterest()){
+                            if(recruits.get(x).getRating() < recruits.get(y).getRating()){
+                                Collections.swap(recruits, x, y);
+                                changes++;
+                            }
+                        }
+                    }
                 }
             }
         }while(changes != 0);

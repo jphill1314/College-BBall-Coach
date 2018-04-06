@@ -69,8 +69,9 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
         holder.tvPos.setText(String.format(Locale.US, "%d", position+1));
         holder.tvName.setText(standing.get(position).getFullName());
         if(type != -1) {
-            holder.tvWins.setText(context.getResources().getString(R.string.record_string, standing.get(position).getConferenceWins(),
-                    standing.get(position).getConferenceLoses()));
+            int totalGames = (standing.size() * 2) - 2;
+            holder.tvWins.setText(context.getResources().getString(R.string.record_string, standing.get(position).getConferenceWins(totalGames),
+                    standing.get(position).getConferenceLoses(totalGames)));
         }
         else{
             holder.tvWins.setText(String.format(Locale.US,"%.4f", standing.get(position).getRPI()));
@@ -114,19 +115,20 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
 
     private void generateStandings(){
         int changes;
+        int totalGames = (standing.size() * 2) - 2;
 
         do{
             changes = 0;
             for(int x = 0; x < standing.size() - 1; x++){
                 for(int y = x + 1; y < standing.size(); y++) {
-                    if(standing.get(x).getConferenceWinPercent() < standing.get(y).getConferenceWinPercent()){
+                    if(standing.get(x).getConferenceWinPercent(totalGames) < standing.get(y).getConferenceWinPercent(totalGames)){
                         Collections.swap(standing, x, y);
                     }
-                    else if(standing.get(x).getConferenceWinPercent() == standing.get(y).getConferenceWinPercent()){
-                        if(standing.get(x).getConferenceWins() < standing.get(y).getConferenceWins()){
+                    else if(standing.get(x).getConferenceWinPercent(totalGames) == standing.get(y).getConferenceWinPercent(totalGames)){
+                        if(standing.get(x).getConferenceWins(totalGames) < standing.get(y).getConferenceWins(totalGames)){
                             Collections.swap(standing, x, y);
                         }
-                        else if (standing.get(x).getConferenceWins() == standing.get(y).getConferenceWins()){
+                        else if (standing.get(x).getConferenceWins(totalGames) == standing.get(y).getConferenceWins(totalGames)){
                             if(standing.get(x).getWinPercent() < standing.get(y).getWinPercent()) {
                                 Collections.swap(standing, x, y);
                                 changes++;

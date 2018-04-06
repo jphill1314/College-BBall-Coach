@@ -35,7 +35,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
+import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
+import com.coaching.jphil.collegebasketballcoach.Database.GameEventDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
+import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameAdapter;
@@ -73,7 +76,7 @@ public class GameFragment extends Fragment {
     private boolean showDeadBallAlerts;
     private boolean pauseSim = false;
 
-    public FloatingActionButton fab;
+    public FloatingActionButton fab, callTimeFab;
     private TextView homeScore, awayScore, half, time, homeTO, awayTO, homeFouls, awayFouls, homeName, awayName;
     private TextView deadBall, gameSpeedText, tvIntentFoul, posLabel, label1, label2, label3, label4;
     private TextView h2FG, h3FG, hFT, hA, hOB, hDB, hS, hTO, a2FG, a3FG, aFT, aA, aOB, aDB, aS, aTO, hName, aName;
@@ -98,12 +101,14 @@ public class GameFragment extends Fragment {
     private ArrayList<GameStatsDB> stats;
 
     private SimGame gameAsync;
+    private DataAsync dataAsync;
+    private MainActivity activity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle args = getArguments();
-        final MainActivity activity = (MainActivity) getActivity();
+        activity = (MainActivity) getActivity();
         if(args != null){
             gameIndex = args.getInt("game");
             game = activity.masterSchedule.get(gameIndex);
@@ -156,12 +161,15 @@ public class GameFragment extends Fragment {
 
         half.setText(getString(R.string.half, 1));
 
+        callTimeFab = view.findViewById(R.id.time_fab);
         fab = view.findViewById(R.id.game_fab);
         if(game.getHomeTeam().isPlayerControlled()){
             fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+            callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
         }
         else{
             fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
+            callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
         }
 
         recyclerView = (RecyclerView) inflater.inflate(R.layout.game_list_view, container, false);
@@ -223,6 +231,18 @@ public class GameFragment extends Fragment {
                 prefs.getBoolean(getString(R.string.shared_pref_disp_misc), true)};
 
         showDeadBallAlerts = prefs.getBoolean(getString(R.string.shared_pref_alert_dead_ball), true);
+
+        if(gameAsync == null && !game.isInProgress()) {
+            gameAsync = new SimGame();
+            gameAsync.execute();
+        }
+        else if(game.isInProgress()){
+            dataAsync = new DataAsync();
+            dataAsync.execute("load");
+        }
+        spinner.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+
 
         return view;
     }
@@ -307,10 +327,12 @@ public class GameFragment extends Fragment {
         @Override
         protected void onPreExecute(){
             if(!game.getIsInProgress()) {
+                Log.d("game", "pre game setup");
                 game.setSavePlays(true);
                 game.preGameSetUp();
             }
             else{
+                Log.d("game", "joining game in progress");
                 changeAdapters(0);
             }
         }
@@ -319,6 +341,7 @@ public class GameFragment extends Fragment {
         protected String doInBackground(String... strings) {
             do{
                 int playResult = game.simPlay();
+
                 while(playResult != -1 && !isCancelled()){
                     if(playResult == 1 && !isCancelled()) {
                         isInTimeout = true;
@@ -390,6 +413,7 @@ public class GameFragment extends Fragment {
             }while(game.startNextHalf() && !isCancelled());
 
             if(!isCancelled()) {
+                Log.d("Game", "Game is finished");
                 game.setIsPlayed(true);
 
                 stats = new ArrayList<>();
@@ -427,12 +451,15 @@ public class GameFragment extends Fragment {
             updateUI();
             gameAsync = null;
 
-            new DataAsync().execute();
+            dataAsync = new DataAsync();
+            dataAsync.execute("normal");
         }
 
         @Override
         protected void onCancelled(){
             gameAsync = null;
+            dataAsync = new DataAsync();
+            dataAsync.execute("in progress");
         }
 
         private void updateUI(){
@@ -526,6 +553,7 @@ public class GameFragment extends Fragment {
             playerTeam.setDefenseFavorsThrees(pendingDefThrees);
         }
 
+        fab.setVisibility(View.VISIBLE);
     }
 
     private void alertFoulTrouble(){
@@ -589,6 +617,14 @@ public class GameFragment extends Fragment {
                 }
             }
         });
+        if(game.getHomeTeam().isPlayerControlled()) {
+            gameSpeedBar.getProgressDrawable().setColorFilter(getResources().getColor(game.getHomeTeam().getColorLight()), PorterDuff.Mode.SRC_IN);
+            gameSpeedBar.getThumb().setColorFilter(getResources().getColor(game.getHomeTeam().getColorLight()), PorterDuff.Mode.SRC_IN);
+        }
+        else{
+            gameSpeedBar.getProgressDrawable().setColorFilter(getResources().getColor(game.getAwayTeam().getColorLight()), PorterDuff.Mode.SRC_IN);
+            gameSpeedBar.getThumb().setColorFilter(getResources().getColor(game.getAwayTeam().getColorLight()), PorterDuff.Mode.SRC_IN);
+        }
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -607,31 +643,18 @@ public class GameFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(adapterType == 0){
-                    if(gameAsync == null){
-                        gameAsync = new SimGame();
-                        gameAsync.execute();
-
-                        spinner.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                    }
-                    else if(alertDeadBall){
+                if(adapterType == 0) {
+                    if (alertDeadBall) {
                         alertDeadBall = false;
                         gameSpeedBar.setVisibility(View.VISIBLE);
                         gameSpeedText.setVisibility(View.VISIBLE);
                         deadBall.setVisibility(View.INVISIBLE);
                         updateGRA = true;
 
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_timeout));
-                    }
-                    else if(game.getPlayerWantsTO()){
-                        game.setPlayerWantsTO(false);
-                    }
-                    else {
-                        game.setPlayerWantsTO(true);
+                        fab.setVisibility(View.GONE);
                     }
                 }
-                else if(adapterType == 1 || adapterType == 2){
+                if(adapterType == 1 || adapterType == 2){
                     boolean success;
                     if(game.getHomeTeam().isPlayerControlled()){
                         success = game.getHomeTeam().updateSubs(grAdapter.getSubs());
@@ -673,6 +696,20 @@ public class GameFragment extends Fragment {
                     changeAdapters(0);
                 }
 
+            }
+        });
+
+        callTimeFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(adapterType == 0){
+                    if(game.getPlayerWantsTO()){
+                        game.setPlayerWantsTO(false);
+                    }
+                    else {
+                        game.setPlayerWantsTO(true);
+                    }
+                }
             }
         });
 
@@ -887,7 +924,15 @@ public class GameFragment extends Fragment {
             else {
                 fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_call_timeout));
             }
-            fab.setVisibility(View.VISIBLE);
+
+            if(alertDeadBall){
+                fab.setVisibility(View.VISIBLE);
+            }
+            else {
+                fab.setVisibility(View.GONE);
+            }
+            callTimeFab.setVisibility(View.VISIBLE);
+
 
             if(isInTimeout || alertDeadBall){
                 gameSpeedText.setVisibility(View.INVISIBLE);
@@ -915,6 +960,7 @@ public class GameFragment extends Fragment {
             }
 
             fab.setVisibility(View.GONE);
+            callTimeFab.setVisibility(View.GONE);
             if(game.getHomeTeam().isPlayerControlled()){
                 grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0, this);
             }
@@ -951,6 +997,7 @@ public class GameFragment extends Fragment {
             }
 
             fab.setVisibility(View.GONE);
+            callTimeFab.setVisibility(View.GONE);
             if(game.getAwayTeam().isPlayerControlled()){
                 grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0, this);
             }
@@ -986,6 +1033,7 @@ public class GameFragment extends Fragment {
             }
 
             fab.setVisibility(View.GONE);
+            callTimeFab.setVisibility(View.GONE);
             gameSpeedText.setVisibility(View.GONE);
             gameSpeedBar.setVisibility(View.GONE);
             deadBall.setVisibility(View.GONE);
@@ -1004,6 +1052,7 @@ public class GameFragment extends Fragment {
                 frame.addView(teamStatsView);
             }
             fab.setVisibility(View.GONE);
+            callTimeFab.setVisibility(View.GONE);
             gameSpeedText.setVisibility(View.GONE);
             gameSpeedBar.setVisibility(View.GONE);
             deadBall.setVisibility(View.GONE);
@@ -1027,6 +1076,7 @@ public class GameFragment extends Fragment {
 
             fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_black_24dp));
             fab.setVisibility(View.VISIBLE);
+            callTimeFab.setVisibility(View.GONE);
             if(game.getTimeRemaining() == 20 * 60 || (game.getHalf() > 2 && game.getTimeRemaining() == 5 * 60)){
                 adapter = new GameSpeechAdapter(getResources().getStringArray(R.array.pre_game_speeches));
                 deadBall.setText(getString(R.string.pre_game_instruction));
@@ -1120,26 +1170,325 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
-            db = Room.databaseBuilder(GameFragment.this.getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
-            Log.d("save games", "Start saving games");
+            db = Room.databaseBuilder(activity, AppDatabase.class, "basketballdb").build();
         }
 
         @Override
         protected void onPostExecute(String result){
             db.close();
+            if(result.equals("loaded")){
+                gameAsync = new SimGame();
+                gameAsync.execute();
+            }
+
+            dataAsync = null;
             Log.d("save games", "Finished saving games");
         }
 
         @Override
         protected String doInBackground(String... strings){
+            if(strings[0].equals("in progress")){
+                Log.d("save games", "Start saving game in progress");
+                saveGameInProgress();
+            }
+            else if(strings[0].equals("load")){
+                Log.d("Load", "Loading game in progress");
+                loadGameInProgress();
+                return "loaded";
+            }
+            else {
+                Log.d("save games", "Start saving game");
+                saveGameAndStats();
+            }
+
+            return "none";
+        }
+
+        private void saveGameAndStats(){
             GameStatsDB[] gameStatsDB = new GameStatsDB[stats.size()];
+
             for(int x = 0; x < gameStatsDB.length; x++){
                 gameStatsDB[x] = stats.get(x);
             }
 
-            db.appDAO().insertGamesStats(gameStatsDB);
+            GameDB games = new GameDB();
 
-            return null;
+            games.gameID = game.getId();
+            games.homeTeamID = game.getHomeTeam().getId();
+            games.awayTeamID = game.getAwayTeam().getId();
+
+            games.homeScore = game.getHomeScore();
+            games.awayScore = game.getAwayScore();
+
+            games.isNeutralCourt = game.getIsNeutralCourt();
+            games.isPlayed = game.isPlayed();
+
+
+            db.appDAO().insertGames(games);
+            db.appDAO().insertGamesStats(gameStatsDB);
+            Log.d("Saves", "Finished saving games");
+        }
+
+        private void saveGameInProgress(){
+            GameDB gameDB = new GameDB();
+            PlayerDB[] players = new PlayerDB[(game.getAwayTeam().getPlayers().size() + game.getHomeTeam().getPlayers().size())];
+
+            gameDB.gameID = game.getId();
+            gameDB.homeTeamID = game.getHomeTeam().getId();
+            gameDB.awayTeamID = game.getAwayTeam().getId();
+
+            gameDB.homeScore = game.getHomeScore();
+            gameDB.awayScore = game.getAwayScore();
+
+            gameDB.isNeutralCourt = game.getIsNeutralCourt();
+            gameDB.isPlayed = game.isPlayed();
+
+            gameDB.isInProgress = game.getIsInProgress();
+            gameDB.half = game.getHalf();
+            gameDB.timeRemaining = game.getTimeRemaining();
+            gameDB.playerWithBall = game.getPlayerWithBall();
+            gameDB.location = game.getLocation();
+            gameDB.shotClock = game.getShotClock();
+            gameDB.lastPlayerWithBall = game.getLastPlayerWithBall();
+            gameDB.lastShotClock = game.getLastShotClock();
+            gameDB.lastTimeRemaining = game.getLastTimeRemaining();
+            gameDB.playType = game.getPlayType();
+            gameDB.madeShot = game.isMadeShot();
+            gameDB.deadBall = game.isDeadBall();
+            gameDB.homeTeamHasBall = game.isHomeTeamHasBall();
+            gameDB.homeTeamHasPosArrow = game.isHomeTeamHasPosArrow();
+            gameDB.mediaTimeout1 = game.getMediaTimeouts()[0];
+            gameDB.mediaTimeout2 = game.getMediaTimeouts()[1];
+            gameDB.mediaTimeout3 = game.getMediaTimeouts()[2];
+            gameDB.mediaTimeout4 = game.getMediaTimeouts()[3];
+            gameDB.mediaTimeout5 = game.getMediaTimeouts()[4];
+            gameDB.mediaTimeout6 = game.getMediaTimeouts()[5];
+            gameDB.mediaTimeout7 = game.getMediaTimeouts()[6];
+            gameDB.mediaTimeout8 = game.getMediaTimeouts()[7];
+            gameDB.mediaTimeout9 = game.getMediaTimeouts()[8];
+            gameDB.mediaTimeout10 = game.getMediaTimeouts()[9];
+            gameDB.playerWantsTO = game.isPlayerWantsTO();
+            gameDB.recentTO = game.isRecentTO();
+            gameDB.playerIntentFoul = game.isPlayerIntentFoul();
+            gameDB.homeTimeouts = game.getHomeTimeouts();
+            gameDB.awayTimeouts = game.getAwayTimeouts();
+            gameDB.homeFouls = game.getHomeFouls();
+            gameDB.awayFouls = game.getAwayFouls();
+            gameDB.savePlays = game.isSavePlays();
+            gameDB.playerFouledOut = game.isPlayerFouledOut();
+            gameDB.alertedDeadBall = game.isAlertedDeadBall();
+            gameDB.shootFreeThrows = game.isShootFreeThrows();
+            gameDB.freeThrows = game.getFreeThrows();
+            if(game.getFreeThrowShooter() != null) {
+                gameDB.freeThrowShooterID = game.getFreeThrowShooter().getId();
+            }
+
+            int pIndex = 0;
+            for(int x = 0; x < game.getHomeTeam().getPlayers().size(); x++){
+                Player player = game.getHomeTeam().getPlayers().get(x);
+                players[pIndex] = new PlayerDB();
+
+                players[pIndex].gameFouls = player.getFouls();
+                players[pIndex].gameTwoPointShotAttempts = player.getTwoPointShotAttempts();
+                players[pIndex].gameTwoPointShotMade = player.getTwoPointShotMade();
+                players[pIndex].gameThreePointShotAttempts = player.getThreePointShotAttempts();
+                players[pIndex].gameThreePointShotMade = player.getThreePointShotMade();
+                players[pIndex].gameFreeThrowAttempts = player.getFreeThrowAttempts();
+                players[pIndex].gameFreeThrowMade = player.getFreeThrowMade();
+                players[pIndex].gameAssists = player.getAssists();
+                players[pIndex].gameORebounds = player.getdRebounds();
+                players[pIndex].gameDRebounds = player.getdRebounds();
+                players[pIndex].gameSteals = player.getSteals();
+                players[pIndex].gameTurnovers = player.getTurnovers();
+                players[pIndex].gameTimePlayed = player.getGamesPlayed();
+                players[pIndex].gameFatigue = player.getFatigue();
+                players[pIndex].gameRosterLocation = game.getHomeTeam().getPlayers().indexOf(player);
+                players[pIndex].offensiveModifier = player.getOffensiveModifier();
+                players[pIndex].defensiveModifier = player.getDefensiveModifier();
+
+                player.setSavedInProgress(true);
+
+                player.prepareForSaving();
+                if(player.getId() != -1){
+                    players[pIndex].playerId = player.getId();
+                }
+
+                players[pIndex].teamID = game.getHomeTeam().getId();
+                players[pIndex].lastName = player.getlName();
+                players[pIndex].firstName = player.getfName();
+                players[pIndex].year = player.getYear();
+                players[pIndex].pos = player.getPosition();
+                players[pIndex].trainingAs = player.getTrainingAs();
+                players[pIndex].currentRosterLocation = game.getHomeTeam().getRosterPlayers().indexOf(player);
+
+                players[pIndex].closeRangeShot = player.getCloseRangeShot();
+                players[pIndex].midRangeShot = player.getMidRangeShot();
+                players[pIndex].longRangeShot = player.getLongRangeShot();
+                players[pIndex].freeThrowShot = player.getFreeThrowShot();
+                players[pIndex].postMove = player.getPostMove();
+                players[pIndex].ballHandling = player.getBallHandling();
+                players[pIndex].passing = player.getPassing();
+                players[pIndex].screening = player.getScreening();
+                players[pIndex].offBallMovement = player.getOffBallMovement();
+
+                players[pIndex].postDefense = player.getPostDefense();
+                players[pIndex].perimeterDefense = player.getPerimeterDefense();
+                players[pIndex].onBallDefense = player.getOnBallDefense();
+                players[pIndex].offBallDefense = player.getOffBallDefense();
+                players[pIndex].stealing = player.getStealing();
+                players[pIndex].rebounding = player.getRebounding();
+
+                players[pIndex].stamina = player.getStamina();
+                players[pIndex].aggressiveness = player.getAggressiveness();
+                players[pIndex].workEthic = player.getWorkEthic();
+
+                players[pIndex].gamesPlayed = player.getGamesPlayed();
+                players[pIndex].totalMinutes = player.getTotalMinutes();
+
+                players[pIndex].closeRangeShotProgress = player.getCloseRangeShotProgress();
+                players[pIndex].midRangeShotProgress = player.getMidRangeShotProgress();
+                players[pIndex].longRangeShotProgress = player.getLongRangeShotProgress();
+                players[pIndex].freeThrowShotProgress = player.getFreeThrowShotProgress();
+                players[pIndex].postMoveProgress = player.getPostMoveProgress();
+                players[pIndex].ballHandlingProgress = player.getBallHandlingProgress();
+                players[pIndex].passingProgress = player.getPassingProgress();
+                players[pIndex].screeningProgress = player.getScreeningProgress();
+                players[pIndex].offballMovementProgress = player.getOffBallMovementProgress();
+
+                players[pIndex].postDefenseProgress = player.getPostDefenseProgress();
+                players[pIndex].perimeterDefenseProgress = player.getPerimeterDefenseProgress();
+                players[pIndex].onBallDefenseProgress = player.getOnBallDefenseProgress();
+                players[pIndex].offBallDefenseProgress = player.getOffBallDefenseProgress();
+                players[pIndex].stealingProgress = player.getStealingProgress();
+                players[pIndex].reboundingProgress = player.getReboundingProgress();
+
+                players[pIndex].staminaProgress = player.getStaminaProgress();
+
+                pIndex++;
+            }
+
+            for(int x = 0; x < game.getAwayTeam().getPlayers().size(); x++){
+                Player player = game.getAwayTeam().getPlayers().get(x);
+                players[pIndex] = new PlayerDB();
+
+                players[pIndex].gameFouls = player.getFouls();
+                players[pIndex].gameTwoPointShotAttempts = player.getTwoPointShotAttempts();
+                players[pIndex].gameTwoPointShotMade = player.getTwoPointShotMade();
+                players[pIndex].gameThreePointShotAttempts = player.getThreePointShotAttempts();
+                players[pIndex].gameThreePointShotMade = player.getThreePointShotMade();
+                players[pIndex].gameFreeThrowAttempts = player.getFreeThrowAttempts();
+                players[pIndex].gameFreeThrowMade = player.getFreeThrowMade();
+                players[pIndex].gameAssists = player.getAssists();
+                players[pIndex].gameORebounds = player.getdRebounds();
+                players[pIndex].gameDRebounds = player.getdRebounds();
+                players[pIndex].gameSteals = player.getSteals();
+                players[pIndex].gameTurnovers = player.getTurnovers();
+                players[pIndex].gameTimePlayed = player.getGamesPlayed();
+                players[pIndex].gameFatigue = player.getFatigue();
+                players[pIndex].gameRosterLocation = game.getAwayTeam().getPlayers().indexOf(player);
+                players[pIndex].offensiveModifier = player.getOffensiveModifier();
+                players[pIndex].defensiveModifier = player.getDefensiveModifier();
+
+                player.setSavedInProgress(true);
+
+                player.prepareForSaving();
+                if(player.getId() != -1){
+                    players[pIndex].playerId = player.getId();
+                }
+
+                players[pIndex].teamID = game.getAwayTeam().getId();
+                players[pIndex].lastName = player.getlName();
+                players[pIndex].firstName = player.getfName();
+                players[pIndex].year = player.getYear();
+                players[pIndex].pos = player.getPosition();
+                players[pIndex].trainingAs = player.getTrainingAs();
+                players[pIndex].currentRosterLocation = game.getAwayTeam().getRosterPlayers().indexOf(player);
+
+                players[pIndex].closeRangeShot = player.getCloseRangeShot();
+                players[pIndex].midRangeShot = player.getMidRangeShot();
+                players[pIndex].longRangeShot = player.getLongRangeShot();
+                players[pIndex].freeThrowShot = player.getFreeThrowShot();
+                players[pIndex].postMove = player.getPostMove();
+                players[pIndex].ballHandling = player.getBallHandling();
+                players[pIndex].passing = player.getPassing();
+                players[pIndex].screening = player.getScreening();
+                players[pIndex].offBallMovement = player.getOffBallMovement();
+
+                players[pIndex].postDefense = player.getPostDefense();
+                players[pIndex].perimeterDefense = player.getPerimeterDefense();
+                players[pIndex].onBallDefense = player.getOnBallDefense();
+                players[pIndex].offBallDefense = player.getOffBallDefense();
+                players[pIndex].stealing = player.getStealing();
+                players[pIndex].rebounding = player.getRebounding();
+
+                players[pIndex].stamina = player.getStamina();
+                players[pIndex].aggressiveness = player.getAggressiveness();
+                players[pIndex].workEthic = player.getWorkEthic();
+
+                players[pIndex].gamesPlayed = player.getGamesPlayed();
+                players[pIndex].totalMinutes = player.getTotalMinutes();
+
+                players[pIndex].closeRangeShotProgress = player.getCloseRangeShotProgress();
+                players[pIndex].midRangeShotProgress = player.getMidRangeShotProgress();
+                players[pIndex].longRangeShotProgress = player.getLongRangeShotProgress();
+                players[pIndex].freeThrowShotProgress = player.getFreeThrowShotProgress();
+                players[pIndex].postMoveProgress = player.getPostMoveProgress();
+                players[pIndex].ballHandlingProgress = player.getBallHandlingProgress();
+                players[pIndex].passingProgress = player.getPassingProgress();
+                players[pIndex].screeningProgress = player.getScreeningProgress();
+                players[pIndex].offballMovementProgress = player.getOffBallMovementProgress();
+
+                players[pIndex].postDefenseProgress = player.getPostDefenseProgress();
+                players[pIndex].perimeterDefenseProgress = player.getPerimeterDefenseProgress();
+                players[pIndex].onBallDefenseProgress = player.getOnBallDefenseProgress();
+                players[pIndex].offBallDefenseProgress = player.getOffBallDefenseProgress();
+                players[pIndex].stealingProgress = player.getStealingProgress();
+                players[pIndex].reboundingProgress = player.getReboundingProgress();
+
+                players[pIndex].staminaProgress = player.getStaminaProgress();
+
+                pIndex++;
+            }
+
+            ArrayList<GameEventDB> gameEvents = new ArrayList<>();
+            for(GameEvent event: game.getPlays()){
+                GameEventDB gameEvent = new GameEventDB();
+                gameEvent.event = event.getEvent();
+                gameEvent.homeTeam = event.isHomeTeam();
+                gameEvent.type = event.getType();
+                gameEvents.add(gameEvent);
+            }
+
+            db.appDAO().insertGames(gameDB);
+            db.appDAO().insertPlayers(players);
+            db.appDAO().insertGameEvents(gameEvents);
+        }
+
+        private void loadGameInProgress(){
+            GameDB gameDB = db.appDAO().loadGameById(game.getId());
+            game.setUpFromDB(gameDB);
+
+            PlayerDB[] homeDB = db.appDAO().loadPlayersByTeam(game.getHomeTeam().getId());
+            for(int x = 0; x < game.getHomeTeam().getPlayers().size(); x++){
+                for(int y = 0; y < homeDB.length; y++){
+                    if(homeDB[y].playerId == game.getHomeTeam().getPlayers().get(x).getId()){
+                        game.getHomeTeam().getPlayers().get(x).setUpGameInProgress(homeDB[y]);
+                    }
+                }
+            }
+            game.getHomeTeam().setUpGameInProgress(homeDB);
+
+            PlayerDB[] awayDB = db.appDAO().loadPlayersByTeam(game.getAwayTeam().getId());
+            for(int x = 0; x < game.getAwayTeam().getPlayers().size(); x++){
+                for(int y = 0; y < awayDB.length; y++){
+                    if(awayDB[y].playerId == game.getAwayTeam().getPlayers().get(x).getId()){
+                        game.getAwayTeam().getPlayers().get(x).setUpGameInProgress(awayDB[y]);
+                    }
+                }
+            }
+            game.getAwayTeam().setUpGameInProgress(awayDB);
+            game.setGameEvents(db.appDAO().loadAllEvents());
+            db.appDAO().deleteGameEvents();
         }
     }
 }

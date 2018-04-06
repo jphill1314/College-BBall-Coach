@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 t.replace(R.id.content_frame, new ScheduleFragment());
                 makeSwitch = true;
-                actionBar.setTitle(getString(R.string.season_name, currentTeam.getFullName(), currentTeam.getCurrentSeasonYear(), currentTeam.getCurrentSeasonYear() + 1));
+                actionBar.setTitle(getString(R.string.season_name, currentTeam.getMascot(), currentTeam.getCurrentSeasonYear(), currentTeam.getCurrentSeasonYear() + 1));
                 break;
             case 2:
                 t.replace(R.id.content_frame, new StandingsFragment());
@@ -468,7 +468,9 @@ public class MainActivity extends AppCompatActivity {
 
                         }
 
-                        numPlayers += teams.get(i).getPlayers().size();
+                        if(!teams.get(i).getPlayers().get(0).isSavedInProgress()) {
+                            numPlayers += teams.get(i).getPlayers().size();
+                        }
                         numCoaches += teams.get(i).getCoaches().size();
                     }
                     db.appDAO().insertTeams(teamsDB);
@@ -482,65 +484,70 @@ public class MainActivity extends AppCompatActivity {
                     int pIndex = 0;
                     for (int i = 0; i < teams.size(); i++) {
                         for (Player player : teams.get(i).getPlayers()) {
-                            players[pIndex] = new PlayerDB();
-                            player.prepareForSaving();
-                            if(player.getId() != -1){
-                                players[pIndex].playerId = player.getId();
+                            if(player.isSavedInProgress()){
+                                player.setSavedInProgress(false);
                             }
+                            else {
+                                players[pIndex] = new PlayerDB();
+                                player.prepareForSaving();
+                                if (player.getId() != -1) {
+                                    players[pIndex].playerId = player.getId();
+                                }
 
-                            players[pIndex].teamID = teams.get(i).getId();
-                            players[pIndex].lastName = player.getlName();
-                            players[pIndex].firstName = player.getfName();
-                            players[pIndex].year = player.getYear();
-                            players[pIndex].pos = player.getPosition();
-                            players[pIndex].trainingAs = player.getTrainingAs();
-                            players[pIndex].currentRosterLocation = teams.get(i).getPlayers().indexOf(player);
+                                players[pIndex].teamID = teams.get(i).getId();
+                                players[pIndex].lastName = player.getlName();
+                                players[pIndex].firstName = player.getfName();
+                                players[pIndex].year = player.getYear();
+                                players[pIndex].pos = player.getPosition();
+                                players[pIndex].trainingAs = player.getTrainingAs();
+                                players[pIndex].currentRosterLocation = teams.get(i).getPlayers().indexOf(player);
 
-                            players[pIndex].closeRangeShot = player.getCloseRangeShot();
-                            players[pIndex].midRangeShot = player.getMidRangeShot();
-                            players[pIndex].longRangeShot = player.getLongRangeShot();
-                            players[pIndex].freeThrowShot = player.getFreeThrowShot();
-                            players[pIndex].postMove = player.getPostMove();
-                            players[pIndex].ballHandling = player.getBallHandling();
-                            players[pIndex].passing = player.getPassing();
-                            players[pIndex].screening = player.getScreening();
-                            players[pIndex].offBallMovement = player.getOffBallMovement();
+                                players[pIndex].closeRangeShot = player.getCloseRangeShot();
+                                players[pIndex].midRangeShot = player.getMidRangeShot();
+                                players[pIndex].longRangeShot = player.getLongRangeShot();
+                                players[pIndex].freeThrowShot = player.getFreeThrowShot();
+                                players[pIndex].postMove = player.getPostMove();
+                                players[pIndex].ballHandling = player.getBallHandling();
+                                players[pIndex].passing = player.getPassing();
+                                players[pIndex].screening = player.getScreening();
+                                players[pIndex].offBallMovement = player.getOffBallMovement();
 
-                            players[pIndex].postDefense = player.getPostDefense();
-                            players[pIndex].perimeterDefense = player.getPerimeterDefense();
-                            players[pIndex].onBallDefense = player.getOnBallDefense();
-                            players[pIndex].offBallDefense = player.getOffBallDefense();
-                            players[pIndex].stealing = player.getStealing();
-                            players[pIndex].rebounding = player.getRebounding();
+                                players[pIndex].postDefense = player.getPostDefense();
+                                players[pIndex].perimeterDefense = player.getPerimeterDefense();
+                                players[pIndex].onBallDefense = player.getOnBallDefense();
+                                players[pIndex].offBallDefense = player.getOffBallDefense();
+                                players[pIndex].stealing = player.getStealing();
+                                players[pIndex].rebounding = player.getRebounding();
 
-                            players[pIndex].stamina = player.getStamina();
-                            players[pIndex].aggressiveness = player.getAggressiveness();
-                            players[pIndex].workEthic = player.getWorkEthic();
+                                players[pIndex].stamina = player.getStamina();
+                                players[pIndex].aggressiveness = player.getAggressiveness();
+                                players[pIndex].workEthic = player.getWorkEthic();
 
-                            players[pIndex].gamesPlayed = player.getGamesPlayed();
-                            players[pIndex].totalMinutes = player.getTotalMinutes();
+                                players[pIndex].gamesPlayed = player.getGamesPlayed();
+                                players[pIndex].totalMinutes = player.getTotalMinutes();
 
-                            players[pIndex].closeRangeShotProgress = player.getCloseRangeShotProgress();
-                            players[pIndex].midRangeShotProgress = player.getMidRangeShotProgress();
-                            players[pIndex].longRangeShotProgress = player.getLongRangeShotProgress();
-                            players[pIndex].freeThrowShotProgress = player.getFreeThrowShotProgress();
-                            players[pIndex].postMoveProgress = player.getPostMoveProgress();
-                            players[pIndex].ballHandlingProgress = player.getBallHandlingProgress();
-                            players[pIndex].passingProgress = player.getPassingProgress();
-                            players[pIndex].screeningProgress = player.getScreeningProgress();
-                            players[pIndex].offballMovementProgress = player.getOffBallMovementProgress();
+                                players[pIndex].closeRangeShotProgress = player.getCloseRangeShotProgress();
+                                players[pIndex].midRangeShotProgress = player.getMidRangeShotProgress();
+                                players[pIndex].longRangeShotProgress = player.getLongRangeShotProgress();
+                                players[pIndex].freeThrowShotProgress = player.getFreeThrowShotProgress();
+                                players[pIndex].postMoveProgress = player.getPostMoveProgress();
+                                players[pIndex].ballHandlingProgress = player.getBallHandlingProgress();
+                                players[pIndex].passingProgress = player.getPassingProgress();
+                                players[pIndex].screeningProgress = player.getScreeningProgress();
+                                players[pIndex].offballMovementProgress = player.getOffBallMovementProgress();
 
-                            players[pIndex].postDefenseProgress = player.getPostDefenseProgress();
-                            players[pIndex].perimeterDefenseProgress = player.getPerimeterDefenseProgress();
-                            players[pIndex].onBallDefenseProgress = player.getOnBallDefenseProgress();
-                            players[pIndex].offBallDefenseProgress = player.getOffBallDefenseProgress();
-                            players[pIndex].stealingProgress = player.getStealingProgress();
-                            players[pIndex].reboundingProgress = player.getReboundingProgress();
+                                players[pIndex].postDefenseProgress = player.getPostDefenseProgress();
+                                players[pIndex].perimeterDefenseProgress = player.getPerimeterDefenseProgress();
+                                players[pIndex].onBallDefenseProgress = player.getOnBallDefenseProgress();
+                                players[pIndex].offBallDefenseProgress = player.getOffBallDefenseProgress();
+                                players[pIndex].stealingProgress = player.getStealingProgress();
+                                players[pIndex].reboundingProgress = player.getReboundingProgress();
 
-                            players[pIndex].staminaProgress = player.getStaminaProgress();
+                                players[pIndex].staminaProgress = player.getStaminaProgress();
 
 
-                            pIndex++;
+                                pIndex++;
+                            }
                         }
                     }
                     playerIndex += numPlayers;
@@ -788,7 +795,8 @@ public class MainActivity extends AppCompatActivity {
                 for (GameDB game : games) {
                     if(game.gameID < nationalChampGameIndex) {
                         Game g = new Game(teams.get(game.homeTeamID), teams.get(game.awayTeamID),
-                                game.gameID, game.homeScore, game.awayScore, game.isPlayed, game.isNeutralCourt);
+                                game.gameID, game.homeScore, game.awayScore, game.isInProgress,
+                                game.isPlayed, game.isNeutralCourt);
                         masterSchedule.add(g);
                         if(g.getHomeTeam().getConference().equals(g.getAwayTeam().getConference())){
                             g.getHomeTeam().getConference().addGame(g);
@@ -841,8 +849,8 @@ public class MainActivity extends AppCompatActivity {
                                 if(game.gameID >= nationalChampGameIndex){
                                     tourn.addGame(new Game(tourn.getTeams().get(game.homeTeamID),
                                             tourn.getTeams().get(game.awayTeamID),game.gameID,
-                                            game.homeScore, game.awayScore, game.isPlayed,
-                                            game.isNeutralCourt));
+                                            game.homeScore, game.awayScore, game.isInProgress,
+                                            game.isPlayed, game.isNeutralCourt));
                                 }
                             }
 
@@ -851,6 +859,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+            for(Conference c: conferences){
+                c.getStandings();
+            }
+
             Log.d("load", "finished loading");
         }
 
@@ -864,6 +876,7 @@ public class MainActivity extends AppCompatActivity {
                 db.appDAO().deleteCoachDB();
                 db.appDAO().deleteTeamDB();
                 db.appDAO().deleteConferences();
+                db.appDAO().deleteGameEvents();
             }
         }
 

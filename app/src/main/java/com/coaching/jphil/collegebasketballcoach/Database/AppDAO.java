@@ -5,9 +5,6 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
-
-import com.coaching.jphil.collegebasketballcoach.adapters.RecruitAdapter;
 
 import java.util.ArrayList;
 
@@ -41,6 +38,9 @@ public interface AppDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertGamesStats(GameStatsDB... gameStats);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public void insertGameEvents(ArrayList<GameEventDB> gameEvents);
+
 
     @Query("SELECT * FROM TeamDB")
     public TeamDB[] loadAllTeams();
@@ -66,6 +66,15 @@ public interface AppDAO {
     @Query("SELECT * FROM GameStatsDB where playerId = :playerId")
     public GameStatsDB[] loadPlayerStats(int playerId);
 
+    @Query("SELECT * FROM GameDB where gameID = :gameId")
+    public GameDB loadGameById(int gameId);
+
+    @Query("SELECT * FROM PlayerDB where teamID = :teamId")
+    public PlayerDB[] loadPlayersByTeam(int teamId);
+
+    @Query("SELECT * FROM GameEventDB")
+    public GameEventDB[] loadAllEvents();
+
 
     @Query("DELETE FROM TeamDB")
     public void deleteTeamDB();
@@ -90,6 +99,9 @@ public interface AppDAO {
 
     @Query("DELETE FROM GameStatsDB")
     public void deleteGameStats();
+
+    @Query("DELETE FROM GameEventDB")
+    public void deleteGameEvents();
 
     @Delete
     public void deletePlayers(ArrayList<PlayerDB> players);

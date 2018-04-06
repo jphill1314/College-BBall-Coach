@@ -1,6 +1,8 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
 
+import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
+import com.coaching.jphil.collegebasketballcoach.Database.GameEventDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 
 import java.util.ArrayList;
@@ -47,7 +49,7 @@ public class Game {
         this.awayTeam.addGameToSchedule(this);
     }
 
-    public Game(Team homeTeam, Team awayTeam, int id, int homeScore, int awayScore, boolean isPlayed, boolean isNeutralCourt) {
+    public Game(Team homeTeam, Team awayTeam, int id, int homeScore, int awayScore, boolean isInProgress, boolean isPlayed, boolean isNeutralCourt) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.id = id;
@@ -57,6 +59,7 @@ public class Game {
 
         this.isPlayed = isPlayed;
         this.isNeutralCourt = isNeutralCourt;
+        this.isInProgress = isInProgress;
 
         this.homeTeam.addOpponent(awayTeam);
         this.awayTeam.addOpponent(homeTeam);
@@ -249,13 +252,18 @@ public class Game {
         awayTimeouts = 4;
 
         // very simple jump ball
-        homeTeamHasBall = homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding();
-        homeTeamHasPosArrow = !(homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding());
+        homeTeamHasBall = homeTeam.getPlayers().get(4).getRebounding() + r.nextInt(100) > awayTeam.getPlayers().get(4).getRebounding() + r.nextInt(100);
+        homeTeamHasPosArrow = !homeTeamHasBall;
         madeShot = false;
         deadBall = false;
 
 
-        plays.add(new GameEvent(getFormattedTime() + " (30) - " + homeTeam.getFullName() + " has won the tip off!", 0, homeTeamHasBall));
+        if(homeTeamHasBall) {
+            plays.add(new GameEvent(getFormattedTime() + " (30) - " + homeTeam.getFullName() + " has won the tip off!", 0, homeTeamHasBall));
+        }
+        else{
+            plays.add(new GameEvent(getFormattedTime() + " (30) - " + awayTeam.getFullName() + " has won the tip off!", 0, homeTeamHasBall));
+        }
 
         homeTeam.preGameSetup();
         awayTeam.preGameSetup();
@@ -372,64 +380,67 @@ public class Game {
         if(team.equals(awayTeam) && !homeTeamHasBall && awayTimeouts > 0){
             return true;
         }
-        return false;
+
+        return deadBall;
     }
 
     public boolean startNextHalf() {
-        if (half == 1) {
-            // setup 2nd half
-            half++;
-            timeRemaining = 20 * 60;
-            lastTimeRemaining = timeRemaining;
-            shotClock = 30;
-            homeTeamHasBall = homeTeamHasPosArrow;
-            homeTeamHasPosArrow = !homeTeamHasPosArrow;
-            deadBall = true;
-            madeShot = false;
+        if(timeRemaining <= 0) {
+            if (half == 1) {
+                // setup 2nd half
+                half++;
+                timeRemaining = 20 * 60;
+                lastTimeRemaining = timeRemaining;
+                shotClock = 30;
+                homeTeamHasBall = homeTeamHasPosArrow;
+                homeTeamHasPosArrow = !homeTeamHasPosArrow;
+                deadBall = true;
+                madeShot = false;
 
-            homeFouls = 0;
-            awayFouls = 0;
+                homeFouls = 0;
+                awayFouls = 0;
 
-            playType = 0;
+                playType = 0;
 
-            if(homeTimeouts == 4){
-                homeTimeouts = 3;
+                if (homeTimeouts == 4) {
+                    homeTimeouts = 3;
+                }
+                if (awayTimeouts == 4) {
+                    awayTimeouts = 3;
+                }
+
+                for (Player p : homeTeam.getPlayers()) {
+                    p.addTimePlayed(0, 10);
+                }
+                for (Player p : awayTeam.getPlayers()) {
+                    p.addTimePlayed(0, 10);
+                }
+
+                return true;
+            } else if (homeScore == awayScore) {
+                // setup overtime
+                half++;
+                timeRemaining = 5 * 60;
+                lastTimeRemaining = timeRemaining;
+                shotClock = 30;
+                homeTeamHasBall = homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding();
+                homeTeamHasPosArrow = !(homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding());
+                madeShot = false;
+                deadBall = false;
+                playType = 0;
+
+                homeTimeouts++;
+                awayTimeouts++;
+                mediaTimeouts[9] = false;
+                return true;
             }
-            if(awayTimeouts == 4){
-                awayTimeouts = 3;
-            }
 
-            for(Player p: homeTeam.getPlayers()){
-                p.addTimePlayed(0, 10);
+            if (savePlays) {
+                plays.add(0, new GameEvent("Game Over!", 0, false));
             }
-            for(Player p: awayTeam.getPlayers()){
-                p.addTimePlayed(0, 10);
-            }
-
-            return true;
-        } else if (homeScore == awayScore) {
-            // setup overtime
-            half++;
-            timeRemaining = 5 * 60;
-            lastTimeRemaining = timeRemaining;
-            shotClock = 30;
-            homeTeamHasBall = homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding();
-            homeTeamHasPosArrow = !(homeTeam.getPlayers().get(4).getRebounding() > awayTeam.getPlayers().get(4).getRebounding());
-            madeShot = false;
-            deadBall = false;
-            playType = 0;
-
-            homeTimeouts++;
-            awayTimeouts++;
-            mediaTimeouts[9] = false;
-            return true;
+            isPlayed = true;
+            isInProgress = false;
         }
-
-        if(savePlays){
-            plays.add(0, new GameEvent("Game Over!", 0, false));
-        }
-        isPlayed = true;
-        isInProgress = false;
         return false;
     }
 
@@ -1585,4 +1596,123 @@ public class Game {
         return newPlays;
     }
 
+    public int getPlayerWithBall() {
+        return playerWithBall;
+    }
+
+    public int getLocation() {
+        return location;
+    }
+
+    public int getLastPlayerWithBall() {
+        return lastPlayerWithBall;
+    }
+
+    public int getLastShotClock() {
+        return lastShotClock;
+    }
+
+    public int getLastTimeRemaining() {
+        return lastTimeRemaining;
+    }
+
+    public int getPlayType() {
+        return playType;
+    }
+
+    public boolean isMadeShot() {
+        return madeShot;
+    }
+
+    public boolean isDeadBall() {
+        return deadBall;
+    }
+
+    public boolean isHomeTeamHasBall() {
+        return homeTeamHasBall;
+    }
+
+    public boolean isHomeTeamHasPosArrow() {
+        return homeTeamHasPosArrow;
+    }
+
+    public boolean[] getMediaTimeouts() {
+        return mediaTimeouts;
+    }
+
+    public boolean isPlayerWantsTO() {
+        return playerWantsTO;
+    }
+
+    public boolean isRecentTO() {
+        return recentTO;
+    }
+
+    public boolean isPlayerIntentFoul() {
+        return playerIntentFoul;
+    }
+
+    public boolean isSavePlays() {
+        return savePlays;
+    }
+
+    public boolean isPlayerFouledOut() {
+        return playerFouledOut;
+    }
+
+    public boolean isAlertedDeadBall() {
+        return alertedDeadBall;
+    }
+
+    public boolean isShootFreeThrows() {
+        return shootFreeThrows;
+    }
+
+    public boolean isInProgress() {
+        return isInProgress;
+    }
+
+    public int getFreeThrows() {
+        return freeThrows;
+    }
+
+    public Player getFreeThrowShooter() {
+        return freeThrowShooter;
+    }
+
+    public void setUpFromDB(GameDB gameDB){
+        plays = new ArrayList<>();
+        r = new Random();
+        half = gameDB.half;
+        timeRemaining = gameDB.timeRemaining;
+        lastTimeRemaining = gameDB.lastTimeRemaining;
+        shotClock = gameDB.shotClock;
+        lastShotClock = gameDB.lastShotClock;
+        homeScore = gameDB.homeScore;
+        awayScore = gameDB.awayScore;
+        homeFouls = gameDB.homeFouls;
+        awayFouls = gameDB.awayFouls;
+        playerWithBall = gameDB.playerWithBall;
+        lastPlayerWithBall = gameDB.lastPlayerWithBall;
+        location = gameDB.location;
+        playType = gameDB.playType;
+
+        mediaTimeouts = new boolean[]{gameDB.mediaTimeout1, gameDB.mediaTimeout2, gameDB.mediaTimeout3,
+                gameDB.mediaTimeout4, gameDB.mediaTimeout5, gameDB.mediaTimeout6, gameDB.mediaTimeout7,
+                gameDB.mediaTimeout8, gameDB.mediaTimeout9, gameDB.mediaTimeout10};
+        playerWantsTO = gameDB.playerWantsTO;
+        recentTO = gameDB.recentTO;
+        isInProgress = true;
+        homeTimeouts = gameDB.homeTimeouts;
+        awayTimeouts = gameDB.awayTimeouts;
+
+        savePlays = gameDB.savePlays;
+    }
+
+    public void setGameEvents(GameEventDB[] gameEvents){
+        plays = new ArrayList<>();
+        for(GameEventDB event : gameEvents){
+            plays.add(new GameEvent(event.event, event.type, event.homeTeam));
+        }
+    }
 }

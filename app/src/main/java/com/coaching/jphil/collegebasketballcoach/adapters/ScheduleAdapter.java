@@ -71,7 +71,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    @SuppressLint("StringFormatInvalid")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
         if(position < games.size()) {
@@ -85,26 +84,28 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
                 holder.homeName.setText(context.getResources().getString(R.string.team_tourn, teams.indexOf(games.get(position).getHomeTeam())+1, games.get(position).getHomeTeamName()));
             }
 
-            if (games.get(position).isPlayed()) {
+            if (games.get(position).isPlayed() || games.get(position).isInProgress()) {
                 holder.homeScore.setText(context.getResources().getString(R.string.scores, games.get(position).getHomeScore()));
                 holder.awayScore.setText(context.getResources().getString(R.string.scores, games.get(position).getAwayScore()));
-            } else {
+            }
+            else {
                 holder.homeScore.setText(games.get(position).getHomeTeam().getRecordAsString());
                 holder.awayScore.setText(games.get(position).getAwayTeam().getRecordAsString());
             }
 
-            if(games.get(position).isPlayed()){
-                holder.info.setText("");
-            }
-            else{
-                if(games.get(position).getHomeTeam().equals(playerTeam)){
-                    holder.info.setText(context.getResources().getString(R.string.pregame_info,
-                            (int)(((games.get(position).getHomeTeam().getOverallRating() * 1.0) / games.get(position).getAwayTeam().getOverallRating()) * 50)));
+            if(type == 0){
+                if(games.get(position).isPlayed()){
+                    holder.info.setText(context.getResources().getString(R.string.postgame_info));
+                }
+                else if(games.get(position).isInProgress()){
+                    holder.info.setText(context.getResources().getString(R.string.game_in_progress));
                 }
                 else{
-                    holder.info.setText(context.getResources().getString(R.string.pregame_info,
-                            (int)(((games.get(position).getAwayTeam().getOverallRating() * 1.0) / games.get(position).getHomeTeam().getOverallRating()) * 50)));
+                    holder.info.setText(context.getResources().getString(R.string.pregame_info, (position+1)));
                 }
+            }
+            else{
+                holder.info.setText("");
             }
         }
         else{

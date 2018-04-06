@@ -197,9 +197,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                stats.addAll(game.simulateGame());
-                                return -1;
-                                //return mainActivity.masterSchedule.indexOf(game);
+                                //stats.addAll(game.simulateGame());
+                                //return -1;
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());

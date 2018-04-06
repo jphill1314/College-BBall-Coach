@@ -91,6 +91,9 @@ public class RecruitFragment extends Fragment {
                 ((RecruitAdapter)adapter).changeSortType(2);
                 recyclerView.setAdapter(adapter);
                 return true;
+            case R.id.sort_interest:
+                ((RecruitAdapter)adapter).changeSortType(3);
+                return true;
             case android.R.id.home:
                 ((MainActivity)getActivity()).drawerLayout.openDrawer(GravityCompat.START);
                 return true;

@@ -42,7 +42,7 @@
         <item>Canadian Athletic Conference</item>
     </string-array>
 
-    <string name="color_spinner_label">School color:</string>
+    <string name="color_spinner_label">School color</string>
 
     <string-array name="colors">
         <item>Red</item>
@@ -77,11 +77,11 @@
 
     <!-- Roster Fragment-->
     <string name="roster_title">%s Roster</string>
-    <string name="position">Pos.</string>
+    <string name="position">Start</string>
     <string name="name">Name</string>
     <string name="year">Class</string>
     <string name="rating">Rating</string>
-    <string name="pref_position">Pref. Pos.</string>
+    <string name="pref_position">Pos.</string>
 
     <!-- Standings Fragment -->
     <string name="standing_title">Standings</string>
@@ -146,7 +146,10 @@
     <string name="enter_champ">View National Championship</string>
     <string name="home_name">\@ %s</string>
     <string name="no_score">-</string>
-    <string name="pregame_info">Odds of victory: %d%%</string>
+    <string name="pregame_info">Game #%d</string>
+    <string name="game_in_progress">Game in progress</string>
+    <string name="postgame_info">Final</string>
+    <string name="postgame_ot">Final OT</string>
 
     <!--Strategy Fragment -->
     <string name="strategy_title">%s Strategy</string>
@@ -215,6 +218,7 @@
     <string name="sort_position">Sort by position</string>
     <string name="sort_rating">Sort by rating</string>
     <string name="sort_status">Sort by recruitment status</string>
+    <string name="sort_interest">Sort by interest</string>
 
     <string name="position_needs">Returning players by position\nPG: %d SG: %d SF: %d PF: %d C: %d</string>
 

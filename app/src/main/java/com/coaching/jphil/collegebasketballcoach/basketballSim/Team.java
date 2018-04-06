@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
+import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
@@ -195,6 +196,10 @@ public class Team {
 
     public ArrayList<Player> getPlayers(){
         return players;
+    }
+
+    public ArrayList<Player> getRosterPlayers(){
+        return rosterPlayers;
     }
 
     public int getNumberOfPlayers(){
@@ -844,7 +849,7 @@ public class Team {
         seasonOver = !seasonOver;
     }
 
-    private int[] getConferenceRecord(){
+    private int[] getConferenceRecord(int confGames){
         int[] record = new int[]{0,0};
         Conference conf = null;
         for(Conference c: ((MainActivity)context).conferences){
@@ -855,24 +860,25 @@ public class Team {
 
         if(conf != null) {
             for (Game g : schedule) {
-                if (g.getHomeTeam().equals(this)) {
-                    if(conf.getTeams().contains(g.getAwayTeam())) {
-                        if(g.isPlayed()) {
-                            if (g.homeTeamWin()) {
-                                record[0]++;
-                            } else {
-                                record[1]++;
+                if(record[0] + record[1] < confGames) {
+                    if (g.getHomeTeam().equals(this)) {
+                        if (conf.getTeams().contains(g.getAwayTeam())) {
+                            if (g.isPlayed()) {
+                                if (g.homeTeamWin()) {
+                                    record[0]++;
+                                } else {
+                                    record[1]++;
+                                }
                             }
                         }
-                    }
-                }
-                else {
-                    if(conf.getTeams().contains(g.getHomeTeam())) {
-                        if(g.isPlayed()) {
-                            if (g.homeTeamWin()) {
-                                record[1]++;
-                            } else {
-                                record[0]++;
+                    } else {
+                        if (conf.getTeams().contains(g.getHomeTeam())) {
+                            if (g.isPlayed()) {
+                                if (g.homeTeamWin()) {
+                                    record[1]++;
+                                } else {
+                                    record[0]++;
+                                }
                             }
                         }
                     }
@@ -883,16 +889,16 @@ public class Team {
         return record;
     }
 
-    public int getConferenceWins(){
-        return getConferenceRecord()[0];
+    public int getConferenceWins(int confGames){
+        return getConferenceRecord(confGames)[0];
     }
 
-    public int getConferenceLoses(){
-        return getConferenceRecord()[1];
+    public int getConferenceLoses(int confGames){
+        return getConferenceRecord(confGames)[1];
     }
 
-    public int getConferenceWinPercent(){
-        int[] record = getConferenceRecord();
+    public int getConferenceWinPercent(int confGames){
+        int[] record = getConferenceRecord(confGames);
         if(record[1] == 0){
             return 100;
         }
@@ -1014,6 +1020,61 @@ public class Team {
     }
 
     public String getRecordAsString(){
-        return wins + "-" + loses + " (" + getConferenceWins() + "-" + getConferenceLoses() + ")";
+        int confGames = (conference.getTeams().size() * 2) - 2;
+        return wins + "-" + loses + " (" + getConferenceWins(confGames) + "-" + getConferenceLoses(confGames) + ")";
+    }
+
+    public void setUpGameInProgress(PlayerDB[] playerDBS){
+        rosterPlayers = new ArrayList<>(players);
+        subPlayers = new ArrayList<>(players);
+
+        twoPointAttempts = 0;
+        twoPointMakes = 0;
+        threePointAttempts = 0;
+        threePointMakes = 0;
+        freeThrowAttempts = 0;
+        freeThrowMakes = 0;
+        assists = 0;
+        oBoards = 0;
+        dBoards = 0;
+        steals = 0;
+        turnovers = 0;
+
+        for(Player p: players){
+            twoPointAttempts += p.getTwoPointShotAttempts();
+            twoPointMakes += p.getTwoPointShotMade();
+            threePointAttempts += p.getThreePointShotAttempts();
+            threePointMakes += p.getThreePointShotMade();
+            freeThrowAttempts += p.getFreeThrowAttempts();
+            freeThrowMakes += p.getFreeThrowMade();
+            assists += p.getAssists();
+            oBoards += p.getoRebounds();
+            dBoards += p.getdRebounds();
+            steals += p.getSteals();
+            turnovers += p.getTurnovers();
+        }
+
+        int[] playerIDs = new int[playerDBS.length];
+        for(PlayerDB db: playerDBS){
+            playerIDs[db.gameRosterLocation] = db.playerId;
+            //Log.d("Sort", "Index: " + db.playerId + " Name: " + db.lastName + " location: " + db.gameRosterLocation);
+        }
+
+        players = new ArrayList<>();
+        for(int i : playerIDs){
+            if(getSubPlayerWithID(i) != null) {
+                players.add(getSubPlayerWithID(i));
+            }
+        }
+        Log.d("Setup", "Size of players: " + players.size() + " expected size: " + subPlayers.size());
+    }
+
+    private Player getSubPlayerWithID(int id){
+        for(Player p: subPlayers){
+            if(p.getId() == id){
+                return p;
+            }
+        }
+        return null;
     }
 }
