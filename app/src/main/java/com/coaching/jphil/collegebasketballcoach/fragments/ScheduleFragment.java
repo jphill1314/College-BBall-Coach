@@ -27,7 +27,6 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.GameSpeechAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
-import com.coaching.jphil.collegebasketballcoach.adapters.TournamentGameAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
@@ -54,6 +53,7 @@ public class ScheduleFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager manager;
+    private int currentView;
     private MainActivity mainActivity;
 
     //private Button simGame, viewTournament;
@@ -76,22 +76,17 @@ public class ScheduleFragment extends Fragment {
 
         isInTournamentView = false;
 
-        //TextView tvSeason = view.findViewById(R.id.schedule_season);
         mainActivity = (MainActivity) getActivity();
-
-        //tvSeason.setText(getResources().getString(R.string.season_name, mainActivity.getPlayerTeam().getCurrentSeasonYear(), mainActivity.getPlayerTeam().getCurrentSeasonYear() + 1));
 
         recyclerView = view.findViewById(R.id.schedule_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(mainActivity.currentTeam.getSchedule()
-                , mainActivity.currentTeam);
+        adapter = new ScheduleAdapter(mainActivity.currentTeam.getSchedule(), mainActivity.currentTeam, this, 0);
+        currentView = 0;
         recyclerView.setAdapter(adapter);
 
         nextAction = view.findViewById(R.id.adavance_fab);
         nextAction.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(mainActivity.currentTeam.getColorLight())));
-        //simGame = view.findViewById(R.id.sim_game);
-        //viewTournament = view.findViewById(R.id.tourn_view);
 
         async = null;
         updateUI();
@@ -99,39 +94,8 @@ public class ScheduleFragment extends Fragment {
         nextAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: this currently doesn't enter the tournament view or sim tournament games
-                if(mainActivity.championship != null && mainActivity.championship.hasChampion()){
-                    startNewSeason();
-                    nextAction.setEnabled(false);
-                }
-                else{
-                    if(isInTournamentView){
-                        if (mainActivity.championship != null) {
-                        ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());
-                        }
-                        else {
-                            ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
-                        }
-                        async = new SimAsync();
-                        async.execute();
-                    }
-                    else{
-                        if(mainActivity.currentConference.isInPostSeason()){
-                            adapter = new TournamentGameAdapter(mainActivity.currentConference.getTournamentGames(), mainActivity.currentConference.getStandings());
-                            recyclerView.setAdapter(adapter);
-                            isInTournamentView = true;
-                        }
-                        else if(mainActivity.currentConference.isSeasonFinished() && mainActivity.currentConference != null){
-                            adapter = new TournamentGameAdapter(mainActivity.championship.getTournament().getGames(), mainActivity.championship.getTeams());
-                            recyclerView.setAdapter(adapter);
-                            isInTournamentView = true;
-                        }
-                        else {
-                            async = new SimAsync();
-                            async.execute();
-                        }
-                    }
-                }
+                async = new SimAsync();
+                async.execute();
                 adapter.notifyDataSetChanged();
             }
         });
@@ -154,8 +118,7 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
-            //simGame.setEnabled(false);
-            nextAction.setEnabled(false);
+            nextAction.setVisibility(View.GONE);
         }
 
         @Override
@@ -205,8 +168,14 @@ public class ScheduleFragment extends Fragment {
                 }
             }
             async = null;
+            if(currentView == 1){
+                ((ScheduleAdapter)adapter).changeGames(mainActivity.currentConference.getTournamentGames());
+            }
+            else if(currentView == 2){
+                ((ScheduleAdapter)adapter).changeGames(mainActivity.championship.getGames());
+            }
             adapter.notifyDataSetChanged();
-            nextAction.setEnabled(true);
+            nextAction.setVisibility(View.VISIBLE);
             updateUI();
 
             dataAsync = new DataAsync();
@@ -228,9 +197,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                //stats.addAll(game.simulateGame());
-                                //return -1;
-                                return mainActivity.masterSchedule.indexOf(game);
+                                stats.addAll(game.simulateGame());
+                                return -1;
+                                //return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -250,9 +219,9 @@ public class ScheduleFragment extends Fragment {
                             if (!game.isPlayed()) {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                                     if (team.isPlayerControlled()) {
-                                        //stats.addAll(game.simulateGame());
-                                        //return -1;
-                                        return mainActivity.masterSchedule.indexOf(game);
+                                        stats.addAll(game.simulateGame());
+                                        return -1;
+                                        //return mainActivity.masterSchedule.indexOf(game);
                                     }
                                 } else {
                                     stats.addAll(game.simulateGame());
@@ -274,9 +243,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                //stats.addAll(game.simulateGame());
-                                //return -1;
-                                return mainActivity.masterSchedule.indexOf(game);
+                                stats.addAll(game.simulateGame());
+                                return -1;
+                                //return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -448,10 +417,9 @@ public class ScheduleFragment extends Fragment {
             }
         }
 
-//        if(!isInTournamentView && (mainActivity.currentConference.isInPostSeason() || mainActivity.championship != null)){
-//            viewTournament.setVisibility(View.VISIBLE);
-//            simGame.setVisibility(View.INVISIBLE);
-//        }
+        if(startNewSeason){
+            nextAction.setVisibility(View.GONE);
+        }
     }
 
     private void startTournament(boolean generateConfTourn){
@@ -465,24 +433,40 @@ public class ScheduleFragment extends Fragment {
             mainActivity.generateNationalChampionship();
         }
 
-        //simGame.setText(R.string.sim_game);
-        if(isInTournamentView){
-            if (mainActivity.championship != null) {
-                ((TournamentGameAdapter) adapter).changeGames(mainActivity.championship.getGames());
-                ((TournamentGameAdapter)adapter).changeTeams(mainActivity.championship.getTeams());
-            }
-            else {
-                ((TournamentGameAdapter) adapter).changeGames(mainActivity.currentConference.getTournamentGames());
-            }
-        }
-        else {
-            ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());
-        }
+        ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());
         adapter.notifyDataSetChanged();
     }
 
-    private void startNewSeason(){
-        mainActivity.startNewSeason();
-        startNewSeason = false;
+    public void startNewSeason(){
+        if(startNewSeason && mainActivity.championship.hasChampion()) {
+            nextAction.setVisibility(View.GONE);
+            mainActivity.startNewSeason();
+            startNewSeason = false;
+        }
+        else{
+            Toast.makeText(getContext(), "The season is not over yet!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void viewConferenceTournament(){
+        if(mainActivity.currentConference.isInPostSeason()){
+            adapter = new ScheduleAdapter(mainActivity.currentConference.getTournamentGames(), mainActivity.currentTeam, mainActivity.currentConference.getStandings(), this, 1);
+            recyclerView.setAdapter(adapter);
+            currentView = 1;
+        }
+        else{
+            Toast.makeText(getContext(), "You must finish the season before entering the tournament", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void viewChampionship(){
+        if(mainActivity.championship != null){
+            adapter = new ScheduleAdapter(mainActivity.championship.getGames(), mainActivity.currentTeam, mainActivity.championship.getTeams(), this, 2);
+            recyclerView.setAdapter(adapter);
+            currentView = 2;
+        }
+        else{
+            Toast.makeText(getContext(), "All conference tournaments are not yet finished", Toast.LENGTH_LONG).show();
+        }
     }
 }

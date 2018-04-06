@@ -67,7 +67,7 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position){
         holder.tvPos.setText(String.format(Locale.US, "%d", position+1));
-        holder.tvName.setText(standing.get(position).getFullName() + " (" + standing.get(position).getOverallRating() + ")");
+        holder.tvName.setText(standing.get(position).getFullName());
         if(type != -1) {
             holder.tvWins.setText(context.getResources().getString(R.string.record_string, standing.get(position).getConferenceWins(),
                     standing.get(position).getConferenceLoses()));
@@ -79,7 +79,7 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
                 standing.get(position).getLoses())));
 
         if(standing.get(position).isPlayerControlled()){
-            holder.view.setBackgroundColor(Color.rgb(225,225,225));
+            holder.view.setBackgroundResource(standing.get(position).getColorLight());
         }
         else{
             holder.view.setBackgroundColor(Color.rgb(250,250,250));

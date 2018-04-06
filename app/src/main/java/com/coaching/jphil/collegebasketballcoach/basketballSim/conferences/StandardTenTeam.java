@@ -26,7 +26,7 @@ public class StandardTenTeam extends Conference {
 
     @Override
     public void generateTournament() {
-        ArrayList<Team> teams = getStandings();
+        ArrayList<Team> teams = new ArrayList<>(getTeams());
         if(getTournaments() == null) {
             ArrayList<Team> PlayIn7v10 = new ArrayList<>();
             ArrayList<Team> PlayIn8v9 = new ArrayList<>();

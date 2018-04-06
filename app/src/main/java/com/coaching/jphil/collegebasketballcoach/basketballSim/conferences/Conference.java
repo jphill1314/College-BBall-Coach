@@ -125,7 +125,7 @@ public abstract class Conference {
     }
 
     public ArrayList<Team> getStandings(){
-        ArrayList<Team> standing = new ArrayList<>(teams);
+        ArrayList<Team> standing = teams;
 
         int changes = 0;
         do{

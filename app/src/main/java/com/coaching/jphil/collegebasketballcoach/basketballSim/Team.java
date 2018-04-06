@@ -661,6 +661,14 @@ public class Team {
                     loses++;
                 }
             }
+            else{
+                if(game.getHomeTeam().equals(this)){
+                    loses++;
+                }
+                else{
+                    wins++;
+                }
+            }
         }
     }
 
@@ -1003,5 +1011,9 @@ public class Team {
                 }
             }
         }while(chagnes != 0);
+    }
+
+    public String getRecordAsString(){
+        return wins + "-" + loses + " (" + getConferenceWins() + "-" + getConferenceLoses() + ")";
     }
 }

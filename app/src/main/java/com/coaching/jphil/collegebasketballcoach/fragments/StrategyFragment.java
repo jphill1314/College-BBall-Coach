@@ -1,6 +1,9 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -64,6 +67,8 @@ public class StrategyFragment extends Fragment {
                 team.setOffenseFavorsThrees(offThreeProgress);
             }
         });
+        offThree.getProgressDrawable().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
+        offThree.getThumb().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         defThree.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int defThreeProgress = 0;
@@ -83,6 +88,8 @@ public class StrategyFragment extends Fragment {
                 team.setDefenseFavorsThrees(defThreeProgress);
             }
         });
+        defThree.getProgressDrawable().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
+        defThree.getThumb().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         agro.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int aggression = 0;
@@ -101,6 +108,8 @@ public class StrategyFragment extends Fragment {
                 team.setAggression(aggression - 10);
             }
         });
+        agro.getProgressDrawable().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
+        agro.getThumb().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         pace.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int paceProgress = 0;
@@ -121,6 +130,8 @@ public class StrategyFragment extends Fragment {
                 team.setPace(paceProgress);
             }
         });
+        pace.getProgressDrawable().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
+        pace.getThumb().setColorFilter(getResources().getColor(team.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         return view;
     }

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -725,6 +726,8 @@ public class GameFragment extends Fragment {
                 pendingOffThrees = offThreeProgress;
             }
         });
+        offThrees.getProgressDrawable().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
+        offThrees.getThumb().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         defThrees.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int defThreeProgress;
@@ -744,6 +747,8 @@ public class GameFragment extends Fragment {
                 pendingDefThrees = defThreeProgress;
             }
         });
+        defThrees.getProgressDrawable().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
+        defThrees.getThumb().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         agro.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int agroProgress;
@@ -762,6 +767,8 @@ public class GameFragment extends Fragment {
                 pendingAgro = agroProgress - 10;
             }
         });
+        agro.getProgressDrawable().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
+        agro.getThumb().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         pace.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int paceProgress;
@@ -782,6 +789,8 @@ public class GameFragment extends Fragment {
                 pendingPace = paceProgress;
             }
         });
+        pace.getProgressDrawable().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
+        pace.getThumb().setColorFilter(getResources().getColor(playerTeam.getColorLight()), PorterDuff.Mode.SRC_IN);
 
         tbIntentFoul.setChecked(false);
         tbIntentFoul.setVisibility(View.VISIBLE);

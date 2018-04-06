@@ -76,6 +76,7 @@
     <string name="drawer_closed">closed</string>
 
     <!-- Roster Fragment-->
+    <string name="roster_title">%s Roster</string>
     <string name="position">Pos.</string>
     <string name="name">Name</string>
     <string name="year">Class</string>
@@ -83,7 +84,7 @@
     <string name="pref_position">Pref. Pos.</string>
 
     <!-- Standings Fragment -->
-    <string name="standing">%s Standings</string>
+    <string name="standing_title">Standings</string>
     <string name="school_name">School</string>
     <string name="conf_record">Conf.\nW-L</string>
     <string name="overall_record">Overall\nW-L</string>
@@ -136,15 +137,19 @@
     </string-array>
 
     <!-- Schedule Fragment -->
-    <string name="season_name">%d-%d Season</string>
+    <string name="season_name">%s %d-%d Season</string>
     <string name="sim_game">Sim next game!</string>
-    <string name="new_season">Start new season!</string>
+    <string name="new_season">Start new season</string>
     <string name="start_tournament">Start tournament!</string>
     <string name="team_tourn">#%d %s</string>
     <string name="enter_tourn">View conference tournament</string>
     <string name="enter_champ">View National Championship</string>
+    <string name="home_name">\@ %s</string>
+    <string name="no_score">-</string>
+    <string name="pregame_info">Odds of victory: %d%%</string>
 
     <!--Strategy Fragment -->
+    <string name="strategy_title">%s Strategy</string>
     <string name="offense">Offense</string>
     <string name="defense">Defense</string>
     <string name="favor_three">Favors threes</string>
@@ -163,7 +168,7 @@
     <string name="intentional_foul">Intentionally Foul</string>
 
     <!-- Training Fragment -->
-    <string name="practice">Training Plan</string>
+    <string name="training_title">%s Training Plan</string>
     <string name="training_desc">Currently training as: %s</string>
     <string name="training">Currently training as:</string>
     <string-array name="training_types">
@@ -181,6 +186,7 @@
     </string-array>
 
     <!-- Coach Info Fragment-->
+    <string name="staff_title">%s Staff</string>
     <string name="coach_name_pos">%s - %s</string>
     <string name="coach_attributes">Coaching Attributes</string>
     <string name="recruit_ability">Recruiting Ability: %d</string>
@@ -196,6 +202,7 @@
     <string name="condition_teaching">Conditioning: %d</string>
 
     <!-- Recruiting Fragment -->
+    <string name="recruiting_title">%s Recruiting</string>
     <string name="recruit_interest">Interest</string>
     <string name="recruit">Tap to recruit this player</string>
     <string name="stop_recruit">Being recruited by %s</string>

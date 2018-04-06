@@ -181,22 +181,22 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 t.replace(R.id.content_frame, new RosterFragment());
                 makeSwitch = true;
-                actionBar.setTitle(currentTeam.getFullName());
+                actionBar.setTitle(getString(R.string.roster_title, currentTeam.getFullName()));
                 break;
             case 1:
                 t.replace(R.id.content_frame, new ScheduleFragment());
                 makeSwitch = true;
-                actionBar.setTitle(getString(R.string.season_name, currentTeam.getCurrentSeasonYear(), currentTeam.getCurrentSeasonYear() + 1));
+                actionBar.setTitle(getString(R.string.season_name, currentTeam.getFullName(), currentTeam.getCurrentSeasonYear(), currentTeam.getCurrentSeasonYear() + 1));
                 break;
             case 2:
                 t.replace(R.id.content_frame, new StandingsFragment());
-                actionBar.setTitle(currentTeam.getFullName());
+                actionBar.setTitle(getString(R.string.standing_title));
                 makeSwitch = true;
                 break;
             case 3:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new RecruitFragment());
-                    actionBar.setTitle(currentTeam.getFullName());
+                    actionBar.setTitle(getString(R.string.recruiting_title, currentTeam.getFullName()));
                     makeSwitch = true;
                 }
                 else{
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             case 4:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new StrategyFragment());
-                    actionBar.setTitle(currentTeam.getFullName());
+                    actionBar.setTitle(getString(R.string.strategy_title, currentTeam.getFullName()));
                     makeSwitch = true;
                 }
                 else{
@@ -215,13 +215,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 5:
                 t.replace(R.id.content_frame, new StaffFragment());
-                actionBar.setTitle(currentTeam.getFullName());
+                actionBar.setTitle(getString(R.string.staff_title, currentTeam.getFullName()));
                 makeSwitch = true;
                 break;
             case 6:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new TrainingFragment());
-                    actionBar.setTitle(currentTeam.getFullName());
+                    actionBar.setTitle(getString(R.string.training_title, currentTeam.getFullName()));
                     makeSwitch = true;
                 }
                 else{

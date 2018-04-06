@@ -5,15 +5,6 @@
     android:orientation="vertical"
     tools:context="com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment">
 
-    <TextView
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:text="@string/practice"/>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/player_list"
         android:scrollbars="vertical"
