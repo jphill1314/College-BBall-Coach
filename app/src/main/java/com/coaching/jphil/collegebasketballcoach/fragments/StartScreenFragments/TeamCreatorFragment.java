@@ -227,12 +227,16 @@ public class TeamCreatorFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String results){
-            db = null;
             startActivity(new Intent(getActivity(), MainActivity.class));
 
             SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
             editor.putBoolean(getString(R.string.shared_pref_never_opened), false);
             editor.apply();
+
+            if(db.isOpen()){
+                db.close();
+            }
+
             getActivity().finish();
         }
 
@@ -483,8 +487,8 @@ public class TeamCreatorFragment extends Fragment {
             }
 
 
-            String[] names = {"Boston", "Providence", "Manhattan", "Albany", "Burlington", "Manchester", "Long Island", "New Haven", "Augusta", "Flushing"};
-            String[] mascots = {"Colonist", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Cheesemakers"};
+            String[] names = {"Boston", "Providence", "Manhattan", "Albany", "Burlington", "Manchester", "Long Island", "New Haven", "Augusta", "Springfield"};
+            String[] mascots = {"Colonist", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Fame"};
             generateConference(names, mascots, "Northeastern Athletic Association", confStrengths[0], 0, playerConf[0]);
 
             names = new String[]{"Cleveland", "Detroit", "Milwaukee", "Chicago", "Green Bay", "Indianapolis", "Cincinnati", "Pittsburgh", "Duluth", "Toledo"};
@@ -534,10 +538,23 @@ public class TeamCreatorFragment extends Fragment {
             ArrayList<Team> teams = new ArrayList<>();
             Random r = new Random();
 
+            int pIndex = -1;
+            if(player){
+                for(int x = 0; x < names.length; x++){
+                    if(names[x].equalsIgnoreCase(schoolName.getText().toString())){
+                        pIndex = x;
+                    }
+                }
+
+                if(pIndex == -1){
+                    pIndex = 0;
+                }
+            }
+
             for(int i = 0; i < names.length; i++){
                 int numPlayers = 12 + r.nextInt(4);
                 int rating = r.nextInt(15) + minRating;
-                if(i != 0) {
+                if(i != pIndex) {
                     teams.add(new Team(names[i], mascots[i], getPlayers(numPlayers, rating), getCoaches(4, rating, false), false, getTeamColors(), getActivity()));
                 }
                 else{

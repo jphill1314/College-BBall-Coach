@@ -140,6 +140,12 @@ public class PlayerInfoFragment extends Fragment {
             }
             adapter = new PlayerInfoAdapter(results);
             recyclerView.setAdapter(adapter);
+
+            if(db.isOpen()) {
+                db.close();
+            }
+
+            data = null;
         }
     }
 

@@ -19,7 +19,7 @@ public class StartScreenActivity extends AppCompatActivity {
         t.replace(R.id.frame_layout, new StartScreenFragment()).commit();
 
         if(Build.VERSION.SDK_INT >= 21) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.tealDark));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.orangeDark));
         }
 
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));

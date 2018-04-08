@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4db6ac</color>
-    <color name="colorPrimaryDark">#00867d</color>
-    <color name="colorAccent">#82e9de</color>
+    <color name="colorPrimary">#fb8c00</color>
+    <color name="colorPrimaryDark">#c25e00</color>
+    <color name="colorAccent">#ffbd45</color>
 
     <color name="winner">#00ff00</color>
     <color name="loser">#ff0000</color>
-    <color name="defaultTV">#ffffff</color>
+    <color name="white">#ffffff</color>
     <color name="black">#000000</color>
 
     <color name="redPrimary">#e53935</color>

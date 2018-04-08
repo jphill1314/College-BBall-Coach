@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * Created by jphil on 2/14/2018.
  */
-
+// TODO: improve the stats page for players
 public class Player {
 
     private String lName, fName;
@@ -244,6 +244,8 @@ public class Player {
         offensiveModifier = 0;
         defensiveModifier = 0;
         fatigue = 0;
+
+        savedInProgress = false;
 
         practice(coaches, 1);
         return saveGameStats();

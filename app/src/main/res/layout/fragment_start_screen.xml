@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/white"
     tools:context="com.coaching.jphil.collegebasketballcoach.StartScreenActivity">
 
     <TextView
@@ -16,6 +17,10 @@
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:shadowColor="@color/colorAccent"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="5"
         android:text="@string/app_name"/>
 
     <Button
@@ -24,6 +29,8 @@
         android:layout_gravity="center_horizontal"
         android:layout_width="250dp"
         android:layout_height="75dp"
+        android:textSize="25sp"
+        android:background="@color/colorPrimary"
         android:text="@string/new_game_button"/>
 
     <Button
@@ -32,6 +39,19 @@
         android:layout_gravity="center_horizontal"
         android:layout_width="250dp"
         android:layout_height="75dp"
+        android:textSize="25sp"
+        android:background="@color/colorPrimary"
+        android:visibility="gone"
         android:text="@string/load_game_button"/>
+
+    <Button
+        android:id="@+id/info_button"
+        android:layout_marginTop="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="250dp"
+        android:layout_height="75dp"
+        android:textSize="25sp"
+        android:background="@color/colorPrimary"
+        android:text="@string/help_button"/>
 
 </LinearLayout>

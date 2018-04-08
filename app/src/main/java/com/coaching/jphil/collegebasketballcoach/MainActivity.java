@@ -154,6 +154,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume(){
+        super.onResume();
+
+        if(conferences == null || masterSchedule == null){
+            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            dataAsync = new DataAsync();
+            dataAsync.execute("load");
+        }
+    }
+
+    @Override
     protected void onStop(){
         super.onStop();
 
@@ -484,10 +495,7 @@ public class MainActivity extends AppCompatActivity {
                     int pIndex = 0;
                     for (int i = 0; i < teams.size(); i++) {
                         for (Player player : teams.get(i).getPlayers()) {
-                            if(player.isSavedInProgress()){
-                                player.setSavedInProgress(false);
-                            }
-                            else {
+                            if(!player.isSavedInProgress()){
                                 players[pIndex] = new PlayerDB();
                                 player.prepareForSaving();
                                 if (player.getId() != -1) {
@@ -668,6 +676,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            db.close();
             Log.d("save", "finished saving");
         }
 
@@ -761,6 +770,10 @@ public class MainActivity extends AppCompatActivity {
                                     player.onBallDefenseProgress, player.offBallDefenseProgress,
                                     player.stealingProgress, player.reboundingProgress,
                                     player.staminaProgress);
+
+                    if(player.savedInProgress){
+                        teams.get(player.teamID).getPlayers().get(teams.get(player.teamID).getPlayers().size()-1).setSavedInProgress(true);
+                    }
                 }
 
                 for (RecruitDB recruit : recruits) {

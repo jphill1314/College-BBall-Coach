@@ -12,6 +12,7 @@
     <!-- Start Screen-->
     <string name="new_game_button">New Game</string>
     <string name="load_game_button">Load Game</string>
+    <string name="help_button">Help</string>
 
     <!-- Team Creator -->
     <string name="team_creator">Create your team!</string>

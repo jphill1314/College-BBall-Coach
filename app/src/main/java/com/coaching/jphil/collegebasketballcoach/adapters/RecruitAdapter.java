@@ -69,7 +69,7 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
         holder.tvRating.setText(getStarRating(recruits.get(position).getRating()));
         holder.tvInterest.setText(recruits.get(position).getInterest() + "");
 
-         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         final int pos = position;
          if(recruits.get(position).isRecruited() && !recruits.get(position).getIsCommitted()){

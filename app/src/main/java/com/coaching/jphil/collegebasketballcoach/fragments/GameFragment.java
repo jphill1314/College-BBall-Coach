@@ -97,6 +97,7 @@ public class GameFragment extends Fragment {
     private boolean updateGRA = false;
     private int adapterType = 0;
     private boolean[] displayPlay;
+    private boolean loadedInProgress;
 
     private ArrayList<GameStatsDB> stats;
 
@@ -107,6 +108,7 @@ public class GameFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("createView", "onCreateView called for GameFragment");
         Bundle args = getArguments();
         activity = (MainActivity) getActivity();
         if(args != null){
@@ -233,10 +235,12 @@ public class GameFragment extends Fragment {
         showDeadBallAlerts = prefs.getBoolean(getString(R.string.shared_pref_alert_dead_ball), true);
 
         if(gameAsync == null && !game.isInProgress()) {
+            loadedInProgress = false;
             gameAsync = new SimGame();
             gameAsync.execute();
         }
         else if(game.isInProgress()){
+            loadedInProgress = true;
             dataAsync = new DataAsync();
             dataAsync.execute("load");
         }
@@ -279,6 +283,23 @@ public class GameFragment extends Fragment {
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Log.d("resume", "onResume called for GameFragment");
+
+        if(game == null){
+            loadedInProgress = true;
+            dataAsync = new DataAsync();
+            dataAsync.execute("load");
+        }
+        else if(gameAsync == null){
+            gameAsync = new SimGame();
+            gameAsync.execute();
+        }
     }
 
     @Override
@@ -340,8 +361,15 @@ public class GameFragment extends Fragment {
         @Override
         protected String doInBackground(String... strings) {
             do{
-                int playResult = game.simPlay();
+                int playResult;
+//                if(loadedInProgress){
+//                    playResult = game.getPlayType();
+//                }
+//                else {
+//                    playResult = game.simPlay();
+//                }
 
+                playResult = game.simPlay();
                 while(playResult != -1 && !isCancelled()){
                     if(playResult == 1 && !isCancelled()) {
                         isInTimeout = true;
@@ -473,7 +501,6 @@ public class GameFragment extends Fragment {
             time.setText(getString(R.string.game_time, game.getFormattedTime(), game.getShotClock()));
 
             if(adapterType == 0) {
-                //((GameAdapter) adapter).setPlays(game.getPlays());
                 ((GameAdapter)adapter).setPlays(game.getPlaysOfType(convertDisplayPlay()));
                 adapter.notifyDataSetChanged();
                 grAdapter.notifyDataSetChanged();
@@ -913,7 +940,7 @@ public class GameFragment extends Fragment {
                 frame.addView(recyclerView);
             }
 
-            adapter = new GameAdapter(new ArrayList<>(game.getPlays()), game.getAwayTeam().getColorLight());
+            adapter = new GameAdapter(new ArrayList<>(game.getPlaysOfType(convertDisplayPlay())), game.getAwayTeam().getColorLight());
             if(gameAsync == null){
                 fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
             }
@@ -1170,19 +1197,25 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
-            db = Room.databaseBuilder(activity, AppDatabase.class, "basketballdb").build();
+            if(db == null || !db.isOpen()) {
+                db = Room.databaseBuilder(activity.getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            }
         }
 
         @Override
         protected void onPostExecute(String result){
-            db.close();
+            if(db.isOpen()){
+                db.close();
+            }
+
             if(result.equals("loaded")){
+                gameIsProperlyLoaded();
                 gameAsync = new SimGame();
                 gameAsync.execute();
             }
 
             dataAsync = null;
-            Log.d("save games", "Finished saving games");
+            Log.d("save games", "Finished saving games (Game Fragment)");
         }
 
         @Override
@@ -1226,6 +1259,7 @@ public class GameFragment extends Fragment {
 
             db.appDAO().insertGames(games);
             db.appDAO().insertGamesStats(gameStatsDB);
+            db.close();
             Log.d("Saves", "Finished saving games");
         }
 
@@ -1305,6 +1339,7 @@ public class GameFragment extends Fragment {
                 players[pIndex].gameRosterLocation = game.getHomeTeam().getPlayers().indexOf(player);
                 players[pIndex].offensiveModifier = player.getOffensiveModifier();
                 players[pIndex].defensiveModifier = player.getDefensiveModifier();
+                players[pIndex].savedInProgress = true;
 
                 player.setSavedInProgress(true);
 
@@ -1462,6 +1497,7 @@ public class GameFragment extends Fragment {
             db.appDAO().insertGames(gameDB);
             db.appDAO().insertPlayers(players);
             db.appDAO().insertGameEvents(gameEvents);
+            db.close();
         }
 
         private void loadGameInProgress(){
@@ -1476,7 +1512,7 @@ public class GameFragment extends Fragment {
                     }
                 }
             }
-            game.getHomeTeam().setUpGameInProgress(homeDB);
+            game.getHomeTeam().setUpGameInProgress(homeDB, game.getHomeScore()-game.getAwayScore());
 
             PlayerDB[] awayDB = db.appDAO().loadPlayersByTeam(game.getAwayTeam().getId());
             for(int x = 0; x < game.getAwayTeam().getPlayers().size(); x++){
@@ -1486,9 +1522,22 @@ public class GameFragment extends Fragment {
                     }
                 }
             }
-            game.getAwayTeam().setUpGameInProgress(awayDB);
+            game.getAwayTeam().setUpGameInProgress(awayDB, game.getAwayScore()-game.getHomeScore());
             game.setGameEvents(db.appDAO().loadAllEvents());
             db.appDAO().deleteGameEvents();
+        }
+
+    }
+
+    private void gameIsProperlyLoaded(){
+        if(game != null){
+            if(game.getHomeTeam().getPlayers().size() < 10 || game.getAwayTeam().getPlayers().size() < 10){
+                game.getHomeTeam().undoSetUpGameInProgress();
+                game.getAwayTeam().undoSetUpGameInProgress();
+                game.preGameSetUp();
+
+                Toast.makeText(getContext(), "There was an error loading the game... restarting the game from the beginning.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

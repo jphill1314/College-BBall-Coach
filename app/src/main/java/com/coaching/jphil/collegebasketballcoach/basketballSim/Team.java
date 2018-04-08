@@ -229,7 +229,7 @@ public class Team {
     public String[] getCoachesNamesAndAbility(){
         String[] names = new String[coaches.size()];
         for(int x = 0; x < coaches.size(); x++){
-            names[x] = coaches.get(x).getFullName() + "\t" + coaches.get(x).getRecruitingAbility();
+            names[x] = coaches.get(x).getFullName() + " (" + coaches.get(x).getRecruitingAbility() + ")";
         }
         return names;
     }
@@ -420,7 +420,11 @@ public class Team {
 
     boolean getTimeout(int scoreDif){
         // scoreDif needs to be teamScore - opponentScore
-        return (scoreDif < lastScoreDif - 8) && (Math.random() > .5) && (lastScoreDif < 30);
+        if((scoreDif < lastScoreDif - 8) && (Math.random() > .5) && (scoreDif < 30) && (scoreDif > -30)){
+            lastScoreDif = scoreDif;
+            return true;
+        }
+        return false;
     }
 
     public int getWins(){
@@ -591,9 +595,11 @@ public class Team {
                 if(subPlayers.get(x).getFatigue() > r.nextInt(10) - 5 + tendToSub ||
                         (subPlayers.get(x).isInFoulTrouble(half, timeRemaining) && tendToSub > r.nextInt(30))){
                     int sub = findSub(half, timeRemaining, subPlayers.get(x).getCurrentPosition(), false);
-                    if(subPlayers.get(x).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition()) / subPlayers.get(x).getFatigue() <
-                            subPlayers.get(sub).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition())/ subPlayers.get(sub).getFatigue()){
-                        updateSubs(x, sub);
+                    if(sub > -1 && sub < subPlayers.size()) {
+                        if (subPlayers.get(x).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition()) / subPlayers.get(x).getFatigue() <
+                                subPlayers.get(sub).calculateRatingAtPosition(subPlayers.get(x).getCurrentPosition()) / subPlayers.get(sub).getFatigue()) {
+                            updateSubs(x, sub);
+                        }
                     }
                 }
             }
@@ -1024,9 +1030,11 @@ public class Team {
         return wins + "-" + loses + " (" + getConferenceWins(confGames) + "-" + getConferenceLoses(confGames) + ")";
     }
 
-    public void setUpGameInProgress(PlayerDB[] playerDBS){
+    public void setUpGameInProgress(PlayerDB[] playerDBS, int scoreDif){
         rosterPlayers = new ArrayList<>(players);
         subPlayers = new ArrayList<>(players);
+
+        lastScoreDif = scoreDif;
 
         twoPointAttempts = 0;
         twoPointMakes = 0;
@@ -1066,7 +1074,11 @@ public class Team {
                 players.add(getSubPlayerWithID(i));
             }
         }
-        Log.d("Setup", "Size of players: " + players.size() + " expected size: " + subPlayers.size());
+        subPlayers = new ArrayList<>(players);
+    }
+
+    public void undoSetUpGameInProgress(){
+        players = new ArrayList<>(rosterPlayers);
     }
 
     private Player getSubPlayerWithID(int id){

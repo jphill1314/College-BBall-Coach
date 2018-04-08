@@ -24,6 +24,8 @@ public class PlayerDB {
     public int trainingAs;
     public int currentRosterLocation;
 
+    public boolean savedInProgress;
+
     // Offensive attributes
     public int closeRangeShot;
     public int midRangeShot;

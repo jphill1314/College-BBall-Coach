@@ -1,7 +1,5 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
-import android.util.Log;
-
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
 
 import java.util.ArrayList;
@@ -38,7 +36,6 @@ public class ScheduleGenerator {
                     opponent = allTeams.get(r.nextInt(allTeams.size()-x) + x);
                     repeats++;
                     if(repeats > 100){
-                        Log.d("hope", "Games expected: " + ((numberOfGames - 18) * 51) + " actual games: " + masterSchedule.size());
                         return masterSchedule;
                     }
                 }
@@ -51,7 +48,6 @@ public class ScheduleGenerator {
                 }
             }
         }
-        Log.d("hope", "Games expected: " + ((numberOfGames - 18) * 51) + " actual games: " + masterSchedule.size());
         return masterSchedule;
     }
 }

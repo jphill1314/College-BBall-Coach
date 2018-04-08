@@ -4,6 +4,7 @@ package com.coaching.jphil.collegebasketballcoach.fragments.StartScreenFragments
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,7 +28,7 @@ public class StartScreenFragment extends Fragment {
         // Required empty public constructor
     }
 
-    Button newGame, loadGame;
+    Button newGame, loadGame, helpButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +36,7 @@ public class StartScreenFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_start_screen, container, false);
         newGame = view.findViewById(R.id.new_game_button);
         loadGame = view.findViewById(R.id.load_game_button);
+        helpButton = view.findViewById(R.id.info_button);
 
 
         loadGame.setOnClickListener(new View.OnClickListener() {
@@ -55,12 +57,17 @@ public class StartScreenFragment extends Fragment {
             }
         });
 
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://www.google.com")));
+            }
+        });
+
+
         SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        if(prefs.getBoolean(getString(R.string.shared_pref_never_opened), true)){
-            loadGame.setEnabled(false);
-        }
-        else{
-            loadGame.setEnabled(true);
+        if(!prefs.getBoolean(getString(R.string.shared_pref_never_opened), true)) {
+            loadGame.setVisibility(View.VISIBLE);
         }
 
         return view;

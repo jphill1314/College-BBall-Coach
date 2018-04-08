@@ -8,9 +8,9 @@
         android:id="@+id/sort_rating"
         android:title="@string/sort_rating"/>
     <item
-        android:id="@+id/sort_status"
-        android:title="@string/sort_status"/>
-    <item
         android:id="@+id/sort_interest"
         android:title="@string/sort_interest"/>
+    <item
+        android:id="@+id/sort_status"
+        android:title="@string/sort_status"/>
 </menu>

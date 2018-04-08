@@ -181,7 +181,6 @@ public class ScheduleFragment extends Fragment {
             dataAsync = new DataAsync();
             dataAsync.execute("");
 
-
             Log.d("sim", "finished simming: " + results);
         }
 
@@ -271,12 +270,16 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
-            db = Room.databaseBuilder(ScheduleFragment.this.getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            if(db == null || !db.isOpen()) {
+                db = Room.databaseBuilder(ScheduleFragment.this.getContext().getApplicationContext(), AppDatabase.class, "basketballdb").build();
+            }
         }
 
         @Override
         protected void onPostExecute(String result){
-            db.close();
+            if(db.isOpen()){
+                db.close();
+            }
             dataAsync = null;
         }
 
