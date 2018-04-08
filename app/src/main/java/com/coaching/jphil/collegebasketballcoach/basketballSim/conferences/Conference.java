@@ -1,20 +1,14 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
-import com.coaching.jphil.collegebasketballcoach.R;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 /**
  * Created by Jake on 3/1/2018.

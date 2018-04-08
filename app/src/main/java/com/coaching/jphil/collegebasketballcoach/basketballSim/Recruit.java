@@ -98,7 +98,6 @@ public class Recruit {
             case 5:
                 return "C";
         }
-        Log.v("POS", position + "");
         return "ERROR";
     }
 

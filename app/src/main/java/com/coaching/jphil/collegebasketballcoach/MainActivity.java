@@ -258,7 +258,6 @@ public class MainActivity extends AppCompatActivity {
             c.startNewSeason();
         }
 
-        Log.d("async", "new season");
         dataAsync = new DataAsync();
         dataAsync.execute("new season");
     }
@@ -363,10 +362,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings){
             if(strings[0].equals("load")){
+                if(db != null) {
+                    if (!db.isOpen()) {
+                        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+                    }
+                }
                 loadData();
                 return "loaded";
             }
             else if(strings[0].equals("save")){
+                if(db != null) {
+                    if (!db.isOpen()) {
+                        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+                    }
+                }
                 saveData();
             }
             else if(strings[0].equals("new season")){
@@ -395,6 +404,11 @@ public class MainActivity extends AppCompatActivity {
                 return "new season";
             }
             else if(strings[0].equals("delete all")){
+                if(db != null) {
+                    if (!db.isOpen()) {
+                        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+                    }
+                }
                 clearData();
                 return "data cleared";
             }
@@ -417,8 +431,6 @@ public class MainActivity extends AppCompatActivity {
             int coachIndex = 0;
             int playerIndex = 0;
             int tournamentIndex = 0;
-
-            Log.d("save", "Saving data...");
 
             if(db != null){
                 if(!db.isOpen()) {
@@ -677,7 +689,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             db.close();
-            Log.d("save", "finished saving");
         }
 
         private void saveGames(){
@@ -704,7 +715,6 @@ public class MainActivity extends AppCompatActivity {
 
         private void loadData(){
             if(db != null) {
-                Log.d("load", "loading data");
                 TeamDB[] teamsDB = db.appDAO().loadAllTeams();
                 PlayerDB[] players = db.appDAO().loadAllPlayers();
                 GameDB[] games = db.appDAO().loadAllGames();
@@ -733,7 +743,7 @@ public class MainActivity extends AppCompatActivity {
                     teams.add(new Team(teamsDB[i].schoolName, teamsDB[i].schoolMascot, teamsDB[i].isPlayerControlled,
                              teamsDB[i].offFavorsThrees, teamsDB[i].defFavorsThrees, teamsDB[i].aggression, teamsDB[i].pace,
                             teamsDB[i].currentYear, teamsDB[i].isSeasonOver, teamsDB[i].colorMain,
-                            teamsDB[i].colorDark,teamsDB[i].colorLight, teamsDB[i].id, MainActivity.this));
+                            teamsDB[i].colorDark, teamsDB[i].colorLight, teamsDB[i].id, MainActivity.this));
                 }
 
                 int changes;
@@ -827,9 +837,6 @@ public class MainActivity extends AppCompatActivity {
                                 if(i < masterSchedule.size()) {
                                     tourn.addGame(masterSchedule.get(i));
                                 }
-                                else{
-                                    Log.d("load", "size: " + masterSchedule.size());
-                                }
                             }
                             for (String s : Arrays.asList(t.teamIDs.split(","))) {
                                 int i = Integer.parseInt(s);
@@ -854,9 +861,6 @@ public class MainActivity extends AppCompatActivity {
                                 if(team != null){
                                     tourn.addTeam(team);
                                 }
-                                else{
-                                    Log.e("Error", "Error adding team to national championship " + s);
-                                }
                             }
                             for(GameDB game : games){
                                 if(game.gameID >= nationalChampGameIndex){
@@ -875,8 +879,6 @@ public class MainActivity extends AppCompatActivity {
             for(Conference c: conferences){
                 c.getStandings();
             }
-
-            Log.d("load", "finished loading");
         }
 
         private void clearData(){

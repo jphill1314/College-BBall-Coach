@@ -259,8 +259,6 @@ public class TeamCreatorFragment extends Fragment {
             int coachIndex = 0;
             int playerIndex = 0;
 
-            Log.d("save", "Saving data...");
-
             if(db != null){
                 if(!db.isOpen()) {
                     db = Room.databaseBuilder(getContext(), AppDatabase.class, "basketballdb").build();
@@ -488,7 +486,7 @@ public class TeamCreatorFragment extends Fragment {
 
 
             String[] names = {"Boston", "Providence", "Manhattan", "Albany", "Burlington", "Manchester", "Long Island", "New Haven", "Augusta", "Springfield"};
-            String[] mascots = {"Colonist", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Fame"};
+            String[] mascots = {"Colonists", "Preachers", "Liberty", "Cougars", "Fighting Kittens", "Hunters", "Particles", "Whales", "Lobsters", "Fame"};
             generateConference(names, mascots, "Northeastern Athletic Association", confStrengths[0], 0, playerConf[0]);
 
             names = new String[]{"Cleveland", "Detroit", "Milwaukee", "Chicago", "Green Bay", "Indianapolis", "Cincinnati", "Pittsburgh", "Duluth", "Toledo"};
@@ -496,7 +494,7 @@ public class TeamCreatorFragment extends Fragment {
             generateConference(names, mascots, "Great Lakes Conference", confStrengths[1], 0, playerConf[1]);
 
             names = new String[]{"DC", "Richmond", "Charlotte", "Columbia", "Atlanta", "Baltimore", "Nashville", "Raleigh", "Charleston", "Birmingham"};
-            mascots = new String[]{"Lobbyists", "Bulls", "Bankers", "Cows", "News", "Fishermen", "Musicians", "Hogs", "Plane Builders", "Letters"};
+            mascots = new String[]{"Lobbyists", "Bulls", "Bankers", "Cows", "News", "Anglers", "Musicians", "Hogs", "Plane Builders", "Letters"};
             generateConference(names, mascots, "Tobacco Conference", confStrengths[2], 0, playerConf[2]);
 
             names = new String[]{"Tampa", "Tallahassee", "Mobile", "Houston", "San Antonio", "Austin", "Orlando", "Montgomery", "Baton Rogue", "New Orleans"};
@@ -823,12 +821,6 @@ public class TeamCreatorFragment extends Fragment {
                 masterSchedule.get(x).getHomeTeam().addGameToSchedule(masterSchedule.get(x));
                 masterSchedule.get(x).getAwayTeam().addGameToSchedule(masterSchedule.get(x));
                 masterSchedule.get(x).setId(x);
-            }
-
-            for(Conference c: conferences){
-                for(Team t: c.getTeams()){
-                    Log.d("game", t.getFullName() + " has " + t.getNumberOfGames() + " games scheduled");
-                }
             }
         }
     }

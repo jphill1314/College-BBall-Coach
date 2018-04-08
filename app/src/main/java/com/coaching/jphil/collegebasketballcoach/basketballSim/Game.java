@@ -5,7 +5,6 @@ import com.coaching.jphil.collegebasketballcoach.Database.GameEventDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 /**

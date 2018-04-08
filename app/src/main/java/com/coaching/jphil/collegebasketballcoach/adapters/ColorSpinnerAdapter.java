@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.R;
 
-//TODO: make this actually work
-
 public class ColorSpinnerAdapter extends ArrayAdapter {
 
     private String[] colorNames;
@@ -33,7 +31,7 @@ public class ColorSpinnerAdapter extends ArrayAdapter {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.player_info_list_item,null);
+            convertView = inflater.inflate(R.layout.player_info_list_item, parent, false);
         }
         TextView tv = convertView.findViewById(R.id.player_info_tv);
         tv.setText(context.getResources().getString(R.string.color_spinner_label));
@@ -46,7 +44,7 @@ public class ColorSpinnerAdapter extends ArrayAdapter {
     public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         if(convertView == null){
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.player_info_list_item,null);
+            convertView = inflater.inflate(R.layout.player_info_list_item, parent, false);
         }
         TextView tv = convertView.findViewById(R.id.player_info_tv);
         tv.setText(colorNames[position]);

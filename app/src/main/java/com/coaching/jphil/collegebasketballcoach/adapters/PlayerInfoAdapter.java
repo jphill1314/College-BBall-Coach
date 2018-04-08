@@ -2,7 +2,6 @@ package com.coaching.jphil.collegebasketballcoach.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Created by jphil on 3/20/2018.

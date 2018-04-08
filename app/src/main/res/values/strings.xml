@@ -19,9 +19,6 @@
     <string name="school_name_prompt">School name</string>
     <string name="mascot_name">Mascot</string>
     <string name="coach_name">Coach name</string>
-    <string name="team_rating">Team rating: %d</string>
-    <string name="conference">Team\'s conference</string>
-    <string name="conference_rating">Conference ratings</string>
 
     <string name="radio_team">Strength of Team</string>
     <string name="radio_conference">Strength of Conference</string>
@@ -73,9 +70,6 @@
         <item>Training</item>
     </string-array>
 
-    <string name="drawer_open">open</string>
-    <string name="drawer_closed">closed</string>
-
     <!-- Roster Fragment-->
     <string name="roster_title">%s Roster</string>
     <string name="position">Start</string>
@@ -91,9 +85,6 @@
     <string name="overall_record">Overall\nW-L</string>
     <string name="rpi">RPI</string>
     <string name="record_string">%d-%d</string>
-
-    <string name="wins">Wins</string>
-    <string name="loses">Loses</string>
 
     <!-- Player Info Fragment -->
     <string-array name="off_attributes">
@@ -123,10 +114,6 @@
         <item>Work Ethic: </item>
     </string-array>
 
-    <string name="stats">Statistics</string>
-    <string name="games_played">Games played: %d</string>
-    <string name="total_minutes">Minutes played: %d</string>
-
     <string name="rating_at_pos">PG: %d SG: %d SF: %d PF: %d C: %d</string>
 
     <string name="player_name_pos">%s - %s</string>
@@ -139,18 +126,14 @@
 
     <!-- Schedule Fragment -->
     <string name="season_name">%s %d-%d Season</string>
-    <string name="sim_game">Sim next game!</string>
     <string name="new_season">Start new season</string>
-    <string name="start_tournament">Start tournament!</string>
     <string name="team_tourn">#%d %s</string>
     <string name="enter_tourn">View conference tournament</string>
     <string name="enter_champ">View National Championship</string>
     <string name="home_name">\@ %s</string>
-    <string name="no_score">-</string>
     <string name="pregame_info">Game #%d</string>
     <string name="game_in_progress">Game in progress</string>
     <string name="postgame_info">Final</string>
-    <string name="postgame_ot">Final OT</string>
 
     <!--Strategy Fragment -->
     <string name="strategy_title">%s Strategy</string>
@@ -224,10 +207,6 @@
     <string name="position_needs">Returning players by position\nPG: %d SG: %d SF: %d PF: %d C: %d</string>
 
     <!-- Game Fragment -->
-    <string name="timeout">Call timeout</string>
-    <string name="end_timeout">Return to game</string>
-    <string name="start_game">Start game</string>
-    <string name="start_2nd">Start 2nd half</string>
     <string name="scores">%d</string>
     <string name="half">Half: %d</string>
     <string name="game_time">%s (%d)</string>
@@ -289,8 +268,6 @@
         <item>Fouls</item>
         <item>Miscellaneous plays</item>
     </string-array>
-
-    <string name="list_score">%s: %d - %s: %d</string>
 
     <!-- Names -->
 
@@ -1453,7 +1430,6 @@
         <item>Malcom</item>
         <item>Long</item>
         <item>Korey</item>
-        <item>Jospeh</item>
         <item>Colton</item>
         <item>Waylon</item>
         <item>Von</item>
@@ -2518,7 +2494,4 @@
         <item>Noel</item>
         <item>Vang</item>
     </string-array>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

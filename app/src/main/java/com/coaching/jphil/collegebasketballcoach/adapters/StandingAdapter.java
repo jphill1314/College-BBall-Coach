@@ -12,12 +12,10 @@ import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -92,7 +90,6 @@ public class StandingAdapter extends RecyclerView.Adapter<StandingAdapter.ViewHo
                 @Override
                 public void onClick(View view) {
                     Bundle args = new Bundle();
-                    Log.d("Team", "ID: " + standing.get(pos).getId());
                     args.putInt("team", standing.get(pos).getId());
                     args.putInt("conf", type);
                     RosterFragment frag = new RosterFragment();

@@ -290,7 +290,6 @@ public class Team {
 
         if(!isPlayerControlled) {
             int newNum = (int) (12 + Math.random() * 4);
-            Log.d("New Season", "Number of players to make: " + (newNum - players.size()));
             if (players.size() < newNum) {
                 generateFreshman(newNum - players.size());
             }
@@ -1065,7 +1064,6 @@ public class Team {
         int[] playerIDs = new int[playerDBS.length];
         for(PlayerDB db: playerDBS){
             playerIDs[db.gameRosterLocation] = db.playerId;
-            //Log.d("Sort", "Index: " + db.playerId + " Name: " + db.lastName + " location: " + db.gameRosterLocation);
         }
 
         players = new ArrayList<>();

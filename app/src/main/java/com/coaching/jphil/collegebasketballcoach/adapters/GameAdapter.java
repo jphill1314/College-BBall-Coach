@@ -1,6 +1,5 @@
 package com.coaching.jphil.collegebasketballcoach.adapters;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.GameEvent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 
 /**

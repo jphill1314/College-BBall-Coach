@@ -11,12 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
-import com.coaching.jphil.collegebasketballcoach.StartScreenActivity;
-import com.crashlytics.android.Crashlytics;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,7 +57,7 @@ public class StartScreenFragment extends Fragment {
         helpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://www.google.com")));
+                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://github.com/jphill1314/College-BBall-Coach/blob/master/College%20Basketball%20Coach%20basic%20instructions.md")));
             }
         });
 

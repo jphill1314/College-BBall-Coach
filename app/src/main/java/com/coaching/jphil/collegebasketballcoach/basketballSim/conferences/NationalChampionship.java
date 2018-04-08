@@ -40,9 +40,6 @@ public class NationalChampionship {
         }
         else{
             hasChampion = true;
-            for(Game g: tournament.getGames()){
-                Log.d("Nat Champ", g.getHomeTeamName() + " vs " + g.getAwayTeamName());
-            }
         }
     }
 

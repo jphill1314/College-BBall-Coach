@@ -43,8 +43,9 @@ Training:
 * More specific training roles result in faster results, but affect fewer attributes
 
 In game:
-* Coach speaches affect your player's attributes positively or negatively
-* Different speaches have different effects (how much or which attributes)
+* Coach speeches affect your player's attributes positively or negatively
+* Different speeches have different effects (how much or which attributes)
 * Substitutions can be made in the roster screen by tapping on the players you want to swap
 * The in-game strategy screen has the added toggle of intentionally fouling
+* To pause the sim, slide the speed slider all the way to the left
 * You can exit a game at anytime and resume it later

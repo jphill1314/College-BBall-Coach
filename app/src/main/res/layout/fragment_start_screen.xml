@@ -9,7 +9,6 @@
     tools:context="com.coaching.jphil.collegebasketballcoach.StartScreenActivity">
 
     <TextView
-        android:id="@+id/title_text"
         android:paddingTop="36dp"
         android:textSize="46sp"
         android:textStyle="bold"

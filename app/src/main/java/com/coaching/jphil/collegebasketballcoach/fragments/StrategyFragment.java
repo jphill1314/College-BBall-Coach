@@ -1,9 +1,7 @@
 package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
-import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

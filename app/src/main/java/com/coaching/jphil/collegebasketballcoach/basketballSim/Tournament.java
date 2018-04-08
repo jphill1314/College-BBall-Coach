@@ -27,9 +27,6 @@ public class Tournament {
 
         games = new ArrayList<>();
         generateNextRound();
-        for(Team t: teams){
-            Log.v("tourn", t.getFullName());
-        }
     }
 
     public Tournament(String name, boolean playAtNeutralCourt, boolean hasChampion){

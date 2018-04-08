@@ -211,7 +211,6 @@ public class Player {
             case 3:
                 return "SR";
         }
-        Log.v("year", year +"");
         return "Error";
     }
 
@@ -768,7 +767,6 @@ public class Player {
             case 5:
                 return "C";
         }
-        Log.v("POS", position + "");
         return "Error";
     }
 

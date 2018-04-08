@@ -2,11 +2,9 @@ package com.coaching.jphil.collegebasketballcoach.fragments;
 
 
 import android.arch.persistence.room.Room;
-import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,9 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coaching.jphil.collegebasketballcoach.Database.AppDatabase;
@@ -25,19 +20,13 @@ import com.coaching.jphil.collegebasketballcoach.Database.GameDB;
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
-import com.coaching.jphil.collegebasketballcoach.adapters.GameSpeechAdapter;
 import com.coaching.jphil.collegebasketballcoach.adapters.ScheduleAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Conference;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.NationalChampionship;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -133,7 +122,6 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Integer results){
-            Log.d("results", "Results1: " + results);
             if(results > -1){
                 GameFragment frag = new GameFragment();
                 Bundle args = new Bundle();
@@ -151,16 +139,9 @@ public class ScheduleFragment extends Fragment {
             }
             else if(results == -100){
                 if(mainActivity.championship != null && mainActivity.championship.hasChampion()) {
-                    Log.d("Champ", "Champion: " + mainActivity.championship.getTournament().getChampion().getFullName());
                     startNewSeason = true;
                 }
-                else if(mainActivity.championship != null) {
-                    for (Game g : mainActivity.championship.getGames()) {
-                        Log.d("champs", g.getHomeTeamName() + " vs. " + g.getAwayTeamName());
-                    }
-                }
                 else{
-                    Log.d("results", "Results: " + results);
                     startTournament(false);
                     if(mainActivity.getPlayerTeam().isSeasonOver()){
                         simRestOfSeason();
@@ -180,8 +161,6 @@ public class ScheduleFragment extends Fragment {
 
             dataAsync = new DataAsync();
             dataAsync.execute("");
-
-            Log.d("sim", "finished simming: " + results);
         }
 
         @Override
@@ -218,9 +197,9 @@ public class ScheduleFragment extends Fragment {
                             if (!game.isPlayed()) {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                                     if (team.isPlayerControlled()) {
-                                        stats.addAll(game.simulateGame());
-                                        return -1;
-                                        //return mainActivity.masterSchedule.indexOf(game);
+                                        //stats.addAll(game.simulateGame());
+                                        //return -1;
+                                        return mainActivity.masterSchedule.indexOf(game);
                                     }
                                 } else {
                                     stats.addAll(game.simulateGame());
@@ -230,7 +209,6 @@ public class ScheduleFragment extends Fragment {
                         t.generateNextRound();
                     }
                     if(c.getChampion() == null){
-                        Log.d("champs", c.getName() + " doesn't have a champ yet");
                         allConferencesHaveChamp = false;
                         c.generateTournament();
                     }
@@ -242,9 +220,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                stats.addAll(game.simulateGame());
-                                return -1;
-                                //return mainActivity.masterSchedule.indexOf(game);
+                                //stats.addAll(game.simulateGame());
+                                //return -1;
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -337,14 +315,10 @@ public class ScheduleFragment extends Fragment {
                     games[x].isNeutralCourt = game.getIsNeutralCourt();
                     games[x].isPlayed = game.isPlayed();
                 }
-                else{
-                    Log.e("Save Error", "No game with an ID of: " + gameIndexs.get(x));
-                }
             }
 
             db.appDAO().insertGames(games);
             db.appDAO().insertGamesStats(gameStatsDB);
-            Log.d("Saves", "Finished saving games");
         }
 
         private void saveTournamentGames(){
@@ -378,7 +352,6 @@ public class ScheduleFragment extends Fragment {
             }
 
             db.appDAO().insertGames(games);
-            Log.d("save", "tournament games saved");
         }
     }
 

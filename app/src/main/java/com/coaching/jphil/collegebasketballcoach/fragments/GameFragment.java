@@ -10,10 +10,8 @@ import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,13 +46,11 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Coach;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.GameEvent;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Recruit;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static java.lang.Thread.activeCount;
 import static java.lang.Thread.sleep;
 
 /**
@@ -108,7 +104,6 @@ public class GameFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("createView", "onCreateView called for GameFragment");
         Bundle args = getArguments();
         activity = (MainActivity) getActivity();
         if(args != null){
@@ -289,8 +284,6 @@ public class GameFragment extends Fragment {
     public void onResume(){
         super.onResume();
 
-        Log.d("resume", "onResume called for GameFragment");
-
         if(game == null){
             loadedInProgress = true;
             dataAsync = new DataAsync();
@@ -305,9 +298,7 @@ public class GameFragment extends Fragment {
     @Override
     public void onStop(){
         super.onStop();
-        Log.d("stop", "onStop called for GameFragment");
         if(gameAsync != null) {
-            Log.d("stop", "canceling gameAsync");
             gameAsync.cancel(true);
         }
 
@@ -348,12 +339,10 @@ public class GameFragment extends Fragment {
         @Override
         protected void onPreExecute(){
             if(!game.getIsInProgress()) {
-                Log.d("game", "pre game setup");
                 game.setSavePlays(true);
                 game.preGameSetUp();
             }
             else{
-                Log.d("game", "joining game in progress");
                 changeAdapters(0);
             }
         }
@@ -379,7 +368,6 @@ public class GameFragment extends Fragment {
                                 sleep(500);
                             }
                             catch (InterruptedException e){
-                                Log.e("sleep error", e.toString());
                                 cancel(true);
                             }
                         }
@@ -392,7 +380,6 @@ public class GameFragment extends Fragment {
                                 sleep(500);
                             }
                             catch (InterruptedException e){
-                                Log.e("sleep error", e.toString());
                                 cancel(true);
                             }
                         }
@@ -405,7 +392,6 @@ public class GameFragment extends Fragment {
                                 sleep(500);
                             }
                             catch (InterruptedException e){
-                                Log.e("sleep error", e.toString());
                                 cancel(true);
                             }
                         }
@@ -420,7 +406,6 @@ public class GameFragment extends Fragment {
                                     sleep(100);
                                 }
                             } catch (InterruptedException e) {
-                                Log.e("sleep error", e.toString());
                                 cancel(true);
                             }
                         }
@@ -430,7 +415,6 @@ public class GameFragment extends Fragment {
                             sleep(250);
                         }
                         catch (InterruptedException e){
-                            Log.e("sleep error", e.toString());
                             cancel(true);
                         }
                     }
@@ -441,7 +425,6 @@ public class GameFragment extends Fragment {
             }while(game.startNextHalf() && !isCancelled());
 
             if(!isCancelled()) {
-                Log.d("Game", "Game is finished");
                 game.setIsPlayed(true);
 
                 stats = new ArrayList<>();
@@ -1215,22 +1198,18 @@ public class GameFragment extends Fragment {
             }
 
             dataAsync = null;
-            Log.d("save games", "Finished saving games (Game Fragment)");
         }
 
         @Override
         protected String doInBackground(String... strings){
             if(strings[0].equals("in progress")){
-                Log.d("save games", "Start saving game in progress");
                 saveGameInProgress();
             }
             else if(strings[0].equals("load")){
-                Log.d("Load", "Loading game in progress");
                 loadGameInProgress();
                 return "loaded";
             }
             else {
-                Log.d("save games", "Start saving game");
                 saveGameAndStats();
             }
 
@@ -1260,7 +1239,6 @@ public class GameFragment extends Fragment {
             db.appDAO().insertGames(games);
             db.appDAO().insertGamesStats(gameStatsDB);
             db.close();
-            Log.d("Saves", "Finished saving games");
         }
 
         private void saveGameInProgress(){

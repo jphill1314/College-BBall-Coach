@@ -8,8 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;

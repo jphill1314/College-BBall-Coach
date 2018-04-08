@@ -3,7 +3,6 @@ package com.coaching.jphil.collegebasketballcoach.basketballSim.conferences;
 import android.content.Context;
 import android.util.Log;
 
-import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Tournament;
 
@@ -46,9 +45,7 @@ public class StandardTenTeam extends Conference {
             Iterator<Team> itr = teams.iterator();
             while(itr.hasNext()){
                 Team t = itr.next();
-                Log.d("Team", "Team: " + t.getFullName());
                 if(t.isSeasonOver()){
-                    Log.d("Team", "Removed");
                     itr.remove();
                 }
             }

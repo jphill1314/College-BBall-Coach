@@ -23,8 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:textSize="30sp"
-                android:text="Test String"/>
+                android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/home_score"
@@ -33,8 +32,7 @@
                 android:layout_gravity="bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="45sp"
-                android:text="57"/>
+                android:textSize="45sp"/>
 
             <TextView
                 android:id="@+id/home_to"
@@ -43,8 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="8dp"
-                android:textSize="20sp"
-                android:text="TO: 1"/>
+                android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/home_fouls"
@@ -53,8 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="8dp"
-                android:textSize="20sp"
-                android:text="F: 5"/>
+                android:textSize="20sp"/>
 
         </RelativeLayout>
 
@@ -70,8 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:textSize="30sp"
-                android:text="Test String"/>
+                android:textSize="30sp"/>
 
             <TextView
                 android:id="@+id/away_score"
@@ -79,8 +74,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="45sp"
-                android:text="57"/>
+                android:textSize="45sp"/>
 
             <TextView
                 android:id="@+id/away_to"
@@ -89,8 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:textSize="20sp"
-                android:text="TO: 1"/>
+                android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/away_fouls"
@@ -99,8 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:textSize="20sp"
-                android:text="F: 5"/>
+                android:textSize="20sp"/>
 
         </RelativeLayout>
     </LinearLayout>
