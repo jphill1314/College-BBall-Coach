@@ -23,7 +23,7 @@
             android:gravity="center"
             android:paddingEnd="5dp"
             android:textColor="@color/black"
-            android:text="@string/position"
+            android:text="@string/starting_position"
             android:textSize="20sp" />
 
         <TextView
@@ -52,7 +52,7 @@
             android:gravity="center"
             android:paddingEnd="5dp"
             android:textColor="@color/black"
-            android:text="@string/pref_position"
+            android:text="@string/position"
             android:textSize="20sp" />
 
         <TextView

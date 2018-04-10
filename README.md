@@ -1,92 +1,35 @@
 # College Basketball Coach
 
-Attempt at an Android game that simulates the experience of being the head coach of a college basketball team.
+An Android game that simulates the experience of being the head coach of a college basketball team.
 
-Users will get to manage their team's roster, recruiting, strategy, staff, and training. All of the features have been added in some form.
+(Note to the reader: I will be using ‘user’ to refer to the real person who is playing this game and ‘player’ to fictional in-game characters that comprise the basketball teams. Also, some knowledge of college basketball is assumed for discussions of the various elements of simulating a college basketball team.)
 
-List of improvements to add (for version 1.0):
-* Roster
-- [x] Set starting lineup
+## Main Feature: Basketball Simulator
 
-* Schedule
-- [x] Non-conference games
-- [ ] Games are seperated by time -> in between teams can practice + players' recover from games (after 1.0)
-- [x] When the player has no games left, it should only take one press of the sim button to simulate the rest of the season
-- [x] The button should show the proper next action when the fragment loads (ie will show start tournament when it's tournament time)
+The main feature of this game is the simulation of basketball games. Each team is made of players who have numeric ratings for all of the skills that are involved in playing basketball (dribbling, shooting, passing, defending, etc.). Based on these ratings (and some RNG) probabilities are determined for which action a player will take on a given play. Once the type of play is determined (pass the ball, take a shot, etc.), the player’s probability of success is determined based again on the player’s ratings and the player’s defender’s ratings. During the game, every player’s ratings are modified in two ways by the user’s interactions with his or her team. The first way is in managing player fatigue. Each player gains fatigue during every play that they are on the court for and they lose fatigue during timeouts, halftime, and while on the bench. More fatigue results in poorer success on the court, so the user must carefully manage their players to get the most performance from their team. Each player’s rating is also modified by the user’s team talks. Before the game, at halftime, and during each timeout, the user is able to address their team to encourage their players, challenge them, or to tell them to focus on offense or defense. Which talk the user selects is combined with other factors, such as home court advantage and the relative scores of the teams, to determine whether the team will perform better or worse. Finally the user is also able to control (to some extent) which plays their players run. By modifying their team’s strategy, the user is able to encourage their players to play faster or slower, or to shoot more or fewer threes, as well as how aggressive the players should be on defense. 
 
-* Standings
-- [x] Sort by win % first and # of wins second
-- [x] Show rankings and RPI (or something like strength of schedule)
-- [x] Show the correct season years
+Overall, the game simulation produces realistic scores and stat lines and properly favors the better team and home court advantage. There are some areas that I would like to improve upon in the future though. Currently, a player that is about to shoot free throws is able to be substituted regardless of the result of the player’s final free throw (a sub should only occur if the player makes their final free throw). The AI that governs the non-player controlled teams also leaves a bit to be desired. Oftentimes, the AI will often play its players out of position which results in sub-optimal lineups. The AI is also incapable of making complex substitutions. For example, Player A moves to Player B’s position and Player B is substituted for Player C, who plays in Player A’s former position. Allowing the AI to make such substitutions would likely result in fewer occurrences of sub-optimal lines described above. The AI also currently does not change it strategy during games. The strategy options are also fairly limiting in the closing moments of a ‘close and late situation.’ In real life basketball, it oftentimes makes sense to shoot threes as quickly as possible or try to run out the clock, but these strategies are currently impossible to use in the current state of the game. The simulation would also benefit from the inclusion of the ability to use full-court defenses or zone defenses.
 
-* Recruiting
-- [x] Assign a coach to recruit a certain player instead of pressing a button after every game
-- [x] Recruits that are not recruited will gradually lose interest
-- [x] Recruits that are recruited will gain interest based on the coach's ability and the team's results
-- [ ] Each recruit has a scouting report that is gradually revealed the longer they are recruited (probably best and worst abilities and work ethic)
-- [x] Once a recruit reaches a certain level of interest, he will have a chance to commit after every game
-- [ ] When a recruit commits, all other recruits' interest is effected based on the position of the commit and the number of spots left on the team
-- [x] The recruits should be generated based on the team's expected needs and their current ability, but there should be a couple of hard to get players that are much better
+## Other Features
 
-* Strategy
-- [ ] Add ability to press with varring intensity (to slow the pace or to steal the ball) and frequency (never, sometimes, always)
-- [x] Add ability to intentionally foul
-- [x] Add ability to set overal aggression level (lower means fewer fouls, but not as good defense)
+The other features of the game are fairly simple in comparison to the game simulation. The roster screen allows the user to set their starting line and to view their players’ ratings and statistics. The biggest room for improvement here is in the viewing of statistics. I would like to add the ability to view statistics from previous seasons and season averages for players. Another possible addition here is to add the ability to give each player a role on the team which would affect what the player does in game. For example, giving a player a role of ‘floor general’ will make them focus on passing the ball to their open teammates for great shots or a role of ‘sharp shooter’ will have the player focus on taking and making three pointers.
 
-* Staff
-- [x] Add recruiting ability
-- [ ] Hire and fire staff
+The schedule screen allows the user to view all of their team’s games for the current season and the results of the games played. One obvious area for improvement is to add an easy indicator of whether a game was won or lost by the team being viewed. This screen could also benefit from adding the ability to preview upcoming games to easily compare how the two teams that will be playing.
 
-* Training
-- [ ] Add intensity slider which affects how much the players improve and how quickly they recover from games (after 1.0)
-- [x] Train each position differently
-- [x] A player's improvement depends on playing time, practice intensity, work ethic, and the coaches' abilities
+The standings screen allows the user to view each conference’s standings as well as the overall RPI ranking for all teams. This screen could be improved by implementing the modern formula for RPI (home wins count less than road wins) and by implementing other rating metrics such as strength of schedule or strength of victory or even pythagorean win percentage.
 
-* Game Viewer
-- [x] Add empty list items so that the FAB doesn't always block bottom item in lists
-- [x] Indicate which team has the ball in the Play-by-Play screen
-- [ ] Add more varriety to team talks
-- [x] Give better indication of a player's rating, prefered position, condition, and if they are a pending sub on roster page
-- [x] Add additional screen on roster page to get a better view of stats
-- [x] Add team stats
-- [ ] (maybe 1.0) Add ability to 'run a play' out of a timeout in close and late situations
-- [x] Prevent the user from accessing other parts of the game while in the game view
-- [ ] If the user quits while in game, reopening the app should place the user back into the game
-- [x] Add ability to pause the sim
+The recruiting screen allows the user to view all possible recruits for their team. Currently, getting a recruit to commit to your team is based on the recruit’s interest in your team and the assigned coach’s recruiting ability. I would like to modify this to be less of a ‘set and forget’ experience and instead reward a more active handling of recruiting. This could possibly be achieved by requiring the player to make promises to get a commitment from a recruit. This could be playing time or role or how many wins the team will get in the next season. Another thing to add could be scouting of recruits which would reveal some of their ratings. This would allow the user to look for a player with certain abilities that they desire on their team.
 
-* Game Simulation
-- [ ] Save games that are quit while in progress
-- [ ] Prevent a player that is shooting free throws from being subbed out if they don't make their final free throw
-- [ ] Find better balance between which plays occur
-- [ ] Improve balance of gaining fatigue vs losing fatigue
-- [ ] Have the AI modify strategy based on the situation
-- [x] Track more stats like steals and turnovers
+(The strategy screen and its potential changes were discussed at the end of the game simulation discussion.)
 
-* Players
-- [x] Save game stats
-- [x] Generate initial abilities based on position
-- [x] Calculate overall rating based on position 
-- [x] A player can be set to train as a different position, but will improve slower than if they trained as their best position
+The staff screen allows a player to view their staff and their staff’s ratings. This is the most useless screen in the game currently as you cannot interact with your staff in any way. To change this, it would be beneficial to hire and fire staff as well as to train your current staff to become better at certain skills.
 
-* Offseason (Pushed to after 1.0)
-- [ ] Team has a maximum and minimum size. The user can cut players if they have too many and can add walk-ons to reach the minimum
-- [ ] The user can schedule non-conference games or let the computer pick (Maybe generate an initial schedule that the user can modify if they wish)
-- [ ] Generate other teams' schedules after the player creates theirs
+The player training screen allows the user to direct the training of each of their players. The more general roles (big and guard) train more skills than the specific roles (energy guy, three point specialist, etc.), but do not improve the skills as quickly as the specific roles.This screen could be improved by being more transparent about what skills each role works on. It could also be useful to be able to see how a player’s ratings have changed over time.
 
-* General UI
-- [ ] Add a team overview screen
-- [x] Add a button that will take the user to the overview screen from anywhere in the game (except while in game)[This is effectively added)
-- [x] Indicate which team is being viewed
-- [x] Add a start screen from which the user can load a save or start a new one (there can only ever be one saved game [for now])
-- [x] Add a team creation page for starting a new game
-- [ ] Add loading indicators whenever an AsyncTask is running
+## Technology
 
-* Team Creation
-- [x] User can name the school, the mascot, the conference, and the head coach's name
-- [x] User can choose the average rating of the other schools in the conference and their own team's overall rating
-- [ ] There should be a couple of pre-made options (maybe later - think scenarios)
+On the technology side, this project was fairly straight forward. Room was used to handle the app’s SQLite database and AsyncTasks were used to save and load the data, as well as run the game simulations. Firebase was used to handle crash reporting and analytics.
 
-* Teams and Conferences
-- [x] Aim for 100 teams in at least 10 conferences
-- [x] National Championship should take all conference champs + some at large teams based on their RPI (16 or 32 teams?)
-- [x] Add tournament overview view for both conference tournaments and national championship
+## Future
+
+While I mentioned how I would like to improve the existing features of the game, there are some other ideas that I think would be good additions to the game. I would like to support women’s basketball as well. The only significant changes that this would require is changing the game simulator to also support quarters and have media timeouts and bonus free throws reflect this. A larger addition that I would like to add is giving each school a ‘personality.’ This would mean that different schools would have different levels of investment in their team. With higher financial investment, the user would be able to field a larger team, recruit more players at one time, and schedule more non-conference home games. Higher fan investment would give the user a greater home court advantage, but also place higher expectations on the team for on-court success. This could lead to a system in which the player (and other AI coaches) could be hired and fired by different schools. Another possible improvement would be to add an in-game tutorial.

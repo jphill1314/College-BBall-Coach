@@ -192,7 +192,7 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
             holder.name.setTextColor(Color.GRAY);
         }
 
-        holder.name.setText(pendingSub.get(position).getFullName());
+        holder.name.setText(pendingSub.get(position).getInitialAndName());
 
         if(isPlayerTeam) {
             final int pos = position;

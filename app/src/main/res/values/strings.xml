@@ -72,11 +72,11 @@
 
     <!-- Roster Fragment-->
     <string name="roster_title">%s Roster</string>
-    <string name="position">Start</string>
+    <string name="starting_position">Start</string>
     <string name="name">Name</string>
     <string name="year">Class</string>
     <string name="rating">Rating</string>
-    <string name="pref_position">Pos.</string>
+    <string name="position">Pos.</string>
 
     <!-- Standings Fragment -->
     <string name="standing_title">Standings</string>

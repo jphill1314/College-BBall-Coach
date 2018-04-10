@@ -617,9 +617,8 @@ public class Team {
             if(indexOfBest == -5 && subPlayers.get(x).isEligible()){
                 indexOfBest = x;
                 best = subPlayers.get(x);
-                continue;
             }
-            if(subPlayers.get(x).isEligible()) {
+            else if(subPlayers.get(x).isEligible()) {
                 if (best.calculateRatingAtPosition(position) / best.getFatigue() <
                         subPlayers.get(x).calculateRatingAtPosition(position) / subPlayers.get(x).getFatigue() &&
                         (mustSub || (!subPlayers.get(x).isInFoulTrouble(half, timeRemaining) ||

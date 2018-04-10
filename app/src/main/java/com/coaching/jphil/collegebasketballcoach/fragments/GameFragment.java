@@ -351,15 +351,8 @@ public class GameFragment extends Fragment {
         protected String doInBackground(String... strings) {
             do{
                 int playResult;
-//                if(loadedInProgress){
-//                    playResult = game.getPlayType();
-//                }
-//                else {
-//                    playResult = game.simPlay();
-//                }
-
                 playResult = game.simPlay();
-                while(playResult != -1 && !isCancelled()){
+                while(playResult != -1 && !isCancelled() && game.getTimeRemaining() > 0){
                     if(playResult == 1 && !isCancelled()) {
                         isInTimeout = true;
                         publishProgress();
@@ -436,24 +429,26 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onProgressUpdate(String... progress){
-            updateUI();
+            if(!isCancelled()) {
+                updateUI();
 
-            if(forceSub){
-                forceSub();
-            }
+                if (forceSub) {
+                    forceSub();
+                }
 
-            if(alertDeadBall){
-                alertDeadBall();
-                alertFoulTrouble();
-            }
+                if (alertDeadBall) {
+                    alertDeadBall();
+                    alertFoulTrouble();
+                }
 
-            if(isInTimeout){
-                callTimeout();
-                alertFoulTrouble();
-            }
+                if (isInTimeout) {
+                    callTimeout();
+                    alertFoulTrouble();
+                }
 
-            if(updateGRA){
-                updateGRA();
+                if (updateGRA) {
+                    updateGRA();
+                }
             }
         }
 

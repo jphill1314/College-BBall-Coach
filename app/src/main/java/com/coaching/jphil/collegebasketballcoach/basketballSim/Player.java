@@ -188,6 +188,10 @@ public class Player {
         return fName + " " + lName;
     }
 
+    public String getInitialAndName(){
+        return fName.substring(0,1) + ". " + lName;
+    }
+
     public int getYear(){
         return year;
     }

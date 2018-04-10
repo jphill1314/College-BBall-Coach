@@ -280,6 +280,10 @@ public class Game {
     }
 
     private boolean callTimeout(){
+        if(callMediaTimeout()){
+            return true;
+        }
+
         if(playerWantsTO){
             if(homeTeam.isPlayerControlled()){
                 if(canCallTimeout(homeTeam)) {
@@ -314,7 +318,7 @@ public class Game {
                 }
             }
         }
-        return callMediaTimeout();
+        return false;
     }
 
     private boolean callMediaTimeout(){
@@ -573,7 +577,7 @@ public class Game {
                     awayScore += getShot(awayTeam, homeTeam, false);
                 }
             }
-            else if(shotClock < 4 && r.nextDouble() > .05){
+            else if(shotClock <= 5 && r.nextDouble() > .05){
                 if (homeTeamHasBall) {
                     homeScore += getShot(homeTeam, awayTeam, false);
                 } else {
@@ -755,11 +759,15 @@ public class Game {
                 currentPlay += target.getFullName() + " cannot control the pass and has lost the ball out of bounds!";
                 target.addTurnover();
                 offense.addTurnover();
+                deadBall = true;
+                madeShot = false;
             }
             else{
                 currentPlay += passer.getFullName() + " has thrown the ball away!";
                 passer.addTurnover();
                 offense.addTurnover();
+                deadBall = true;
+                madeShot = false;
             }
 
             smartTimeChange((int) (4 - (offense.getPace() / 90.0) * r.nextInt(3)));
@@ -928,10 +936,10 @@ public class Game {
         int shotLocation;
         Player shooter = offense.getPlayers().get(playerWithBall - 1);
 
-        int shotClose = (int) (shooter.getCloseRangeShot() * (1 - offense.getOffenseFavorsThrees() / 100.0) *
-                (1 - defense.getDefenseFavorsThrees() / 100.0) + r.nextInt(randomBoundValue));
+        int shotClose = (int) (shooter.getCloseRangeShot() * (1 - (offense.getOffenseFavorsThrees() / 100.0)) *
+                (1 - (defense.getDefenseFavorsThrees() / 100.0)) + r.nextInt(randomBoundValue));
 
-        int shotMid = (int) (shooter.getMidRangeShot() * .4 + r.nextInt(randomBoundValue));
+        int shotMid = (int) (shooter.getMidRangeShot() * .2 + r.nextInt(randomBoundValue));
 
         int shotLong = (int) (shooter.getLongRangeShot() * (offense.getOffenseFavorsThrees() / 100.0) *
                 (defense.getDefenseFavorsThrees() / 100.0) + r.nextInt(randomBoundValue));
