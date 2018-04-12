@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
+import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
     Player player;
     int type;
     ArrayList<String> items;
+    ArrayList<Integer> gameIds;
+    ArrayList<Game> games;
+    MainActivity activity;
 
     public PlayerInfoAdapter(Player player, int type, Context context){
         this.player = player;
@@ -39,9 +44,12 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
         getItems(context);
     }
 
-    public PlayerInfoAdapter(ArrayList<String> items){
+    public PlayerInfoAdapter(ArrayList<String> items, ArrayList<Game> games, ArrayList<Integer> gameIds, MainActivity activity){
         this.items = items;
         type = -1;
+        this.games = games;
+        this.gameIds = gameIds;
+        this.activity = activity;
     }
 
     private void getItems(Context context){
@@ -76,10 +84,48 @@ public class PlayerInfoAdapter extends RecyclerView.Adapter<PlayerInfoAdapter.Vi
                 holder.tv.setText(items.get(position) + " " + player.getOtherAttributes()[position]);
                 break;
             case -1:
-                holder.tv.setText(items.get(position));
+                if(isHomeGame(gameIds.get(position))) {
+                    holder.tv.setText(activity.getString(R.string.game_name_home, getOpponentName(gameIds.get(position)),
+                            items.get(position)));
+                }
+                else{
+                    holder.tv.setText(activity.getString(R.string.game_name_away, getOpponentName(gameIds.get(position)),
+                            items.get(position)));
+                }
         }
     }
 
+    private boolean isHomeGame(int id){
+        if(games != null && activity != null){
+            for(Game g: games){
+                if(g.getId() == id){
+                    if(g.getHomeTeam().equals(activity.currentTeam)){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private String getOpponentName(int id){
+        if(games != null && activity != null){
+            for(Game g: games){
+                if(g.getId() == id){
+                    if(g.getHomeTeam().equals(activity.currentTeam)){
+                        return g.getAwayTeamName();
+                    }
+                    else{
+                        return g.getHomeTeamName();
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     @Override
     public int getItemCount() {

@@ -680,11 +680,11 @@ public class GameFragment extends Fragment {
                 }
                 else if(adapterType == 5) {
                     if (game.getHomeTeam().isPlayerControlled()) {
-                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getAwayScore() - game.getHomeScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
-                        game.coachTalk(game.getAwayTeam(), false, game.getHomeScore() - game.getAwayScore());
+                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
+                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore());
                     } else {
-                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getAwayScore() - game.getHomeScore());
-                        game.coachTalk(game.getAwayTeam(), false, game.getHomeScore() - game.getAwayScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
+                        game.coachTalk(game.getHomeTeam(), !game.getIsNeutralCourt(), game.getHomeScore() - game.getAwayScore());
+                        game.coachTalk(game.getAwayTeam(), false, game.getAwayScore() - game.getHomeScore(), ((GameSpeechAdapter) adapter).getSelectedValue());
                     }
                     spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
                     spinner.setAdapter(spinnerAdapter);
@@ -745,10 +745,10 @@ public class GameFragment extends Fragment {
         pendingAgro = playerTeam.getAggression();
         pendingPace = playerTeam.getPace();
 
-        offThrees.setProgress((int) (pendingOffThrees / 70.0 * 100.0 - 30));
-        defThrees.setProgress((int) (pendingDefThrees / 70.0 * 100.0 - 30));
-        agro.setProgress(pendingAgro + 10);
-        pace.setProgress((int) ((pendingPace - 55) / 35.0 * 100.0));
+        offThrees.setProgress(playerTeam.getOffenseFavorsThrees() - 25);
+        defThrees.setProgress(playerTeam.getDefenseFavorsThrees() - 25);
+        agro.setProgress(playerTeam.getAggression() + 10);
+        pace.setProgress((int) ((playerTeam.getPace() - 55) / 35.0 * 100.0));
 
         offThrees.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int offThreeProgress;
@@ -764,7 +764,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                offThreeProgress = (int) (((offThreeProgress + 30) / 100.0) * 70);
+                offThreeProgress = offThreeProgress + 25;
                 pendingOffThrees = offThreeProgress;
             }
         });
@@ -785,7 +785,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                defThreeProgress = (int) (((defThreeProgress + 30) / 100.0) * 70);
+                defThreeProgress = defThreeProgress + 25;
                 pendingDefThrees = defThreeProgress;
             }
         });
@@ -1216,6 +1216,7 @@ public class GameFragment extends Fragment {
 
             for(int x = 0; x < gameStatsDB.length; x++){
                 gameStatsDB[x] = stats.get(x);
+                gameStatsDB[x].gameId = gameIndex;
             }
 
             GameDB games = new GameDB();

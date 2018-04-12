@@ -165,8 +165,8 @@ public class Game {
             int lastPlay = simPlay();
             while (lastPlay != -1) {
                 if(lastPlay == 1){
-                    coachTalk(homeTeam, !isNeutralCourt, awayScore-homeScore, homeTeam.getCoachTalk(awayScore - homeScore));
-                    coachTalk(awayTeam, false, homeScore-awayScore, awayTeam.getCoachTalk(homeScore - awayScore));
+                    coachTalk(homeTeam, !isNeutralCourt, homeScore-awayScore, homeTeam.getCoachTalk(homeScore - awayScore));
+                    coachTalk(awayTeam, false, awayScore-homeScore, awayTeam.getCoachTalk(awayScore - homeScore));
                 }
                 lastPlay = simPlay();
             }
@@ -269,14 +269,16 @@ public class Game {
 
     public void coachTalk(Team team, boolean homeCourt, int scoreDif){
         for(Player p: team.getPlayers()){
-            p.setGameModifiers(homeCourt, scoreDif, team.getCoachTalk(scoreDif));
+            p.setGameModifiers(homeCourt, scoreDif - team.getLastScoreDif(), team.getCoachTalk(scoreDif));
         }
+        team.setLastScoreDif(scoreDif);
     }
 
     public void coachTalk(Team team, boolean homeCourt, int scoreDif, int talkType){
         for(Player p: team.getPlayers()){
-            p.setGameModifiers(homeCourt, scoreDif, talkType);
+            p.setGameModifiers(homeCourt, scoreDif - team.getLastScoreDif(), talkType);
         }
+        team.setLastScoreDif(scoreDif);
     }
 
     private boolean callTimeout(){
@@ -783,6 +785,9 @@ public class Game {
                 currentPlay += passer.getFullName() + " cannot find the open man and is called for a 5 second violation!";
                 passer.addTurnover();
                 offense.addTurnover();
+                deadBall = true;
+                madeShot = false;
+
                 if(savePlays){
                     plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 2, homeTeamHasBall));
                 }

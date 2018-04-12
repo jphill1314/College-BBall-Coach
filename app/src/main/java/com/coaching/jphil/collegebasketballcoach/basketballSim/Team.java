@@ -403,16 +403,23 @@ public class Team {
         return stats;
     }
 
+    public void setLastScoreDif(int scoreDif){
+        lastScoreDif = scoreDif;
+    }
+
+    public int getLastScoreDif(){
+        return lastScoreDif;
+    }
+
     int getCoachTalk(int scoreDif){
+        // scoreDif = teamScore - opponentScore
         if(scoreDif < lastScoreDif - 5){
-            lastScoreDif = scoreDif;
-            if(scoreDif > 15){
+            if(scoreDif < lastScoreDif - 15){
                 return 3; // more effect
             }
             return 0; // no effect
         }
         else{
-            lastScoreDif = scoreDif;
             return 1; // smaller effect
         }
     }
@@ -420,7 +427,6 @@ public class Team {
     boolean getTimeout(int scoreDif){
         // scoreDif needs to be teamScore - opponentScore
         if((scoreDif < lastScoreDif - 8) && (Math.random() > .5) && (scoreDif < 30) && (scoreDif > -30)){
-            lastScoreDif = scoreDif;
             return true;
         }
         return false;

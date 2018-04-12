@@ -132,10 +132,12 @@ public class PlayerInfoFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             ArrayList<String> results = new ArrayList<>();
+            ArrayList<Integer> ids = new ArrayList<>();
             for(GameStatsDB stat: stats){
                 results.add(stat.getStatsAsString());
+                ids.add(stat.gameId);
             }
-            adapter = new PlayerInfoAdapter(results);
+            adapter = new PlayerInfoAdapter(results, mainActivity.currentTeam.getSchedule(), ids, mainActivity);
             recyclerView.setAdapter(adapter);
 
             if(db.isOpen()) {

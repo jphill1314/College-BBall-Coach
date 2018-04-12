@@ -115,6 +115,8 @@
     </string-array>
 
     <string name="rating_at_pos">PG: %d SG: %d SF: %d PF: %d C: %d</string>
+    <string name="game_name_home">Vs. %s\n%s</string>
+    <string name="game_name_away">\@ %s\n%s</string>
 
     <string name="player_name_pos">%s - %s</string>
     <string-array name="player_info_spinner">

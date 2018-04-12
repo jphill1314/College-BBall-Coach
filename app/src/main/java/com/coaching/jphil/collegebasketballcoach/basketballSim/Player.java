@@ -22,7 +22,6 @@ public class Player {
     private int trainingAs;
 
     private int ratingVariability = 10; // when attributes are generated, how much variability +/-
-    private int gameVariability = 10;
     private int offensiveModifier = 0;
     private int defensiveModifier = 0;
 
@@ -1132,8 +1131,12 @@ public class Player {
 
     void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
         // for coach type: 0=no effect, 1=less variability, 2=extra variability (good or bad), 3=defensive focus, 4=offensive focus
+        // scoreDif = teamScore - opponentScore -> positive = lead, negative = deficit
+
         int maxModifier = 30;
+        int gameVariability = 5;
         double gameModifier = (Math.random() * 2 * gameVariability) - gameVariability;
+
         if(coachType == 1){
             gameModifier /= 2;
         }
@@ -1143,51 +1146,38 @@ public class Player {
 
         if(homeTeam){
             // players play better at home
-            gameModifier += 3;
+            gameModifier += 2;
         }
 
-        if(scoreDif > 10 && gameModifier < 0){
-            gameModifier = -gameModifier;
-        }
-        else if(scoreDif < -10 && gameModifier > 0){
-            gameModifier = 0;
-        }
-
-        if(scoreDif > 0){
-            gameModifier *= (1 + scoreDif / 100.0);
-        }
-        else if(scoreDif > -15){
+        if(scoreDif > 15){
             gameModifier *= (1 - scoreDif / 100.0);
         }
-        else{
-            gameModifier = scoreDif;
+        else if(scoreDif > 0){
+            gameModifier *= (1 + scoreDif / 100.0);
         }
+        else{
+            gameModifier -= scoreDif;
+        }
+
+        if(gameModifier > maxModifier){
+            gameModifier = maxModifier;
+        }
+        else if(gameModifier < -maxModifier){
+            gameModifier = -maxModifier;
+        }
+
 
         if(coachType == 3){
-            offensiveModifier += gameModifier;
-            defensiveModifier += gameModifier + 3;
+            offensiveModifier = (int)gameModifier;
+            defensiveModifier = (int)gameModifier + 3;
         }
         else if(coachType == 4){
-            offensiveModifier += gameModifier + 3;
-            defensiveModifier += gameModifier;
+            offensiveModifier = (int)gameModifier + 3;
+            defensiveModifier = (int)gameModifier;
         }
         else{
-            offensiveModifier += gameModifier;
-            defensiveModifier += gameModifier;
-        }
-
-        if(offensiveModifier > maxModifier){
-            offensiveModifier = maxModifier;
-        }
-        else if(offensiveModifier < -maxModifier){
-            offensiveModifier = -maxModifier;
-        }
-
-        if(defensiveModifier > maxModifier){
-            defensiveModifier = maxModifier;
-        }
-        else if(defensiveModifier < -maxModifier){
-            defensiveModifier = -maxModifier;
+            offensiveModifier = (int)gameModifier;
+            defensiveModifier = (int)gameModifier;
         }
     }
 
