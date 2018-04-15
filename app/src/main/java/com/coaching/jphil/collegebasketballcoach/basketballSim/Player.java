@@ -1034,6 +1034,10 @@ public class Player {
         return (int) fatigue;
     }
 
+    public double getGameFatigue(){
+        return fatigue;
+    }
+
     public int getAggressiveness(){
         return aggressiveness;
     }

@@ -7,8 +7,11 @@ import android.support.v7.widget.Toolbar;
 
 
 import com.coaching.jphil.collegebasketballcoach.fragments.StartScreenFragments.StartScreenFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class StartScreenActivity extends AppCompatActivity {
+
+    private FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,5 +27,15 @@ public class StartScreenActivity extends AppCompatActivity {
 
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
         getSupportActionBar().setTitle(getString(R.string.app_name));
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+    }
+
+    public void logNewGameStarted(String teamName, int confStrength, int teamStrength){
+        Bundle bundle = new Bundle();
+        bundle.putString("team_name", teamName);
+        bundle.putInt("conference_strength", confStrength);
+        bundle.putInt("team_strength", teamStrength);
+        firebaseAnalytics.logEvent("start_new_game", bundle);
     }
 }

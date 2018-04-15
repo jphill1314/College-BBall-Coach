@@ -50,6 +50,7 @@ import com.coaching.jphil.collegebasketballcoach.fragments.StaffFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager manager;
 
     private AppDatabase db;
-    private DataAsync dataAsync;
 
     public ArrayList<Conference> conferences;
     public ArrayList<Game> masterSchedule;
@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     public FloatingActionButton homeButton;
     public ActionBar actionBar;
 
+    private FirebaseAnalytics firebaseAnalytics;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if(db == null && conferences == null){
-            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
-            dataAsync = new DataAsync();
-            dataAsync.execute("load");
+            new DataAsync().execute("load");
         }
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         invalidateOptionsMenu();
     }
@@ -131,16 +133,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDataAsyncFinish(){
+        Log.d("test", "onDataAsyncFinished called");
         currentTeam = getPlayerTeam();
         currentConference = getPlayerConference();
 
         initUI();
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, new RosterFragment())
-                .commit();
-
-        dataAsync = null;
+        updateFragment(0);
     }
 
     @Override
@@ -154,28 +153,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume(){
-        super.onResume();
-
-        if(conferences == null || masterSchedule == null){
-            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
-            dataAsync = new DataAsync();
-            dataAsync.execute("load");
-        }
-    }
-
-    @Override
     protected void onStop(){
         super.onStop();
 
-        if(dataAsync != null) {
-            dataAsync.cancel(true);
-        }
-        if(!db.isOpen()){
-            db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
-        }
-        dataAsync = new DataAsync();
-        dataAsync.execute("save");
+        new DataAsync().execute("save");
     }
 
     public void updateFragment(int position){
@@ -193,22 +174,26 @@ public class MainActivity extends AppCompatActivity {
                 t.replace(R.id.content_frame, new RosterFragment());
                 makeSwitch = true;
                 actionBar.setTitle(getString(R.string.roster_title, currentTeam.getFullName()));
+                firebaseAnalytics.setCurrentScreen(this, "RosterFragment", "RosterFragment");
                 break;
             case 1:
                 t.replace(R.id.content_frame, new ScheduleFragment());
                 makeSwitch = true;
                 actionBar.setTitle(getString(R.string.season_name, currentTeam.getMascot(), currentTeam.getCurrentSeasonYear(), currentTeam.getCurrentSeasonYear() + 1));
+                firebaseAnalytics.setCurrentScreen(this, "ScheduleFragment", "ScheduleFragment");
                 break;
             case 2:
                 t.replace(R.id.content_frame, new StandingsFragment());
                 actionBar.setTitle(getString(R.string.standing_title));
                 makeSwitch = true;
+                firebaseAnalytics.setCurrentScreen(this, "StandingsFragment", "StandingsFragment");
                 break;
             case 3:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new RecruitFragment());
                     actionBar.setTitle(getString(R.string.recruiting_title, currentTeam.getFullName()));
                     makeSwitch = true;
+                    firebaseAnalytics.setCurrentScreen(this, "RecruitFragment", "RecruitFragment");
                 }
                 else{
                     text = "You can't view another team's recruits!";
@@ -219,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
                     t.replace(R.id.content_frame, new StrategyFragment());
                     actionBar.setTitle(getString(R.string.strategy_title, currentTeam.getFullName()));
                     makeSwitch = true;
+                    firebaseAnalytics.setCurrentScreen(this, "StrategyFragment", "StrategyFragment");
                 }
                 else{
                     text = "You can't view another team's strategy!";
@@ -228,12 +214,14 @@ public class MainActivity extends AppCompatActivity {
                 t.replace(R.id.content_frame, new StaffFragment());
                 actionBar.setTitle(getString(R.string.staff_title, currentTeam.getFullName()));
                 makeSwitch = true;
+                firebaseAnalytics.setCurrentScreen(this, "StaffFragment", "StaffFragment");
                 break;
             case 6:
                 if(currentTeam.isPlayerControlled()) {
                     t.replace(R.id.content_frame, new TrainingFragment());
                     actionBar.setTitle(getString(R.string.training_title, currentTeam.getFullName()));
                     makeSwitch = true;
+                    firebaseAnalytics.setCurrentScreen(this, "TrainingFragment", "TrainingFragment");
                 }
                 else{
                     text = "You can't view another team's practice plans!";
@@ -258,8 +246,12 @@ public class MainActivity extends AppCompatActivity {
             c.startNewSeason();
         }
 
-        dataAsync = new DataAsync();
-        dataAsync.execute("new season");
+        Bundle bundle = new Bundle();
+        bundle.putString("team_name", currentTeam.getFullName());
+        bundle.putInt("season", currentTeam.getCurrentSeasonYear());
+        firebaseAnalytics.logEvent("start_new_season", bundle);
+
+        new DataAsync().execute("new season");
     }
 
     public Team getPlayerTeam(){
@@ -355,48 +347,69 @@ public class MainActivity extends AppCompatActivity {
         homeButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(currentTeam.getColorLight())));
     }
 
+    public void logGameStartedEvent(int gameID){
+        Bundle bundle = new Bundle();
+        bundle.putString("team_name", currentTeam.getFullName());
+        bundle.putInt("game_id", gameID);
+        firebaseAnalytics.logEvent("game_started", bundle);
+    }
+
+    public void changeScreenToGameFragment(){
+        firebaseAnalytics.setCurrentScreen(this, "GameFragment", "GameFragment");
+    }
+
+    public void leaveGameFragment(){
+        firebaseAnalytics.setCurrentScreen(this, "ScheduleFragment", "ScheduleFragment");
+    }
 
     private class DataAsync extends AsyncTask<String, String, String> {
         private int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
 
         @Override
         protected String doInBackground(String... strings){
+            Log.d("AsyncTasks", "MainActivity.DataAsync starting");
             if(strings[0].equals("load")){
+                Log.d("test", "load");
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                     }
+                }
+                else{
+                    db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 }
                 loadData();
                 return "loaded";
             }
             else if(strings[0].equals("save")){
+                Log.d("test", "save");
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                     }
                 }
+                else{
+                    db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+                }
                 saveData();
             }
             else if(strings[0].equals("new season")){
-
-                if(db != null){
-                    if(!db.isOpen()){
-                        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
-                    }
-                    db.appDAO().deleteGameStats();
-                    db.appDAO().deleteTournaments();
-                    db.appDAO().deleteGameDB();
-
-                    PlayerDB[] players = db.appDAO().loadAllPlayers();
-                    ArrayList<PlayerDB> removedPlayers = new ArrayList<>();
-                    for(PlayerDB player: players){
-                        if(player.year == 3){
-                            removedPlayers.add(player);
-                        }
-                    }
-                    db.appDAO().deletePlayers(removedPlayers);
+                Log.d("test", "new season");
+                if(db == null || !db.isOpen()){
+                    db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 }
+                db.appDAO().deleteGameStats();
+                db.appDAO().deleteTournaments();
+                db.appDAO().deleteGameDB();
+
+                PlayerDB[] players = db.appDAO().loadAllPlayers();
+                ArrayList<PlayerDB> removedPlayers = new ArrayList<>();
+                for(PlayerDB player: players){
+                    if(player.year == 3){
+                        removedPlayers.add(player);
+                    }
+                }
+                db.appDAO().deletePlayers(removedPlayers);
                 generateNonConferenceGames();
                 saveData();
                 saveGames();
@@ -404,14 +417,19 @@ public class MainActivity extends AppCompatActivity {
                 return "new season";
             }
             else if(strings[0].equals("delete all")){
+                Log.d("test", "delete");
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                     }
                 }
+                else{
+                    db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
+                }
                 clearData();
                 return "data cleared";
             }
+            Log.d("test", "test");
             return null;
         }
 
@@ -422,8 +440,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if(db.isOpen()){
+                Log.d("test", "Database is open");
                 db.close();
             }
+
+            Log.d("AsyncTasks", "MainActivity.DataAsync has finished");
         }
 
         private void saveData(){
@@ -714,6 +735,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void loadData(){
+            Log.d("AsyncTasks", "MainActivity... loading data");
             if(db != null) {
                 TeamDB[] teamsDB = db.appDAO().loadAllTeams();
                 PlayerDB[] players = db.appDAO().loadAllPlayers();
@@ -879,6 +901,8 @@ public class MainActivity extends AppCompatActivity {
             for(Conference c: conferences){
                 c.getStandings();
             }
+
+            db.close();
         }
 
         private void clearData(){

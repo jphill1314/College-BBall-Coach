@@ -112,6 +112,7 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected Integer doInBackground(String... strings) {
+            Log.d("AsyncTasks", "ScheduleFragment.SimAsync starting");
             int index = simulateGames(mainActivity.currentTeam);
             if(index > -1){
                 return index;
@@ -158,6 +159,8 @@ public class ScheduleFragment extends Fragment {
             adapter.notifyDataSetChanged();
             nextAction.setVisibility(View.VISIBLE);
             updateUI();
+
+            Log.d("AsyncTasks", "ScheduleFragment.SimAsync has finished");
 
             dataAsync = new DataAsync();
             dataAsync.execute("");
@@ -258,11 +261,14 @@ public class ScheduleFragment extends Fragment {
             if(db.isOpen()){
                 db.close();
             }
+
+            Log.d("AsyncTasks", "ScheduleFragment.DataAsync has finished");
             dataAsync = null;
         }
 
         @Override
         protected String doInBackground(String... strings){
+            Log.d("AsyncTasks", "ScheduleFragment.DataAsync starting");
             if(strings[0].equals("tournament")){
                 saveTournamentGames();
             }

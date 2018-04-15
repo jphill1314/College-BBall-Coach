@@ -153,6 +153,9 @@ public class TeamCreatorFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 fab.setVisibility(View.GONE);
+                ((StartScreenActivity)getActivity()).logNewGameStarted(schoolName.getText().toString() + " " + mascot.getText().toString(),
+                        confStrength, teamStrength);
+
                 db = Room.databaseBuilder(getActivity().getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 new NewGameAsync().execute();
             }

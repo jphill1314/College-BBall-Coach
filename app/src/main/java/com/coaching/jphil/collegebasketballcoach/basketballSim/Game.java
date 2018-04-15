@@ -574,16 +574,16 @@ public class Game {
             }
             if (shotClock < shotUrgency && r.nextDouble() > .5 && location == 1) {
                 if (homeTeamHasBall) {
-                    homeScore += getShot(homeTeam, awayTeam, false);
+                    homeScore += getShot(homeTeam, awayTeam, false, false);
                 } else {
-                    awayScore += getShot(awayTeam, homeTeam, false);
+                    awayScore += getShot(awayTeam, homeTeam, false, false);
                 }
             }
             else if(shotClock <= 5 && r.nextDouble() > .05){
                 if (homeTeamHasBall) {
-                    homeScore += getShot(homeTeam, awayTeam, false);
+                    homeScore += getShot(homeTeam, awayTeam, false, false);
                 } else {
-                    awayScore += getShot(awayTeam, homeTeam, false);
+                    awayScore += getShot(awayTeam, homeTeam, false, false);
                 }
             }
             else {
@@ -592,6 +592,15 @@ public class Game {
                 } else {
                     awayScore += getPass(awayTeam, homeTeam);
                 }
+            }
+        }
+
+        if(!madeShot && !deadBall && freeThrows == 0 && shotClock <= 5 && r.nextDouble() > .05){
+            currentPlay = "\n";
+            if (homeTeamHasBall) {
+                homeScore += getShot(homeTeam, awayTeam, false, true);
+            } else {
+                awayScore += getShot(awayTeam, homeTeam, false, true);
             }
         }
 
@@ -717,7 +726,7 @@ public class Game {
                     if ((passSuccess > (20 + defense.getAggression() / 2))) {
                         // pass leading to a shot
                         smartTimeChange((int) (8 - (offense.getPace() / 90.0) * r.nextInt(4)));
-                        return getShot(offense, defense, true);
+                        return getShot(offense, defense, true, false);
                     }
 
                     int post = getPostMove(target, targetDef);
@@ -937,7 +946,7 @@ public class Game {
 
     }
 
-    private int getShot(Team offense, Team defense, boolean assisted) {
+    private int getShot(Team offense, Team defense, boolean assisted, boolean rushed) {
         int shotLocation;
         Player shooter = offense.getPlayers().get(playerWithBall - 1);
 
@@ -952,18 +961,38 @@ public class Game {
         if(currentPlay.length() != 0){
             currentPlay += "\n";
         }
-        if (shotClose > shotMid && shotClose > shotLong) {
-            currentPlay += shooter.getFullName() + " shoots from up close";
-            shotLocation = 1;
-        } else if (shotMid > shotClose && shotMid > shotLong) {
-            currentPlay += shooter.getFullName() + " shoots from mid-range";
-            shotLocation = 2;
-        } else {
-            currentPlay += shooter.getFullName() + " shoots from 3";
+
+        if (location == 0) {
+            currentPlay += shooter.getFullName() + " shoots from near mid-court";
             shotLocation = 3;
         }
-
-        if (location < 1) {
+        else if(location == -1){
+            currentPlay += shooter.getFullName() + " shoots from well beyond half court";
+            shotLocation = 3;
+        }
+        else if (shotClose > shotMid && shotClose > shotLong) {
+            if(rushed){
+                currentPlay += shooter.getFullName() + " rushes a shot from up close";
+            }
+            else {
+                currentPlay += shooter.getFullName() + " shoots from up close";
+            }
+            shotLocation = 1;
+        } else if (shotMid > shotClose && shotMid > shotLong) {
+            if(rushed){
+                currentPlay += shooter.getFullName() + " rushes a shot from mid-range";
+            }
+            else {
+                currentPlay += shooter.getFullName() + " shoots from mid-range";
+            }
+            shotLocation = 2;
+        } else {
+            if(rushed){
+                currentPlay += shooter.getFullName() + " rushes a shot from 3";
+            }
+            else {
+                currentPlay += shooter.getFullName() + " shoots from 3";
+            }
             shotLocation = 3;
         }
 
@@ -990,6 +1019,10 @@ public class Game {
         if (assisted) {
             // shots off of good passes go in more often!
             shotSuccess += 30;
+        }
+
+        if(rushed){
+            shotSuccess -= 30;
         }
 
         boolean isFouled = getFoul(2);
@@ -1023,7 +1056,12 @@ public class Game {
                 shooter.addTwoPointShot(true);
                 offense.addTwoPointShot(true);
                 if(!currentPlay.equals("") && savePlays) {
-                    plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 2, homeTeamHasBall));
+                    if(rushed){
+                        plays.get(0).appendString(currentPlay);
+                    }
+                    else {
+                        plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 2, homeTeamHasBall));
+                    }
                 }
                 if(isFouled){
                     freeThrowShooter = shooter;
@@ -1040,7 +1078,12 @@ public class Game {
                 shooter.addThreePointShot(true);
                 offense.addThreePointShot(true);
                 if(!currentPlay.equals("") && savePlays) {
-                    plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 2, homeTeamHasBall));
+                    if(rushed){
+                        plays.get(0).appendString(currentPlay);
+                    }
+                    else {
+                        plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 2, homeTeamHasBall));
+                    }
                 }
                 if(isFouled){
                     freeThrowShooter = shooter;
@@ -1071,7 +1114,12 @@ public class Game {
                 freeThrows = 2;
                 shootFreeThrows = true;
                 if(!currentPlay.equals("") && savePlays) {
-                    plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 3, homeTeamHasBall));
+                    if(rushed){
+                        plays.get(0).appendString(currentPlay);
+                    }
+                    else {
+                        plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 3, homeTeamHasBall));
+                    }
                 }
                 return 0;
             }
@@ -1087,7 +1135,12 @@ public class Game {
                 freeThrows = 3;
                 shootFreeThrows = true;
                 if(!currentPlay.equals("") && savePlays) {
-                    plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 3, homeTeamHasBall));
+                    if(rushed){
+                        plays.get(0).appendString(currentPlay);
+                    }
+                    else {
+                        plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 3, homeTeamHasBall));
+                    }
                 }
                 return 0;
             }
@@ -1095,7 +1148,7 @@ public class Game {
             offense.addThreePointShot(false);
         }
 
-        getRebound(offense, defense);
+        getRebound(offense, defense, rushed);
         return 0;
     }
 
@@ -1245,10 +1298,10 @@ public class Game {
 
         if(!madeLast){
             if(homeTeamHasBall) {
-                getRebound(homeTeam, awayTeam);
+                getRebound(homeTeam, awayTeam, false);
             }
             else{
-                getRebound(awayTeam, homeTeam);
+                getRebound(awayTeam, homeTeam, false);
             }
         }
         else{
@@ -1262,7 +1315,7 @@ public class Game {
         return made;
     }
 
-    private void getRebound(Team offense, Team defense) {
+    private void getRebound(Team offense, Team defense, boolean rushedShot) {
         lastShotClock = shotClock;
         deadBall = false;
         madeShot = false;
@@ -1296,7 +1349,12 @@ public class Game {
                 shotClock = timeRemaining;
             }
             if(!currentPlay.equals("") && savePlays) {
-                plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 0, homeTeamHasBall));
+                if(rushedShot){
+                    plays.get(0).appendString(currentPlay);
+                }
+                else {
+                    plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 0, homeTeamHasBall));
+                }
             }
         } else {
             playerWithBall = defHigh + 1;
@@ -1304,7 +1362,12 @@ public class Game {
             defense.getPlayers().get(playerWithBall-1).addRebound(false);
             defense.addRebound(false);
             if(!currentPlay.equals("") && savePlays) {
-                plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 2, homeTeamHasBall));
+                if(rushedShot){
+                    plays.get(0).appendString(currentPlay);
+                }
+                else {
+                    plays.add(0, new GameEvent(getFormattedTime() + " (" + lastShotClock + ") - " + currentPlay, 2, homeTeamHasBall));
+                }
             }
             changePossession();
         }
@@ -1560,10 +1623,10 @@ public class Game {
                 }
 
                 if(homeTeamHasBall) {
-                    getRebound(homeTeam, awayTeam);
+                    getRebound(homeTeam, awayTeam, false);
                 }
                 else{
-                    getRebound(awayTeam, homeTeam);
+                    getRebound(awayTeam, homeTeam, false);
                 }
 
                 return 0;

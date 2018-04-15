@@ -14,6 +14,7 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.RosterAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 
 public class RosterFragment extends Fragment {

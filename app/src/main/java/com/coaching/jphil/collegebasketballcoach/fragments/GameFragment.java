@@ -109,8 +109,10 @@ public class GameFragment extends Fragment {
         if(args != null){
             gameIndex = args.getInt("game");
             game = activity.masterSchedule.get(gameIndex);
-
         }
+
+        activity.logGameStartedEvent(gameIndex);
+
         activity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         activity.actionBar.setDisplayHomeAsUpEnabled(false);
         activity.actionBar.setTitle("Game Day");
@@ -285,14 +287,21 @@ public class GameFragment extends Fragment {
         super.onResume();
 
         if(game == null){
+            Log.d("GameFrag", "Loading data");
             loadedInProgress = true;
             dataAsync = new DataAsync();
             dataAsync.execute("load");
         }
-        else if(gameAsync == null){
+        else if(gameAsync == null && dataAsync == null){
+            Log.d("GameFrag", "Starting game");
             gameAsync = new SimGame();
             gameAsync.execute();
         }
+        else{
+            Log.d("GameFrag", "Doing nothing");
+        }
+
+        activity.changeScreenToGameFragment();
     }
 
     @Override
@@ -332,6 +341,8 @@ public class GameFragment extends Fragment {
         editor.putBoolean(getString(R.string.shared_pref_disp_misc), displayPlay[3]);
         editor.putBoolean(getString(R.string.shared_pref_alert_dead_ball), showDeadBallAlerts);
         editor.apply();
+
+        activity.leaveGameFragment();
     }
 
     private class SimGame extends AsyncTask<String, String, String>{
@@ -349,6 +360,7 @@ public class GameFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
+            Log.d("AsyncTasks", "GameFragment.SimGame starting");
             do{
                 int playResult;
                 playResult = game.simPlay();
@@ -456,6 +468,7 @@ public class GameFragment extends Fragment {
         protected void onPostExecute(String results){
             updateUI();
             gameAsync = null;
+            Log.d("AsyncTasks", "GameFragment.SimGame has finished");
 
             dataAsync = new DataAsync();
             dataAsync.execute("normal");
@@ -463,9 +476,11 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onCancelled(){
+            Log.d("AsyncTasks", "GameFragment.SimGame has been cancelled");
             gameAsync = null;
             dataAsync = new DataAsync();
             dataAsync.execute("in progress");
+            Log.d("GameFrag", "end onCancelled");
         }
 
         private void updateUI(){
@@ -1172,7 +1187,6 @@ public class GameFragment extends Fragment {
 
         private AppDatabase db;
 
-
         @Override
         protected void onPreExecute(){
             if(db == null || !db.isOpen()) {
@@ -1187,16 +1201,20 @@ public class GameFragment extends Fragment {
             }
 
             if(result.equals("loaded")){
-                gameIsProperlyLoaded();
-                gameAsync = new SimGame();
-                gameAsync.execute();
+                finishedLoading();
+                Log.d("GameFrag", "Finished loading");
+            }
+            else{
+                Log.d("GameFrag", "Finished saving");
             }
 
+            Log.d("AsyncTasks", "GameFragment.DataAsync has finished");
             dataAsync = null;
         }
 
         @Override
         protected String doInBackground(String... strings){
+            Log.d("AsyncTasks", "GameFragment.DataAsync starting");
             if(strings[0].equals("in progress")){
                 saveGameInProgress();
             }
@@ -1309,7 +1327,7 @@ public class GameFragment extends Fragment {
                 players[pIndex].gameSteals = player.getSteals();
                 players[pIndex].gameTurnovers = player.getTurnovers();
                 players[pIndex].gameTimePlayed = player.getGamesPlayed();
-                players[pIndex].gameFatigue = player.getFatigue();
+                players[pIndex].gameFatigue = player.getGameFatigue();
                 players[pIndex].gameRosterLocation = game.getHomeTeam().getPlayers().indexOf(player);
                 players[pIndex].offensiveModifier = player.getOffensiveModifier();
                 players[pIndex].defensiveModifier = player.getDefensiveModifier();
@@ -1393,7 +1411,7 @@ public class GameFragment extends Fragment {
                 players[pIndex].gameSteals = player.getSteals();
                 players[pIndex].gameTurnovers = player.getTurnovers();
                 players[pIndex].gameTimePlayed = player.getGamesPlayed();
-                players[pIndex].gameFatigue = player.getFatigue();
+                players[pIndex].gameFatigue = player.getGameFatigue();
                 players[pIndex].gameRosterLocation = game.getAwayTeam().getPlayers().indexOf(player);
                 players[pIndex].offensiveModifier = player.getOffensiveModifier();
                 players[pIndex].defensiveModifier = player.getDefensiveModifier();
@@ -1501,6 +1519,12 @@ public class GameFragment extends Fragment {
             db.appDAO().deleteGameEvents();
         }
 
+    }
+
+    private void finishedLoading(){
+        gameIsProperlyLoaded();
+        gameAsync = new SimGame();
+        gameAsync.execute();
     }
 
     private void gameIsProperlyLoaded(){
