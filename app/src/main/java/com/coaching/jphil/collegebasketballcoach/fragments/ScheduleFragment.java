@@ -9,7 +9,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,7 +111,6 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         protected Integer doInBackground(String... strings) {
-            Log.d("AsyncTasks", "ScheduleFragment.SimAsync starting");
             int index = simulateGames(mainActivity.currentTeam);
             if(index > -1){
                 return index;
@@ -159,8 +157,6 @@ public class ScheduleFragment extends Fragment {
             adapter.notifyDataSetChanged();
             nextAction.setVisibility(View.VISIBLE);
             updateUI();
-
-            Log.d("AsyncTasks", "ScheduleFragment.SimAsync has finished");
 
             dataAsync = new DataAsync();
             dataAsync.execute("");
@@ -262,13 +258,11 @@ public class ScheduleFragment extends Fragment {
                 db.close();
             }
 
-            Log.d("AsyncTasks", "ScheduleFragment.DataAsync has finished");
             dataAsync = null;
         }
 
         @Override
         protected String doInBackground(String... strings){
-            Log.d("AsyncTasks", "ScheduleFragment.DataAsync starting");
             if(strings[0].equals("tournament")){
                 saveTournamentGames();
             }

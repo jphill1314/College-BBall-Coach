@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -287,18 +286,13 @@ public class GameFragment extends Fragment {
         super.onResume();
 
         if(game == null){
-            Log.d("GameFrag", "Loading data");
             loadedInProgress = true;
             dataAsync = new DataAsync();
             dataAsync.execute("load");
         }
         else if(gameAsync == null && dataAsync == null){
-            Log.d("GameFrag", "Starting game");
             gameAsync = new SimGame();
             gameAsync.execute();
-        }
-        else{
-            Log.d("GameFrag", "Doing nothing");
         }
 
         activity.changeScreenToGameFragment();
@@ -360,7 +354,6 @@ public class GameFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
-            Log.d("AsyncTasks", "GameFragment.SimGame starting");
             do{
                 int playResult;
                 playResult = game.simPlay();
@@ -468,7 +461,6 @@ public class GameFragment extends Fragment {
         protected void onPostExecute(String results){
             updateUI();
             gameAsync = null;
-            Log.d("AsyncTasks", "GameFragment.SimGame has finished");
 
             dataAsync = new DataAsync();
             dataAsync.execute("normal");
@@ -476,11 +468,9 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onCancelled(){
-            Log.d("AsyncTasks", "GameFragment.SimGame has been cancelled");
             gameAsync = null;
             dataAsync = new DataAsync();
             dataAsync.execute("in progress");
-            Log.d("GameFrag", "end onCancelled");
         }
 
         private void updateUI(){
@@ -1202,19 +1192,13 @@ public class GameFragment extends Fragment {
 
             if(result.equals("loaded")){
                 finishedLoading();
-                Log.d("GameFrag", "Finished loading");
-            }
-            else{
-                Log.d("GameFrag", "Finished saving");
             }
 
-            Log.d("AsyncTasks", "GameFragment.DataAsync has finished");
             dataAsync = null;
         }
 
         @Override
         protected String doInBackground(String... strings){
-            Log.d("AsyncTasks", "GameFragment.DataAsync starting");
             if(strings[0].equals("in progress")){
                 saveGameInProgress();
             }
@@ -1326,7 +1310,7 @@ public class GameFragment extends Fragment {
                 players[pIndex].gameDRebounds = player.getdRebounds();
                 players[pIndex].gameSteals = player.getSteals();
                 players[pIndex].gameTurnovers = player.getTurnovers();
-                players[pIndex].gameTimePlayed = player.getGamesPlayed();
+                players[pIndex].gameTimePlayed = player.getTimePlayed();
                 players[pIndex].gameFatigue = player.getGameFatigue();
                 players[pIndex].gameRosterLocation = game.getHomeTeam().getPlayers().indexOf(player);
                 players[pIndex].offensiveModifier = player.getOffensiveModifier();
@@ -1523,8 +1507,10 @@ public class GameFragment extends Fragment {
 
     private void finishedLoading(){
         gameIsProperlyLoaded();
-        gameAsync = new SimGame();
-        gameAsync.execute();
+        if(isAdded()) {
+            gameAsync = new SimGame();
+            gameAsync.execute();
+        }
     }
 
     private void gameIsProperlyLoaded(){

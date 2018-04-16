@@ -2,6 +2,7 @@ package com.coaching.jphil.collegebasketballcoach.adapters;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,15 +125,18 @@ public class GameRosterAdapter extends RecyclerView.Adapter<GameRosterAdapter.Vi
 
         holder.view.setBackgroundColor(Color.rgb(250, 250,250));
 
-        if(players.get(position).getFatigue() > 60){
-            holder.condition.setTextColor(Color.rgb(255, 0, 0));
+        double fatigue = pendingSub.get(position).getFatigueFactor();
+        int red, green;
+        if(fatigue > .75){
+            green = 255;
+            red = (int)(255 * (-4 * (fatigue - .75) + 1));
         }
-        else if(players.get(position).getFatigue() > 40){
-            holder.condition.setTextColor(Color.rgb(255, 255, 0));
+        else{
+            red = 255;
+            green = (int)(255 * 4 * (fatigue - .5));
         }
-        else {
-            holder.condition.setTextColor(Color.rgb(0, 255, 0));
-        }
+
+        holder.condition.setTextColor(Color.rgb(red, green, 0));
     }
 
     private void bindType1(GameRosterAdapter.ViewHolder holder, int position){

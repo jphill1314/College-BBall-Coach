@@ -1,6 +1,5 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
-import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
@@ -383,11 +382,11 @@ public class Player {
     }
 
     void addTimePlayed(int time, int event){
-        // event: 0 = nothing, 1 = change of possession, -1 = timeout / on bench, 10 = halftime
+        // event: 0 = nothing, 1 = change of possession, -1 = on bench,  -2 = timeout, 10 = halftime
         timePlayed += time;
         if(time > 0){
             if(event == 1){
-                fatigue += 1.5 - (stamina / 100.0);
+                fatigue += 2.0 - (stamina / 100.0);
                 if(fatigue > 100){
                     fatigue = 100.0;
                 }
@@ -397,9 +396,14 @@ public class Player {
         if(event == 10){
             fatigue *= .5;
         }
-        else if(event < 0){
+        else if(event == -1){
+            if(fatigue > 0){
+                fatigue *= .9;
+            }
+        }
+        else if(event == -2){
             if(fatigue > 0) {
-                fatigue -= .1;
+                fatigue -= .2;
             }
         }
     }
@@ -1062,6 +1066,10 @@ public class Player {
         return timePlayed / 60;
     }
 
+    public int getTimePlayed(){
+        return timePlayed;
+    }
+
     public int getCloseRangeShotProgress() {
         return closeRangeShotProgress;
     }
@@ -1126,11 +1134,17 @@ public class Player {
         return staminaProgress;
     }
 
-    private double getFatigueFactor(){
+    public double getFatigueFactor(){
         if(prepareForSave){
             return 1;
         }
-        return (1 - ((Math.exp((fatigue) / 25)) / 100));
+        double factor = (1 - ((Math.exp((fatigue) / 10)) / 100));
+
+        if(factor < .5){
+            factor = .5;
+        }
+
+        return factor;
     }
 
     void setGameModifiers(boolean homeTeam, int scoreDif, int coachType){
@@ -1191,14 +1205,14 @@ public class Player {
 
     public boolean isInFoulTrouble(int half, int timeRemaining){
         int min = timeRemaining / 60;
-        if(half == 1 && fouls == 2){
+        if(half == 1 && fouls >= 2){
             return true;
         }
         if(half == 2){
-            if(fouls == 3 && min > 14){
+            if(fouls >= 3 && min > 14){
                 return true;
             }
-            if(fouls == 4 && min > 6){
+            if(fouls >= 4 && min > 6){
                 return true;
             }
         }

@@ -15,9 +15,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -133,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDataAsyncFinish(){
-        Log.d("test", "onDataAsyncFinished called");
         currentTeam = getPlayerTeam();
         currentConference = getPlayerConference();
 
@@ -367,9 +363,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings){
-            Log.d("AsyncTasks", "MainActivity.DataAsync starting");
             if(strings[0].equals("load")){
-                Log.d("test", "load");
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -382,7 +376,6 @@ public class MainActivity extends AppCompatActivity {
                 return "loaded";
             }
             else if(strings[0].equals("save")){
-                Log.d("test", "save");
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -394,7 +387,6 @@ public class MainActivity extends AppCompatActivity {
                 saveData();
             }
             else if(strings[0].equals("new season")){
-                Log.d("test", "new season");
                 if(db == null || !db.isOpen()){
                     db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 }
@@ -417,7 +409,6 @@ public class MainActivity extends AppCompatActivity {
                 return "new season";
             }
             else if(strings[0].equals("delete all")){
-                Log.d("test", "delete");
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -429,7 +420,6 @@ public class MainActivity extends AppCompatActivity {
                 clearData();
                 return "data cleared";
             }
-            Log.d("test", "test");
             return null;
         }
 
@@ -440,11 +430,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if(db.isOpen()){
-                Log.d("test", "Database is open");
                 db.close();
             }
-
-            Log.d("AsyncTasks", "MainActivity.DataAsync has finished");
         }
 
         private void saveData(){
@@ -735,7 +722,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private void loadData(){
-            Log.d("AsyncTasks", "MainActivity... loading data");
             if(db != null) {
                 TeamDB[] teamsDB = db.appDAO().loadAllTeams();
                 PlayerDB[] players = db.appDAO().loadAllPlayers();

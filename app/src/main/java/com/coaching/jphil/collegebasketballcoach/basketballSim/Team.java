@@ -1,7 +1,6 @@
 package com.coaching.jphil.collegebasketballcoach.basketballSim;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.coaching.jphil.collegebasketballcoach.Database.GameStatsDB;
 import com.coaching.jphil.collegebasketballcoach.Database.PlayerDB;
@@ -625,8 +624,8 @@ public class Team {
                 best = subPlayers.get(x);
             }
             else if(subPlayers.get(x).isEligible()) {
-                if (best.calculateRatingAtPosition(position) / best.getFatigue() <
-                        subPlayers.get(x).calculateRatingAtPosition(position) / subPlayers.get(x).getFatigue() &&
+                if (best.calculateRatingAtPosition(position) * best.getFatigueFactor() <
+                        subPlayers.get(x).calculateRatingAtPosition(position) * subPlayers.get(x).getFatigueFactor() &&
                         (mustSub || (!subPlayers.get(x).isInFoulTrouble(half, timeRemaining) ||
                                 coaches.get(0).getTendencyToSub() > r.nextInt(30)))) {
                     indexOfBest = x;

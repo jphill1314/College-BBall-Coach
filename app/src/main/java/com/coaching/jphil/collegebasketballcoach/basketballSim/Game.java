@@ -515,6 +515,14 @@ public class Game {
             alertedDeadBall = true;
 
             recentTO = true;
+
+            for(Player p: homeTeam.getPlayers()){
+                p.addTimePlayed(0, -1);
+            }
+            for(Player p: awayTeam.getPlayers()){
+                p.addTimePlayed(0, -1);
+            }
+
             return 1;
         }
 
@@ -595,12 +603,22 @@ public class Game {
             }
         }
 
-        if(!madeShot && !deadBall && freeThrows == 0 && shotClock <= 5 && r.nextDouble() > .05){
-            currentPlay = "\n";
-            if (homeTeamHasBall) {
-                homeScore += getShot(homeTeam, awayTeam, false, true);
-            } else {
-                awayScore += getShot(awayTeam, homeTeam, false, true);
+        if(!madeShot && !deadBall && !shootFreeThrows && shotClock == 0 && r.nextDouble() > .05){
+            currentPlay = " ";
+            if((timeRemaining == shotClock && half > 1) || Math.abs(homeScore - awayScore) < 4) {
+                if (homeTeamHasBall && homeScore - awayScore > -4) {
+                    homeScore += getShot(homeTeam, awayTeam, false, true);
+                } else if(awayScore - homeScore > -4){
+                    awayScore += getShot(awayTeam, homeTeam, false, true);
+                }
+            }
+            else{
+                if(homeTeamHasBall){
+                    homeScore += getShot(homeTeam, awayTeam, false, true);
+                }
+                else{
+                    awayScore += getShot(awayTeam, homeTeam, false, true);
+                }
             }
         }
 
@@ -628,7 +646,7 @@ public class Game {
                     p.addTimePlayed(lastTimeRemaining - timeRemaining, playType);
                 }
                 else{
-                    p.addTimePlayed(0, -1);
+                    p.addTimePlayed(0, -2);
                 }
                 count++;
             }
@@ -638,7 +656,7 @@ public class Game {
                     p.addTimePlayed(lastTimeRemaining - timeRemaining, playType);
                 }
                 else{
-                    p.addTimePlayed(0, -1);
+                    p.addTimePlayed(0, -2);
                 }
                 count++;
             }
@@ -652,7 +670,7 @@ public class Game {
                     p.addTimePlayed(lastTimeRemaining, playType);
                 }
                 else{
-                    p.addTimePlayed(0, -1);
+                    p.addTimePlayed(0, -2);
                 }
                 count++;
             }
@@ -662,7 +680,7 @@ public class Game {
                     p.addTimePlayed(lastTimeRemaining, playType);
                 }
                 else{
-                    p.addTimePlayed(0, -1);
+                    p.addTimePlayed(0, -2);
                 }
                 count++;
             }
@@ -772,6 +790,7 @@ public class Game {
                 offense.addTurnover();
                 deadBall = true;
                 madeShot = false;
+                alertedDeadBall = false;
             }
             else{
                 currentPlay += passer.getFullName() + " has thrown the ball away!";
@@ -779,6 +798,7 @@ public class Game {
                 offense.addTurnover();
                 deadBall = true;
                 madeShot = false;
+                alertedDeadBall = false;
             }
 
             smartTimeChange((int) (4 - (offense.getPace() / 90.0) * r.nextInt(3)));
@@ -796,6 +816,7 @@ public class Game {
                 offense.addTurnover();
                 deadBall = true;
                 madeShot = false;
+                alertedDeadBall = false;
 
                 if(savePlays){
                     plays.add(0, new GameEvent(getFormattedTime() + " (" + shotClock + ") - " + currentPlay, 2, homeTeamHasBall));
@@ -1025,10 +1046,16 @@ public class Game {
             shotSuccess -= 30;
         }
 
-        boolean isFouled = getFoul(2);
+        boolean isFouled = false;
+        if(timeRemaining > 0){
+            isFouled = getFoul(2);
+        }
+
         if(isFouled){
             currentPlay += ", is fouled";
-            shotSuccess -= 30;
+            if(!rushed) {
+                shotSuccess -= 30;
+            }
         }
 
         if (shotSuccess > defense.getAggression() && r.nextBoolean()) {
@@ -1148,7 +1175,9 @@ public class Game {
             offense.addThreePointShot(false);
         }
 
-        getRebound(offense, defense, rushed);
+        if(timeRemaining > 0) {
+            getRebound(offense, defense, rushed);
+        }
         return 0;
     }
 
@@ -1511,6 +1540,7 @@ public class Game {
                 alertedDeadBall = false;
                 madeShot = false;
                 homeFouls++;
+                lastShotClock = shotClock;
                 if(shotClock < 20 && situation != 2){
                     shotClock = 20;
                 }
@@ -1527,6 +1557,7 @@ public class Game {
                 alertedDeadBall = false;
                 madeShot = false;
                 awayFouls++;
+                lastShotClock = shotClock;
                 if(shotClock < 20 && situation != 2){
                     shotClock = 20;
                 }
