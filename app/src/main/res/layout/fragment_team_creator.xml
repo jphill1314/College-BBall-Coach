@@ -24,7 +24,7 @@
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textCapSentences"
+        android:inputType="textCapWords"
         android:hint="@string/school_name_prompt"/>
 
     <EditText
@@ -33,7 +33,7 @@
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textCapSentences"
+        android:inputType="textCapWords"
         android:hint="@string/mascot_name"/>
 
     <EditText

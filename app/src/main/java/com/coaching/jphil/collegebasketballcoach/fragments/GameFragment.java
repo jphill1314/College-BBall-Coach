@@ -101,155 +101,150 @@ public class GameFragment extends Fragment {
     private DataAsync dataAsync;
     private MainActivity activity;
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle args = getArguments();
         activity = (MainActivity) getActivity();
 
-        if(args != null){
-            gameIndex = args.getInt("game");
-            try {
-                game = activity.masterSchedule.get(gameIndex);
-            }
-            catch (NullPointerException e){
-                Crashlytics.logException(e);
-            }
-        }
-
-        activity.logGameStartedEvent(gameIndex);
-
-        activity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        activity.actionBar.setDisplayHomeAsUpEnabled(false);
-        activity.actionBar.setTitle("Game Day");
-
         View view = inflater.inflate(R.layout.fragment_game, container, false);
 
-        frame = view.findViewById(R.id.game_frame_layout);
-        strategyView = inflater.inflate(R.layout.fragment_strategy, container, false);
-        gameRosterView = inflater.inflate(R.layout.game_roster_view, container, false);
-        teamStatsView = inflater.inflate(R.layout.game_team_stats_view, container, false);
+        if(activity != null) {
+            if (args != null) {
+                gameIndex = args.getInt("game");
+                game = activity.masterSchedule.get(gameIndex);
+            }
 
-        createTeamStatsView();
+            activity.logGameStartedEvent(gameIndex);
 
-        homeScore = view.findViewById(R.id.home_score);
-        awayScore = view.findViewById(R.id.away_score);
+            activity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            activity.actionBar.setDisplayHomeAsUpEnabled(false);
+            activity.actionBar.setTitle("Game Day");
 
-        homeTO = view.findViewById(R.id.home_to);
-        awayTO = view.findViewById(R.id.away_to);
+            frame = view.findViewById(R.id.game_frame_layout);
+            strategyView = inflater.inflate(R.layout.fragment_strategy, container, false);
+            gameRosterView = inflater.inflate(R.layout.game_roster_view, container, false);
+            teamStatsView = inflater.inflate(R.layout.game_team_stats_view, container, false);
 
-        homeFouls = view.findViewById(R.id.home_fouls);
-        awayFouls = view.findViewById(R.id.away_fouls);
+            createTeamStatsView();
 
-        gameSpeedText = view.findViewById(R.id.speed_text);
-        deadBall = view.findViewById(R.id.alert_dead_ball);
+            homeScore = view.findViewById(R.id.home_score);
+            awayScore = view.findViewById(R.id.away_score);
 
-        offThrees = strategyView.findViewById(R.id.seek_offense_three);
-        defThrees = strategyView.findViewById(R.id.seek_defense_three);
-        pace = strategyView.findViewById(R.id.seek_pace);
-        agro = strategyView.findViewById(R.id.seek_agro);
-        tvIntentFoul = strategyView.findViewById(R.id.tv_foul);
-        tbIntentFoul = strategyView.findViewById(R.id.foul_button);
+            homeTO = view.findViewById(R.id.home_to);
+            awayTO = view.findViewById(R.id.away_to);
 
-        homeScore.setText(getString(R.string.scores, game.getHomeScore()));
-        awayScore.setText(getString(R.string.scores, game.getAwayScore()));
+            homeFouls = view.findViewById(R.id.home_fouls);
+            awayFouls = view.findViewById(R.id.away_fouls);
 
-        homeTO.setText(getString(R.string.timeout_left, 4));
-        awayTO.setText(getString(R.string.timeout_left, 4));
+            gameSpeedText = view.findViewById(R.id.speed_text);
+            deadBall = view.findViewById(R.id.alert_dead_ball);
 
-        homeFouls.setText(getString(R.string.team_fouls, 0));
-        awayFouls.setText(getString(R.string.team_fouls, 0));
+            offThrees = strategyView.findViewById(R.id.seek_offense_three);
+            defThrees = strategyView.findViewById(R.id.seek_defense_three);
+            pace = strategyView.findViewById(R.id.seek_pace);
+            agro = strategyView.findViewById(R.id.seek_agro);
+            tvIntentFoul = strategyView.findViewById(R.id.tv_foul);
+            tbIntentFoul = strategyView.findViewById(R.id.foul_button);
 
-        half = view.findViewById(R.id.current_half);
-        time = view.findViewById(R.id.current_time);
-        time.setText("20:00 (30)");
+            homeScore.setText(getString(R.string.scores, game.getHomeScore()));
+            awayScore.setText(getString(R.string.scores, game.getAwayScore()));
 
-        half.setText(getString(R.string.half, 1));
+            homeTO.setText(getString(R.string.timeout_left, 4));
+            awayTO.setText(getString(R.string.timeout_left, 4));
 
-        callTimeFab = view.findViewById(R.id.time_fab);
-        fab = view.findViewById(R.id.game_fab);
-        if(game.getHomeTeam().isPlayerControlled()){
-            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
-            callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+            homeFouls.setText(getString(R.string.team_fouls, 0));
+            awayFouls.setText(getString(R.string.team_fouls, 0));
+
+            half = view.findViewById(R.id.current_half);
+            time = view.findViewById(R.id.current_time);
+            time.setText("20:00 (30)");
+
+            half.setText(getString(R.string.half, 1));
+
+            callTimeFab = view.findViewById(R.id.time_fab);
+            fab = view.findViewById(R.id.game_fab);
+            if (game.getHomeTeam().isPlayerControlled()) {
+                fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+                callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+            } else {
+                fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
+                callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
+            }
+
+            recyclerView = (RecyclerView) inflater.inflate(R.layout.game_list_view, container, false);
+            manager = new LinearLayoutManager(getContext());
+            recyclerView.setLayoutManager(manager);
+
+            rosterSpinner = gameRosterView.findViewById(R.id.game_roster_spinner);
+            rosterSpinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.game_roster_spinner));
+            rosterSpinner.setAdapter(rosterSpinnerAdapter);
+
+
+            adapter = new GameAdapter(new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.timeout_array))));
+            recyclerView.setAdapter(adapter);
+
+            recyclerView.setVisibility(View.GONE);
+            frame.addView(recyclerView);
+
+            gameSpeedBar = view.findViewById(R.id.game_speed_bar);
+            gameSpeedBar.setProgress(gameSpeed);
+
+            spinner = view.findViewById(R.id.game_spinner);
+            spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
+            spinner.setAdapter(spinnerAdapter);
+            spinner.setSelection(0, false);
+            spinner.setVisibility(View.INVISIBLE);
+
+
+            rosterRecycler = gameRosterView.findViewById(R.id.roster_list);
+            rosterManager = new LinearLayoutManager(getContext());
+            rosterRecycler.setLayoutManager(rosterManager);
+
+            homeName = view.findViewById(R.id.home_team_name);
+            homeName.setText(game.getHomeTeam().getMascot());
+            awayName = view.findViewById(R.id.away_team_name);
+            awayName.setText(game.getAwayTeam().getMascot());
+
+            posLabel = gameRosterView.findViewById(R.id.pos_label);
+            label1 = gameRosterView.findViewById(R.id.label1);
+            label2 = gameRosterView.findViewById(R.id.label2);
+            label3 = gameRosterView.findViewById(R.id.label3);
+            label4 = gameRosterView.findViewById(R.id.label4);
+
+            if (game.getHomeTeam().isPlayerControlled()) {
+                grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0, this);
+            } else {
+                grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0, this);
+            }
+
+            setClickListeners();
+            setStrategyView();
+
+            setHasOptionsMenu(true);
+
+            SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+            displayPlay = new boolean[]{prefs.getBoolean(getString(R.string.shared_pref_disp_scoring), true),
+                    prefs.getBoolean(getString(R.string.shared_pref_disp_cop), true),
+                    prefs.getBoolean(getString(R.string.shared_pref_disp_fouls), true),
+                    prefs.getBoolean(getString(R.string.shared_pref_disp_misc), true)};
+
+            showDeadBallAlerts = prefs.getBoolean(getString(R.string.shared_pref_alert_dead_ball), true);
+
+            if (gameAsync == null && !game.isInProgress()) {
+                loadedInProgress = false;
+                gameAsync = new SimGame();
+                gameAsync.execute();
+            } else if (game.isInProgress()) {
+                loadedInProgress = true;
+                dataAsync = new DataAsync();
+                dataAsync.execute("load");
+            }
+            spinner.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
-        else{
-            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
-            callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
-        }
-
-        recyclerView = (RecyclerView) inflater.inflate(R.layout.game_list_view, container, false);
-        manager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(manager);
-
-        rosterSpinner = gameRosterView.findViewById(R.id.game_roster_spinner);
-        rosterSpinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.game_roster_spinner));
-        rosterSpinner.setAdapter(rosterSpinnerAdapter);
-
-
-        adapter = new GameAdapter(new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.timeout_array))));
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.setVisibility(View.GONE);
-        frame.addView(recyclerView);
-
-        gameSpeedBar = view.findViewById(R.id.game_speed_bar);
-        gameSpeedBar.setProgress(gameSpeed);
-
-        spinner = view.findViewById(R.id.game_spinner);
-        spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
-        spinner.setAdapter(spinnerAdapter);
-        spinner.setSelection(0, false);
-        spinner.setVisibility(View.INVISIBLE);
-
-
-        rosterRecycler = gameRosterView.findViewById(R.id.roster_list);
-        rosterManager = new LinearLayoutManager(getContext());
-        rosterRecycler.setLayoutManager(rosterManager);
-
-        homeName = view.findViewById(R.id.home_team_name);
-        homeName.setText(game.getHomeTeam().getMascot());
-        awayName = view.findViewById(R.id.away_team_name);
-        awayName.setText(game.getAwayTeam().getMascot());
-
-        posLabel = gameRosterView.findViewById(R.id.pos_label);
-        label1 = gameRosterView.findViewById(R.id.label1);
-        label2 = gameRosterView.findViewById(R.id.label2);
-        label3 = gameRosterView.findViewById(R.id.label3);
-        label4 = gameRosterView.findViewById(R.id.label4);
-
-        if(game.getHomeTeam().isPlayerControlled()){
-            grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0, this);
-        }
-        else{
-            grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0, this);
-        }
-
-        setClickListeners();
-        setStrategyView();
-
-        setHasOptionsMenu(true);
-
-        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        displayPlay = new boolean[]{prefs.getBoolean(getString(R.string.shared_pref_disp_scoring), true),
-                prefs.getBoolean(getString(R.string.shared_pref_disp_cop), true),
-                prefs.getBoolean(getString(R.string.shared_pref_disp_fouls), true),
-                prefs.getBoolean(getString(R.string.shared_pref_disp_misc), true)};
-
-        showDeadBallAlerts = prefs.getBoolean(getString(R.string.shared_pref_alert_dead_ball), true);
-
-        if(gameAsync == null && !game.isInProgress()) {
-            loadedInProgress = false;
-            gameAsync = new SimGame();
-            gameAsync.execute();
-        }
-        else if(game.isInProgress()){
-            loadedInProgress = true;
-            dataAsync = new DataAsync();
-            dataAsync.execute("load");
-        }
-        spinner.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.VISIBLE);
-
 
         return view;
     }
@@ -292,17 +287,18 @@ public class GameFragment extends Fragment {
     public void onResume(){
         super.onResume();
 
-        if(game == null){
-            loadedInProgress = true;
-            dataAsync = new DataAsync();
-            dataAsync.execute("load");
-        }
-        else if(gameAsync == null && dataAsync == null){
-            gameAsync = new SimGame();
-            gameAsync.execute();
-        }
+        if(isAdded() && activity != null) {
+            if (game == null) {
+                loadedInProgress = true;
+                dataAsync = new DataAsync();
+                dataAsync.execute("load");
+            } else if (gameAsync == null && dataAsync == null) {
+                gameAsync = new SimGame();
+                gameAsync.execute();
+            }
 
-        activity.changeScreenToGameFragment();
+            activity.changeScreenToGameFragment();
+        }
     }
 
     @Override
