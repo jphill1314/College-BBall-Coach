@@ -44,11 +44,13 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
     }
 
     public RecruitAdapter(ArrayList<Recruit> recruits, MainActivity activity, int sortType){
-        this.recruits = new ArrayList<>(recruits);
         this.activity = activity;
         this.sortType = sortType;
 
-        sortRecruits(sortType);
+        if(recruits != null) {
+            this.recruits = new ArrayList<>(recruits);
+            sortRecruits(sortType);
+        }
     }
 
     @Override
@@ -59,89 +61,109 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.tvPosition.setText(recruits.get(position).getPositionAsString());
-        holder.tvName.setText(recruits.get(position).getFullName());
-        holder.tvRating.setText(getStarRating(recruits.get(position).getRating()));
-        holder.tvInterest.setText(recruits.get(position).getInterest() + "");
+        if(getItemCount() == 1){
+            holder.tvInform.setText(activity.getString(R.string.error_loading));
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setMessage(R.string.fix_error_warning);
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    activity.currentTeam.generateRecruits();
+                    recruits = activity.currentTeam.getRecruits();
+                    notifyDataSetChanged();
+                }
+            });
 
-        final int pos = position;
-         if(recruits.get(position).isRecruited() && !recruits.get(position).getIsCommitted()){
-             builder.setTitle(R.string.warn_unrecruit);
-             builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                 @Override
-                 public void onClick(DialogInterface dialogInterface, int i) {
-                     for(Coach c: activity.getPlayerTeam().getCoaches()){
-                         if(c.getRecruits() != null) {
-                             if (c.getRecruits().contains(recruits.get(pos))) {
-                                 c.removeRecruit(recruits.get(pos));
-                                 notifyDataSetChanged();
-                                 break;
-                             }
-                         }
-                     }
-                 }
-             });
+            holder.tvInform.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    builder.show();
+                }
+            });
+        }
+        else {
+            holder.tvPosition.setText(recruits.get(position).getPositionAsString());
+            holder.tvName.setText(recruits.get(position).getFullName());
+            holder.tvRating.setText(getStarRating(recruits.get(position).getRating()));
+            holder.tvInterest.setText(recruits.get(position).getInterest() + "");
 
-             builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                 @Override
-                 public void onClick(DialogInterface dialogInterface, int i) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
-                 }
-             });
+            final int pos = position;
+            if (recruits.get(position).isRecruited() && !recruits.get(position).getIsCommitted()) {
+                builder.setTitle(R.string.warn_unrecruit);
+                builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        for (Coach c : activity.getPlayerTeam().getCoaches()) {
+                            if (c.getRecruits() != null) {
+                                if (c.getRecruits().contains(recruits.get(pos))) {
+                                    c.removeRecruit(recruits.get(pos));
+                                    notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
 
-             holder.view.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View view) {
-                     builder.show();
-                 }
-             });
+                builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-             for(Coach c : activity.getPlayerTeam().getCoaches()) {
-                 if (c.getRecruits() != null) {
-                     for (Recruit r : c.getRecruits()){
-                         if(r.equals(recruits.get(position))){
-                             holder.tvInform.setText(activity.getResources().getString(R.string.stop_recruit, c.getFullName()));
-                         }
-                     }
-                 }
-             }
-         }
-         else if(!recruits.get(position).getIsCommitted()){
-             holder.tvInterest.setVisibility(View.VISIBLE);
-             builder.setTitle(R.string.alert_title)
-                     .setItems(activity.getPlayerTeam().getCoachesNamesAndAbility(),
-                             new DialogInterface.OnClickListener() {
-                                 @Override
-                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                     if(!activity.getPlayerTeam().getCoaches().get(i).addRecruit(recruits.get(pos))){
-                                         Toast.makeText(activity.getApplicationContext(), "This coach is recruiting too many players." +
-                                         "\nPlease unassign a recruit from this coach before assigning a new one.", Toast.LENGTH_LONG).show();
-                                     }
-                                     else {
-                                         notifyDataSetChanged();
-                                     }
-                                 }
-                             });
+                    }
+                });
 
-             holder.tvInform.setText(activity.getResources().getString(R.string.recruit));
-             holder.view.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View view) {
-                     builder.show();
-                 }
-             });
-         }
-         else{
-             holder.tvInform.setText(activity.getResources().getString(R.string.committed));
-             holder.tvInterest.setVisibility(View.INVISIBLE);
-         }
+                holder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        builder.show();
+                    }
+                });
+
+                for (Coach c : activity.getPlayerTeam().getCoaches()) {
+                    if (c.getRecruits() != null) {
+                        for (Recruit r : c.getRecruits()) {
+                            if (r.equals(recruits.get(position))) {
+                                holder.tvInform.setText(activity.getResources().getString(R.string.stop_recruit, c.getFullName()));
+                            }
+                        }
+                    }
+                }
+            } else if (!recruits.get(position).getIsCommitted()) {
+                holder.tvInterest.setVisibility(View.VISIBLE);
+                builder.setTitle(R.string.alert_title)
+                        .setItems(activity.getPlayerTeam().getCoachesNamesAndAbility(),
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (!activity.getPlayerTeam().getCoaches().get(i).addRecruit(recruits.get(pos))) {
+                                            Toast.makeText(activity.getApplicationContext(), "This coach is recruiting too many players." +
+                                                    "\nPlease unassign a recruit from this coach before assigning a new one.", Toast.LENGTH_LONG).show();
+                                        } else {
+                                            notifyDataSetChanged();
+                                        }
+                                    }
+                                });
+
+                holder.tvInform.setText(activity.getResources().getString(R.string.recruit));
+                holder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        builder.show();
+                    }
+                });
+            } else {
+                holder.tvInform.setText(activity.getResources().getString(R.string.committed));
+                holder.tvInterest.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     @Override
     public int getItemCount() {
-        return recruits.size();
+        return (recruits != null ) ? recruits.size() : 1;
     }
 
     private String getStarRating(int rating){
@@ -162,96 +184,86 @@ public class RecruitAdapter extends RecyclerView.Adapter<RecruitAdapter.ViewHold
     private void sortRecruits(int type){
         int changes;
 
-        do {
-            changes = 0;
-            for (int x = 0; x < recruits.size() - 1; x++) {
-                for (int y = x + 1; y < recruits.size(); y++) {
-                    if (type == 0) {
-                        if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
-                            Collections.swap(recruits, x, y);
-                            changes++;
-                        }
-                        else if(recruits.get(x).getPosition() == recruits.get(y).getPosition()){
+        if(recruits != null) {
+            do {
+                changes = 0;
+                for (int x = 0; x < recruits.size() - 1; x++) {
+                    for (int y = x + 1; y < recruits.size(); y++) {
+                        if (type == 0) {
+                            if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
+                                Collections.swap(recruits, x, y);
+                                changes++;
+                            } else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
+                                if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
+                                    Collections.swap(recruits, x, y);
+                                    changes++;
+                                }
+                            }
+                        } else if (type == 1) {
                             if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
                                 Collections.swap(recruits, x, y);
                                 changes++;
                             }
-                        }
-                    }
-                    else if (type == 1) {
-                        if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
-                            Collections.swap(recruits, x, y);
-                            changes++;
-                        }
-                    }
-                    else if (type == 2) {
-                        if (recruits.get(x).getIsCommitted()) {
-                            if (recruits.get(y).getIsCommitted()) {
-                                if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
-                                    Collections.swap(recruits, x, y);
-                                    changes++;
-                                }
-                                else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
-                                    if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
+                        } else if (type == 2) {
+                            if (recruits.get(x).getIsCommitted()) {
+                                if (recruits.get(y).getIsCommitted()) {
+                                    if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
                                         Collections.swap(recruits, x, y);
                                         changes++;
+                                    } else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
+                                        if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
+                                            Collections.swap(recruits, x, y);
+                                            changes++;
+                                        }
+                                    }
+                                }
+                            } else if (recruits.get(x).isRecruited()) {
+                                if (recruits.get(y).getIsCommitted()) {
+                                    Collections.swap(recruits, x, y);
+                                    changes++;
+                                } else if (recruits.get(y).isRecruited()) {
+                                    if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
+                                        Collections.swap(recruits, x, y);
+                                        changes++;
+                                    } else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
+                                        if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
+                                            Collections.swap(recruits, x, y);
+                                            changes++;
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (recruits.get(y).getIsCommitted() || recruits.get(y).isRecruited()) {
+                                    Collections.swap(recruits, x, y);
+                                    changes++;
+                                } else {
+                                    if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
+                                        Collections.swap(recruits, x, y);
+                                        changes++;
+                                    } else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
+                                        if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
+                                            Collections.swap(recruits, x, y);
+                                            changes++;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else if (recruits.get(x).isRecruited()) {
-                            if (recruits.get(y).getIsCommitted()) {
+                        } else if (type == 3) {
+                            if (recruits.get(x).getInterest() < recruits.get(y).getInterest()) {
                                 Collections.swap(recruits, x, y);
                                 changes++;
-                            }
-                            else if (recruits.get(y).isRecruited()) {
-                                if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
+                            } else if (recruits.get(x).getInterest() == recruits.get(y).getInterest()) {
+                                if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
                                     Collections.swap(recruits, x, y);
                                     changes++;
                                 }
-                                else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
-                                    if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
-                                        Collections.swap(recruits, x, y);
-                                        changes++;
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            if (recruits.get(y).getIsCommitted() || recruits.get(y).isRecruited()) {
-                                Collections.swap(recruits, x, y);
-                                changes++;
-                            }
-                            else {
-                                if (recruits.get(x).getPosition() > recruits.get(y).getPosition()) {
-                                    Collections.swap(recruits, x, y);
-                                    changes++;
-                                }
-                                else if (recruits.get(x).getPosition() == recruits.get(y).getPosition()) {
-                                    if (recruits.get(x).getRating() < recruits.get(y).getRating()) {
-                                        Collections.swap(recruits, x, y);
-                                        changes++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else if(type == 3){
-                        if(recruits.get(x).getInterest() < recruits.get(y).getInterest()){
-                            Collections.swap(recruits, x, y);
-                            changes++;
-                        }
-                        else if(recruits.get(x).getInterest() == recruits.get(y).getInterest()){
-                            if(recruits.get(x).getRating() < recruits.get(y).getRating()){
-                                Collections.swap(recruits, x, y);
-                                changes++;
                             }
                         }
                     }
                 }
-            }
-        }while(changes != 0);
-        notifyDataSetChanged();
+            } while (changes != 0);
+            notifyDataSetChanged();
+        }
     }
 
     public int getSortType(){

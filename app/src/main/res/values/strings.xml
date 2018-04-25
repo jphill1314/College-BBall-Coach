@@ -208,6 +208,16 @@
 
     <string name="position_needs">Returning players by position\nPG: %d SG: %d SF: %d PF: %d C: %d</string>
 
+    <string name="error_loading">There was an error loading your team\'s recruits. It may be possible to
+            fix this issue by closing and reloading the game. If the issue persists you can tap this button
+            to generate new recruits to replace your missing ones.</string>
+
+    <string name="fix_error_warning">Warning! Pressing OK will delete any recruits that may still be saved,
+            but failed to load. Only press OK if you are certain that you want to regenerate your team's
+            recruits.</string>
+
+    <string name="ok">OK</string>
+
     <!-- Game Fragment -->
     <string name="scores">%d</string>
     <string name="half">Half: %d</string>

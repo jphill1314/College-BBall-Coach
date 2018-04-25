@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -841,9 +842,13 @@ public class MainActivity extends AppCompatActivity {
                         Tournament tourn = new Tournament(t.name, t.playAtNeutralCourt, t.hasChampion);
                         if(t.conferenceId != -1) {
                             for (String s : Arrays.asList(t.gameIDs.split(","))) {
-                                int i = Integer.parseInt(s);
-                                if(i < masterSchedule.size()) {
-                                    tourn.addGame(masterSchedule.get(i));
+                                try {
+                                    int i = Integer.parseInt(s);
+                                    if (i < masterSchedule.size()) {
+                                        tourn.addGame(masterSchedule.get(i));
+                                    }
+                                }catch(NumberFormatException e){
+                                    Log.e("Load Tourn", "Can't parse int: " + t.gameIDs + " " + t.tournamentID);
                                 }
                             }
                             for (String s : Arrays.asList(t.teamIDs.split(","))) {

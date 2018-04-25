@@ -315,7 +315,7 @@ public class Team {
         generateRecruits();
     }
 
-    private void generateRecruits(){
+    public void generateRecruits(){
         recruits = new ArrayList<>();
         int[] needs = positionNeeds(false);
 

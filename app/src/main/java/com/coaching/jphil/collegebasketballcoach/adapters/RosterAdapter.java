@@ -2,8 +2,11 @@ package com.coaching.jphil.collegebasketballcoach.adapters;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -111,45 +114,54 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
             holder.tvPos.setText(pos);
 
             final int fpos = position;
-            if (playerControlled) {
-                holder.view.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        if (player1 == -1) {
-                            player1 = fpos;
-                        } else {
-                            if (player1 == fpos) {
-                                player1 = -1;
-                            } else {
-                                Collections.swap(subs, player1, fpos);
-                                roster.makeFABVisible();
-                                player1 = -1;
-                            }
+
+            final GestureDetectorCompat detectorCompat = new GestureDetectorCompat(activity,
+                    new GestureDetector.SimpleOnGestureListener(){
+                        @Override
+                        public boolean onDoubleTap(MotionEvent event){
+                            Bundle args = new Bundle();
+                            args.putInt("player", fpos);
+                            PlayerInfoFragment frag = new PlayerInfoFragment();
+                            frag.setArguments(args);
+
+                            activity.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.content_frame, frag)
+                                    .addToBackStack("playerFrag")
+                                    .commit();
+
+                            return true;
                         }
-                        notifyDataSetChanged();
-                        return true;
-                    }
-                });
-            }
 
-            holder.view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public boolean onSingleTapConfirmed(MotionEvent event){
+                            if(playerControlled) {
+                                if (player1 == -1) {
+                                    player1 = fpos;
+                                } else {
+                                    if (player1 == fpos) {
+                                        player1 = -1;
+                                    } else {
+                                        Collections.swap(subs, player1, fpos);
+                                        roster.makeFABVisible();
+                                        player1 = -1;
+                                    }
+                                }
+                                notifyDataSetChanged();
+                            }
+                            return true;
+                        }
+                    });
+
+
+            holder.view.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View view) {
-                    Bundle args = new Bundle();
-                    args.putInt("player", fpos);
-                    PlayerInfoFragment frag = new PlayerInfoFragment();
-                    frag.setArguments(args);
-
-                    activity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_frame, frag)
-                            .addToBackStack("playerFrag")
-                            .commit();
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    return detectorCompat.onTouchEvent(motionEvent);
                 }
             });
         }
         else{
-            holder.view.setOnClickListener(null);
-            holder.view.setOnLongClickListener(null);
+            holder.view.setOnTouchListener(null);
             holder.tvPos.setText("");
             holder.tvName.setText("");
             holder.tvRating.setText("");
