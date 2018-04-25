@@ -16,6 +16,7 @@ import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.fragments.PlayerInfoFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,6 +130,7 @@ public class RosterAdapter extends RecyclerView.Adapter<RosterAdapter.ViewHolder
                                     .addToBackStack("playerFrag")
                                     .commit();
 
+                            FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "PlayerFragment", "PlayerFragment");
                             return true;
                         }
 

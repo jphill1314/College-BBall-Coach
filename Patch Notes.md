@@ -1,5 +1,13 @@
 # Patch Notes
 
+## 1.04
+UI Changes
+* Added work around to prevent the game from becoming unplayable if a team's recruits fail to load
+* Changed roster management in the Roster Fragment. The user can now swap players by tapping on them and can view their stats and attributes by double clicking on them.
+* The game will now ask nicely for long-term users to rate the app
+* Fixed issue that prevented the national championship from progressing past the first round
+* Game now reports when the user views a player's stats
+
 ## 1.03
 UI Changes
 * Fixed issue with closing and reopening the game sim

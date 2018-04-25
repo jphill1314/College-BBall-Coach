@@ -162,11 +162,6 @@ public class ScheduleFragment extends Fragment {
             dataAsync.execute("");
         }
 
-        @Override
-        protected void onProgressUpdate(Integer... integers){
-            adapter.notifyDataSetChanged();
-        }
-
         private Integer simulateGames(Team team) {
             stats = new ArrayList<>();
             if (!allConferencesInPostSeason) {
@@ -174,9 +169,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                stats.addAll(game.simulateGame());
-                                return -1;
-                                //return mainActivity.masterSchedule.indexOf(game);
+                                //stats.addAll(game.simulateGame());
+                                //return -1;
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -196,9 +191,9 @@ public class ScheduleFragment extends Fragment {
                             if (!game.isPlayed()) {
                                 if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                                     if (team.isPlayerControlled()) {
-                                        stats.addAll(game.simulateGame());
-                                        return -1;
-                                        //return mainActivity.masterSchedule.indexOf(game);
+                                        //stats.addAll(game.simulateGame());
+                                        //return -1;
+                                        return mainActivity.masterSchedule.indexOf(game);
                                     }
                                 } else {
                                     stats.addAll(game.simulateGame());
@@ -219,9 +214,9 @@ public class ScheduleFragment extends Fragment {
                     if (!game.isPlayed()) {
                         if (game.getHomeTeam().equals(team) || game.getAwayTeam().equals(team)) {
                             if (team.isPlayerControlled()) {
-                                stats.addAll(game.simulateGame());
-                                return -1;
-                                //return mainActivity.masterSchedule.indexOf(game);
+                                //stats.addAll(game.simulateGame());
+                                //return -1;
+                                return mainActivity.masterSchedule.indexOf(game);
                             }
                         } else {
                             stats.addAll(game.simulateGame());
@@ -406,7 +401,9 @@ public class ScheduleFragment extends Fragment {
             new DataAsync().execute("tournament");
         }
         else{
-            mainActivity.generateNationalChampionship();
+            if(mainActivity.championship == null) {
+                mainActivity.generateNationalChampionship();
+            }
         }
 
         ((ScheduleAdapter) adapter).changeGames(mainActivity.currentTeam.getSchedule());

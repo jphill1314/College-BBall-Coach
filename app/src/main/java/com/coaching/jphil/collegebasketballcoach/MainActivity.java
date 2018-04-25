@@ -48,7 +48,9 @@ import com.coaching.jphil.collegebasketballcoach.fragments.StaffFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StandingsFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.StrategyFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.TrainingFragment;
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.kobakei.ratethisapp.RateThisApp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        RateThisApp.onCreate(this);
+        RateThisApp.showRateDialogIfNeeded(this);
 
         if(db == null && conferences == null){
             new DataAsync().execute("load");
@@ -848,15 +853,20 @@ public class MainActivity extends AppCompatActivity {
                                         tourn.addGame(masterSchedule.get(i));
                                     }
                                 }catch(NumberFormatException e){
-                                    Log.e("Load Tourn", "Can't parse int: " + t.gameIDs + " " + t.tournamentID);
+                                    Crashlytics.logException(e);
                                 }
                             }
                             for (String s : Arrays.asList(t.teamIDs.split(","))) {
-                                int i = Integer.parseInt(s);
-                                for(Team team: conferences.get(t.conferenceId).getTeams()){
-                                    if(team.getId() == i){
-                                        tourn.addTeam(team);
+                                try {
+                                    int i = Integer.parseInt(s);
+                                    for (Team team : conferences.get(t.conferenceId).getTeams()) {
+                                        if (team.getId() == i) {
+                                            tourn.addTeam(team);
+                                        }
                                     }
+                                }
+                                catch (NumberFormatException e){
+                                    Crashlytics.logException(e);
                                 }
                             }
                             conferences.get(t.conferenceId).addTournament(tourn);
@@ -866,8 +876,13 @@ public class MainActivity extends AppCompatActivity {
                                 Team team = null;
                                 for(Conference c: conferences){
                                     for(Team team1: c.getTeams()){
-                                        if(team1.getId() == Integer.parseInt(s)){
-                                            team = team1;
+                                        try {
+                                            if (team1.getId() == Integer.parseInt(s)) {
+                                                team = team1;
+                                            }
+                                        }
+                                        catch (NumberFormatException e){
+                                            Crashlytics.logException(e);
                                         }
                                     }
                                 }

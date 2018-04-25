@@ -22,6 +22,7 @@ import com.coaching.jphil.collegebasketballcoach.MainActivity;
 import com.coaching.jphil.collegebasketballcoach.R;
 import com.coaching.jphil.collegebasketballcoach.adapters.PlayerInfoAdapter;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
@@ -101,6 +102,13 @@ public class PlayerInfoFragment extends Fragment {
         adapter.notifyDataSetChanged();
 
         return view;
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+
+        FirebaseAnalytics.getInstance(mainActivity).setCurrentScreen(mainActivity, "RosterFragment", "RosterFragment");
     }
 
     private DataAsync data;

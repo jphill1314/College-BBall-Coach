@@ -213,9 +213,11 @@ public class Team {
             }
         }
 
-        for(Recruit r: recruits){
-            if(r.getIsCommitted()){
-                num++;
+        if(recruits != null) {
+            for (Recruit r : recruits) {
+                if (r.getIsCommitted()) {
+                    num++;
+                }
             }
         }
         return num;
@@ -670,17 +672,21 @@ public class Team {
             if(game.homeTeamWin()){
                 if(game.getHomeTeam().equals(this)){
                     wins++;
+                    gamesPlayed++;
                 }
                 else{
                     loses++;
+                    gamesPlayed++;
                 }
             }
             else{
                 if(game.getHomeTeam().equals(this)){
                     loses++;
+                    gamesPlayed++;
                 }
                 else{
                     wins++;
+                    gamesPlayed++;
                 }
             }
         }

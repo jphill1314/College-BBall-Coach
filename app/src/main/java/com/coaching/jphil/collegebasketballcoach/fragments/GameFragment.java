@@ -46,6 +46,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.Game;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.GameEvent;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Player;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.Team;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,9 +106,15 @@ public class GameFragment extends Fragment {
                              Bundle savedInstanceState) {
         Bundle args = getArguments();
         activity = (MainActivity) getActivity();
+
         if(args != null){
             gameIndex = args.getInt("game");
-            game = activity.masterSchedule.get(gameIndex);
+            try {
+                game = activity.masterSchedule.get(gameIndex);
+            }
+            catch (NullPointerException e){
+                Crashlytics.logException(e);
+            }
         }
 
         activity.logGameStartedEvent(gameIndex);
