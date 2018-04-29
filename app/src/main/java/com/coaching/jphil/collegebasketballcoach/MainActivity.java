@@ -443,13 +443,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result){
             if(result != null) {
-                onDataAsyncFinish();
-
                 if(result.equals("loaded for game")){
-                    GameFragment game = (GameFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_game);
+                    GameFragment game = (GameFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
                     if(game != null){
+                        Log.d("eh", "eh");
                         game.startGameAfterLoad();
+                        currentTeam = getPlayerTeam();
+                        currentConference = getPlayerConference();
                     }
+                    Log.d("eh", "end");
+                }
+                else{
+                    onDataAsyncFinish();
                 }
             }
 
