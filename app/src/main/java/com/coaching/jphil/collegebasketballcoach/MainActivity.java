@@ -41,6 +41,7 @@ import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.Natio
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StaggeredTenTeam;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardEightTeam;
 import com.coaching.jphil.collegebasketballcoach.basketballSim.conferences.StandardTenTeam;
+import com.coaching.jphil.collegebasketballcoach.fragments.GameFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.RecruitFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.RosterFragment;
 import com.coaching.jphil.collegebasketballcoach.fragments.ScheduleFragment;
@@ -364,12 +365,16 @@ public class MainActivity extends AppCompatActivity {
         firebaseAnalytics.setCurrentScreen(this, "ScheduleFragment", "ScheduleFragment");
     }
 
+    public void loadData(){
+        new DataAsync().execute("load for game");
+    }
+
     private class DataAsync extends AsyncTask<String, String, String> {
         private int nationalChampGameIndex = 10000; // this is to separate national championship games from regular season / conference tournament games
 
         @Override
         protected String doInBackground(String... strings){
-            if(strings[0].equals("load")){
+            if(strings[0].equals("load") || strings[0].equals("load for game")){
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -379,7 +384,13 @@ public class MainActivity extends AppCompatActivity {
                     db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
                 }
                 loadData();
-                return "loaded";
+
+                if(strings[0].equals("load")) {
+                    return "loaded";
+                }
+                else{
+                    return "loaded for game";
+                }
             }
             else if(strings[0].equals("save")){
                 if(db != null) {
@@ -433,6 +444,13 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result){
             if(result != null) {
                 onDataAsyncFinish();
+
+                if(result.equals("loaded for game")){
+                    GameFragment game = (GameFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_game);
+                    if(game != null){
+                        game.startGameAfterLoad();
+                    }
+                }
             }
 
             if(db.isOpen()){

@@ -114,7 +114,6 @@ public class GameFragment extends Fragment {
         if(activity != null) {
             if (args != null) {
                 gameIndex = args.getInt("game");
-                game = activity.masterSchedule.get(gameIndex);
             }
 
             activity.logGameStartedEvent(gameIndex);
@@ -149,9 +148,6 @@ public class GameFragment extends Fragment {
             tvIntentFoul = strategyView.findViewById(R.id.tv_foul);
             tbIntentFoul = strategyView.findViewById(R.id.foul_button);
 
-            homeScore.setText(getString(R.string.scores, game.getHomeScore()));
-            awayScore.setText(getString(R.string.scores, game.getAwayScore()));
-
             homeTO.setText(getString(R.string.timeout_left, 4));
             awayTO.setText(getString(R.string.timeout_left, 4));
 
@@ -166,13 +162,7 @@ public class GameFragment extends Fragment {
 
             callTimeFab = view.findViewById(R.id.time_fab);
             fab = view.findViewById(R.id.game_fab);
-            if (game.getHomeTeam().isPlayerControlled()) {
-                fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
-                callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
-            } else {
-                fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
-                callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
-            }
+
 
             recyclerView = (RecyclerView) inflater.inflate(R.layout.game_list_view, container, false);
             manager = new LinearLayoutManager(getContext());
@@ -193,20 +183,11 @@ public class GameFragment extends Fragment {
             gameSpeedBar.setProgress(gameSpeed);
 
             spinner = view.findViewById(R.id.game_spinner);
-            spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
-            spinner.setAdapter(spinnerAdapter);
-            spinner.setSelection(0, false);
-            spinner.setVisibility(View.INVISIBLE);
 
 
             rosterRecycler = gameRosterView.findViewById(R.id.roster_list);
             rosterManager = new LinearLayoutManager(getContext());
             rosterRecycler.setLayoutManager(rosterManager);
-
-            homeName = view.findViewById(R.id.home_team_name);
-            homeName.setText(game.getHomeTeam().getMascot());
-            awayName = view.findViewById(R.id.away_team_name);
-            awayName.setText(game.getAwayTeam().getMascot());
 
             posLabel = gameRosterView.findViewById(R.id.pos_label);
             label1 = gameRosterView.findViewById(R.id.label1);
@@ -214,14 +195,8 @@ public class GameFragment extends Fragment {
             label3 = gameRosterView.findViewById(R.id.label3);
             label4 = gameRosterView.findViewById(R.id.label4);
 
-            if (game.getHomeTeam().isPlayerControlled()) {
-                grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0, this);
-            } else {
-                grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0, this);
-            }
-
-            setClickListeners();
-            setStrategyView();
+            awayName = view.findViewById(R.id.away_team_name);
+            homeName = view.findViewById(R.id.home_team_name);
 
             setHasOptionsMenu(true);
 
@@ -233,20 +208,41 @@ public class GameFragment extends Fragment {
 
             showDeadBallAlerts = prefs.getBoolean(getString(R.string.shared_pref_alert_dead_ball), true);
 
-            if (gameAsync == null && !game.isInProgress()) {
-                loadedInProgress = false;
-                gameAsync = new SimGame();
-                gameAsync.execute();
-            } else if (game.isInProgress()) {
-                loadedInProgress = true;
-                dataAsync = new DataAsync();
-                dataAsync.execute("load");
-            }
+
             spinner.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.VISIBLE);
         }
 
         return view;
+    }
+
+    private void pregameViewSetup(){
+        homeScore.setText(getString(R.string.scores, game.getHomeScore()));
+        awayScore.setText(getString(R.string.scores, game.getAwayScore()));
+
+        homeName.setText(game.getHomeTeam().getMascot());
+        awayName.setText(game.getAwayTeam().getMascot());
+
+        if (game.getHomeTeam().isPlayerControlled()) {
+            grAdapter = new GameRosterAdapter(game.getHomeTeam().getPlayers(), 0, this);
+        } else {
+            grAdapter = new GameRosterAdapter(game.getAwayTeam().getPlayers(), 0, this);
+        }
+
+        if (game.getHomeTeam().isPlayerControlled()) {
+            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+            callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getHomeTeam().getColorLight())));
+        } else {
+            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
+            callTimeFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(game.getAwayTeam().getColorLight())));
+        }
+
+        spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getSpinnerList());
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(0, false);
+
+        setClickListeners();
+        setStrategyView();
     }
 
     @Override
@@ -288,16 +284,64 @@ public class GameFragment extends Fragment {
         super.onResume();
 
         if(isAdded() && activity != null) {
-            if (game == null) {
-                loadedInProgress = true;
-                dataAsync = new DataAsync();
-                dataAsync.execute("load");
-            } else if (gameAsync == null && dataAsync == null) {
-                gameAsync = new SimGame();
-                gameAsync.execute();
+            if (gameAsync == null) {
+                if (game == null) {
+                    if (activity.masterSchedule != null) {
+                        game = activity.masterSchedule.get(gameIndex);
+                        if (!game.isInProgress()) {
+                            loadedInProgress = false;
+                            gameAsync = new SimGame();
+                            gameAsync.execute();
+                        } else if (game.isInProgress()) {
+                            loadedInProgress = true;
+                            dataAsync = new DataAsync();
+                            dataAsync.execute("load");
+                        }
+                    } else {
+                        activity.loadData();
+                    }
+                } else if (!game.isInProgress()) {
+                    loadedInProgress = false;
+                    gameAsync = new SimGame();
+                    gameAsync.execute();
+                } else if (game.isInProgress()) {
+                    loadedInProgress = true;
+                    dataAsync = new DataAsync();
+                    dataAsync.execute("load");
+                }
             }
-
             activity.changeScreenToGameFragment();
+        }
+    }
+
+    public void startGameAfterLoad(){
+        if(isAdded() && activity != null) {
+            if (gameAsync == null) {
+                if (game == null) {
+                    if (activity.masterSchedule != null) {
+                        game = activity.masterSchedule.get(gameIndex);
+                        if (!game.isInProgress()) {
+                            loadedInProgress = false;
+                            gameAsync = new SimGame();
+                            gameAsync.execute();
+                        } else if (game.isInProgress()) {
+                            loadedInProgress = true;
+                            dataAsync = new DataAsync();
+                            dataAsync.execute("load");
+                        }
+                    } else {
+                        activity.loadData();
+                    }
+                } else if (!game.isInProgress()) {
+                    loadedInProgress = false;
+                    gameAsync = new SimGame();
+                    gameAsync.execute();
+                } else if (game.isInProgress()) {
+                    loadedInProgress = true;
+                    dataAsync = new DataAsync();
+                    dataAsync.execute("load");
+                }
+            }
         }
     }
 
@@ -346,6 +390,7 @@ public class GameFragment extends Fragment {
 
         @Override
         protected void onPreExecute(){
+            pregameViewSetup();
             if(!game.getIsInProgress()) {
                 game.setSavePlays(true);
                 game.preGameSetUp();
@@ -1511,6 +1556,7 @@ public class GameFragment extends Fragment {
     private void finishedLoading(){
         gameIsProperlyLoaded();
         if(isAdded()) {
+            pregameViewSetup();
             gameAsync = new SimGame();
             gameAsync.execute();
         }
