@@ -24,6 +24,10 @@ public class RosterFragment extends Fragment {
     private RecyclerView.LayoutManager manager;
 
     private FloatingActionButton confirmButton;
+    private MainActivity mainActivity;
+
+    private int confIndex;
+    private int teamId;
 
     public RosterFragment() {
         // Required empty public constructor
@@ -35,41 +39,55 @@ public class RosterFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_roster, container, false);
 
-        MainActivity mainActivity = (MainActivity)getActivity();
+        mainActivity = (MainActivity)getActivity();
 
         Bundle args = getArguments();
         if(args != null){
-            mainActivity.currentConference = mainActivity.conferences.get(args.getInt("conf"));
+            confIndex = args.getInt("conf");
+            teamId = args.getInt("team");
+        }
+
+        confirmButton = view.findViewById(R.id.confirm_roster_button);
+
+        recyclerView = view.findViewById(R.id.roster_list);
+        manager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(manager);
+
+        setupAdapter();
+
+        return view;
+    }
+
+    public void setupAdapter(){
+        if(mainActivity.conferences != null) {
+            mainActivity.currentConference = mainActivity.conferences.get(confIndex);
             for(Team t: mainActivity.currentConference.getTeams()){
-                if(t.getId() == args.getInt("team")){
+                if(t.getId() == teamId){
                     mainActivity.currentTeam = t;
                 }
             }
             mainActivity.actionBar.setTitle(mainActivity.currentTeam.getFullName());
             mainActivity.updateColors();
+
+            adapter = new RosterAdapter(mainActivity.currentTeam.getPlayers(), mainActivity.currentTeam.isPlayerControlled(), this);
+            recyclerView.setAdapter(adapter);
+
+            if (mainActivity.currentTeam.isPlayerControlled()) {
+                confirmButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(mainActivity.currentTeam.getColorLight())));
+                confirmButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mainActivity.currentTeam.makeSubs(((RosterAdapter) adapter).getSubs());
+                        adapter.notifyDataSetChanged();
+                        confirmButton.setVisibility(View.GONE);
+                    }
+                });
+
+            }
         }
-
-        recyclerView = view.findViewById(R.id.roster_list);
-        manager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(manager);
-        adapter = new RosterAdapter(mainActivity.currentTeam.getPlayers(), mainActivity.currentTeam.isPlayerControlled(), this);
-        recyclerView.setAdapter(adapter);
-
-        if(mainActivity.currentTeam.isPlayerControlled()){
-            confirmButton = view.findViewById(R.id.confirm_roster_button);
-            confirmButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(((MainActivity)getActivity()).currentTeam.getColorLight())));
-            confirmButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ((MainActivity)getActivity()).currentTeam.makeSubs(((RosterAdapter)adapter).getSubs());
-                    adapter.notifyDataSetChanged();
-                    confirmButton.setVisibility(View.GONE);
-                }
-            });
-
+        else{
+            mainActivity.loadData("load for roster");
         }
-
-        return view;
     }
 
     public void makeFABVisible(){

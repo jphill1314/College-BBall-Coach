@@ -51,41 +51,49 @@ public class StandingsFragment extends Fragment {
         confWL = view.findViewById(R.id.conf_wl);
 
         recyclerView = view.findViewById(R.id.standings_list);
-        recyclerView.setHasFixedSize(true);
-
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
 
-        adapter = new StandingAdapter(mainActivity.currentConference.getTeams(), mainActivity.conferences.indexOf(mainActivity.currentConference), getContext());
-        recyclerView.setAdapter(adapter);
-
         confNames = view.findViewById(R.id.conference_name);
-        names = new ArrayList<>();
-        int selection = 0;
-        for(int x = 0; x < mainActivity.conferences.size(); x++){
-            names.add(mainActivity.conferences.get(x).getName());
-            if(mainActivity.conferences.get(x).equals(mainActivity.currentConference)){
-                selection = x;
-            }
-        }
-        names.add("RPI Ranking");
-
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
-        confNames.setAdapter(spinnerAdapter);
-        confNames.setSelection(selection, false);
-        confNames.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                changeView(i);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        
+        setupAdapter();
 
         return view;
+    }
+
+    public void setupAdapter(){
+        if(mainActivity.currentConference != null && mainActivity.conferences != null){
+            adapter = new StandingAdapter(mainActivity.currentConference.getTeams(), mainActivity.conferences.indexOf(mainActivity.currentConference), getContext());
+            recyclerView.setAdapter(adapter);
+
+            names = new ArrayList<>();
+            int selection = 0;
+            for(int x = 0; x < mainActivity.conferences.size(); x++){
+                names.add(mainActivity.conferences.get(x).getName());
+                if(mainActivity.conferences.get(x).equals(mainActivity.currentConference)){
+                    selection = x;
+                }
+            }
+            names.add("RPI Ranking");
+
+            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
+            confNames.setAdapter(spinnerAdapter);
+            confNames.setSelection(selection, false);
+            confNames.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    changeView(i);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+        }
+        else{
+            mainActivity.loadData("load for standings");
+        }
     }
 
     private void changeView(int type){

@@ -298,7 +298,7 @@ public class GameFragment extends Fragment {
                             dataAsync.execute("load");
                         }
                     } else {
-                        activity.loadData();
+                        activity.loadData("load for game");
                     }
                 } else if (!game.isInProgress()) {
                     loadedInProgress = false;
@@ -330,7 +330,7 @@ public class GameFragment extends Fragment {
                             dataAsync.execute("load");
                         }
                     } else {
-                        activity.loadData();
+                        activity.loadData("load for game");
                     }
                 } else if (!game.isInProgress()) {
                     loadedInProgress = false;

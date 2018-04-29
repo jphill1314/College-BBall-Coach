@@ -69,24 +69,15 @@ public class ScheduleFragment extends Fragment {
         recyclerView = view.findViewById(R.id.schedule_list);
         manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-        adapter = new ScheduleAdapter(mainActivity.currentTeam.getSchedule(), mainActivity.currentTeam, this, 0);
-        currentView = 0;
-        recyclerView.setAdapter(adapter);
 
         nextAction = view.findViewById(R.id.adavance_fab);
+        nextAction.setVisibility(View.INVISIBLE);
         nextAction.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(mainActivity.currentTeam.getColorLight())));
 
         async = null;
-        updateUI();
 
-        nextAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                async = new SimAsync();
-                async.execute();
-                adapter.notifyDataSetChanged();
-            }
-        });
+        setupAdapter();
+        updateUI();
 
         return view;
     }
@@ -97,6 +88,28 @@ public class ScheduleFragment extends Fragment {
 
         if(async != null){
             async.cancel(true);
+        }
+    }
+
+    public void setupAdapter(){
+        if(mainActivity.currentTeam != null && mainActivity.currentTeam.getSchedule() != null) {
+            adapter = new ScheduleAdapter(mainActivity.currentTeam.getSchedule(), mainActivity.currentTeam, this, 0);
+            currentView = 0;
+            recyclerView.setAdapter(adapter);
+
+            nextAction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    async = new SimAsync();
+                    async.execute();
+                    adapter.notifyDataSetChanged();
+                }
+            });
+
+            nextAction.setVisibility(View.VISIBLE);
+        }
+        else{
+            mainActivity.loadData("load for schedule");
         }
     }
 

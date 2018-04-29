@@ -365,8 +365,8 @@ public class MainActivity extends AppCompatActivity {
         firebaseAnalytics.setCurrentScreen(this, "ScheduleFragment", "ScheduleFragment");
     }
 
-    public void loadData(){
-        new DataAsync().execute("load for game");
+    public void loadData(String type){
+        new DataAsync().execute(type);
     }
 
     private class DataAsync extends AsyncTask<String, String, String> {
@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings){
-            if(strings[0].equals("load") || strings[0].equals("load for game")){
+            if(strings[0].contains("load")){
                 if(db != null) {
                     if (!db.isOpen()) {
                         db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "basketballdb").build();
@@ -385,12 +385,19 @@ public class MainActivity extends AppCompatActivity {
                 }
                 loadData();
 
-                if(strings[0].equals("load")) {
-                    return "loaded";
-                }
-                else{
+                if(strings[0].equals("load for game")){
                     return "loaded for game";
                 }
+                else if(strings[0].equals("load for schedule")){
+                    return "loaded for schedule";
+                }
+                else if(strings[0].equals("load for roster")){
+                    return "loaded for roster";
+                }
+                else if(strings[0].equals("load for standings")){
+                    return "loaded for standings";
+                }
+                return "loaded";
             }
             else if(strings[0].equals("save")){
                 if(db != null) {
@@ -446,12 +453,34 @@ public class MainActivity extends AppCompatActivity {
                 if(result.equals("loaded for game")){
                     GameFragment game = (GameFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
                     if(game != null){
-                        Log.d("eh", "eh");
                         game.startGameAfterLoad();
                         currentTeam = getPlayerTeam();
                         currentConference = getPlayerConference();
                     }
-                    Log.d("eh", "end");
+                }
+                else if(result.equals("loaded for schedule")){
+                    ScheduleFragment schedule = (ScheduleFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+                    if(schedule != null){
+                        currentTeam = getPlayerTeam();
+                        currentConference = getPlayerConference();
+                        schedule.setupAdapter();
+                    }
+                }
+                else if(result.equals("loaded for roster")){
+                    RosterFragment roster = (RosterFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+                    if(roster != null){
+                        currentTeam = getPlayerTeam();
+                        currentConference = getPlayerConference();
+                        roster.setupAdapter();
+                    }
+                }
+                else if(result.equals("loaded for standings")){
+                    StandingsFragment standings = (StandingsFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+                    if(standings != null){
+                        currentTeam = getPlayerTeam();
+                        currentConference = getPlayerConference();
+                        standings.setupAdapter();
+                    }
                 }
                 else{
                     onDataAsyncFinish();
