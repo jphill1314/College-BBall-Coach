@@ -2,6 +2,10 @@
 
 An Android game that simulates the experience of being the head coach of a college basketball team.
 
+<a href='https://play.google.com/store/apps/details?id=com.coaching.jphil.collegebasketballcoach&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+
+![alt text][startScreen] ![alt text][createATeam] ![alt text][roster] ![alt text][plays] ![alt text][speech]
+
 (Note to the reader: I will be using ‘user’ to refer to the real person who is playing this game and ‘player’ to fictional in-game characters that comprise the basketball teams. Also, some knowledge of college basketball is assumed for discussions of the various elements of simulating a college basketball team.)
 
 ## Main Feature: Basketball Simulator
@@ -33,3 +37,9 @@ On the technology side, this project was fairly straight forward. Room was used 
 ## Future
 
 While I mentioned how I would like to improve the existing features of the game, there are some other ideas that I think would be good additions to the game. I would like to support women’s basketball as well. The only significant changes that this would require is changing the game simulator to also support quarters and have media timeouts and bonus free throws reflect this. A larger addition that I would like to add is giving each school a ‘personality.’ This would mean that different schools would have different levels of investment in their team. With higher financial investment, the user would be able to field a larger team, recruit more players at one time, and schedule more non-conference home games. Higher fan investment would give the user a greater home court advantage, but also place higher expectations on the team for on-court success. This could lead to a system in which the player (and other AI coaches) could be hired and fired by different schools. Another possible improvement would be to add an in-game tutorial.
+
+[startScreen]: https://github.com/jphill1314/College-BBall-Coach/Screenshots/startScreen.png
+[createATeam]: https://github.com/jphill1314/College-BBall-Coach/Screenshots/createATeam.png
+[roster]: https://github.com/jphill1314/College-BBall-Coach/Screenshots/roster.png
+[plays]: https://github.com/jphill1314/College-BBall-Coach/Screenshots/plays.png
+[speech]: https://github.com/jphill1314/College-BBall-Coach/Screenshots/speech.png
