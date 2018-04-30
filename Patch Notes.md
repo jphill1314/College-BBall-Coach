@@ -1,5 +1,9 @@
 # Patch Notes
 
+## 1.05
+Bug Fixes
+* Fixed issue that would cause the app to crash due to data not being loaded properly
+
 ## 1.04
 UI Changes
 * Added work around to prevent the game from becoming unplayable if a team's recruits fail to load
